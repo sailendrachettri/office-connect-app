@@ -33,7 +33,7 @@ const Sidebar = () => {
     <div className="w-full h-full flex flex-col bg-white">
 
       {/* Title */}
-      <h2 className="text-xl font-semibold px-4 py-3 border-b text-slate-800">
+      <h2 className="text-xl font-semibold px-4 py-[19px] border-b border-slate-200 text-slate-800">
         Office Connect
       </h2>
 
