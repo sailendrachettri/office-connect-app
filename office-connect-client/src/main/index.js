@@ -3,12 +3,31 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+
+ipcMain.on("window-minimize", () => {
+  BrowserWindow.getFocusedWindow().minimize();
+});
+
+ipcMain.on("window-maximize", () => {
+  const win = BrowserWindow.getFocusedWindow();
+  win.isMaximized() ? win.unmaximize() : win.maximize();
+});
+
+ipcMain.on("window-close", () => {
+  BrowserWindow.getFocusedWindow().close();
+});
+
+
 function createWindow() {
   // Create the browser window.
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
   const mainWindow = new BrowserWindow({
-  // fullscreen: true,
-   width,
+    autoHideMenuBar: true,
+    menuBarVisible: false,
+    frame: false,                
+    titleBarOverlay: false,  
+    // fullscreen: true,
+    width,
     height,
     show: false,
     autoHideMenuBar: true,
@@ -16,9 +35,10 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-       fontFamily: "Segoe UI Emoji, Noto Color Emoji, Apple Color Emoji"
+      fontFamily: 'Segoe UI Emoji, Noto Color Emoji, Apple Color Emoji'
     }
   })
+  mainWindow.setMenu(null);
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -29,21 +49,20 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  app.commandLine.appendSwitch("enable-font-antialiasing");
-  app.commandLine.appendSwitch("enable-color-correct-rendering");
-  app.commandLine.appendSwitch("disable-skia-runtime-opts");
-  app.commandLine.appendSwitch("enable-gpu-rasterization");
-  app.commandLine.appendSwitch("enable-zero-copy");
-  app.commandLine.appendSwitch("enable-blink-features", "ColorEmojiFont"); 
+  app.commandLine.appendSwitch('enable-font-antialiasing')
+  app.commandLine.appendSwitch('enable-color-correct-rendering')
+  app.commandLine.appendSwitch('disable-skia-runtime-opts')
+  app.commandLine.appendSwitch('enable-gpu-rasterization')
+  app.commandLine.appendSwitch('enable-zero-copy')
+  app.commandLine.appendSwitch('enable-blink-features', 'ColorEmojiFont')
 
-
-  mainWindow.webContents.on("did-finish-load", () => {
-  mainWindow.webContents.insertCSS(`
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.insertCSS(`
     * {
       font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif !important;
     }
-  `);
-});
+  `)
+  })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.

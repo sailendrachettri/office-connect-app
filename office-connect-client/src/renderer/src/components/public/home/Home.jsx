@@ -7,11 +7,27 @@ import UserRegister from '../../common/UserRegister'
 import LoginUser from '../../common/LoginUser'
 
 const Home = () => {
-   const [isLoggedIn, setIsLoggedIn] = useState(false);  
-  const [showLogin, setShowLogin] = useState(true);     
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [showLogin, setShowLogin] = useState(true)
 
   return (
     <>
+      <div className="w-full h-10 bg-ternary text-slate-700 flex items-center px-4 select-none drag-region">
+        {/* <div className="text-sm font-medium">Office Connect</div> */}
+
+        <div className="ml-auto flex gap-3 no-drag">
+          <button onClick={() => window.api.minimize()} className="px-3 cursor-pointer hover:bg-slate-50 rounded-sm">
+            —
+          </button>
+          <button onClick={() => window.api.maximize()} className="px-3 cursor-pointer hover:bg-slate-50 rounded-sm">
+            ▢
+          </button>
+          <button onClick={() => window.api.close()} className="px-3 hover:bg-red-600 hover:text-slate-300 cursor-pointer rounded-sm">
+            ✕
+          </button>
+        </div>
+      </div>
+
       {isLoggedIn ? (
         <div className="w-screen h-screen overflow-hidden bg-gray-100 flex">
           {/* LEFT VERTICAL MENU */}
@@ -40,15 +56,9 @@ const Home = () => {
       ) : (
         <>
           {showLogin ? (
-            <LoginUser
-             setShowLogin={setShowLogin}
-             setIsLoggedIn={setIsLoggedIn}
-            />
+            <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
           ) : (
-            <UserRegister
-              setShowLogin={setShowLogin}
-             setIsLoggedIn={setIsLoggedIn}
-            />
+            <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
           )}
         </>
       )}
