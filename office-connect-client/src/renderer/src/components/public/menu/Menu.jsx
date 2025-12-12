@@ -1,8 +1,12 @@
-import React from 'react'
+import { BsChatLeftDots } from 'react-icons/bs'
 
 const Menu = () => {
   return (
-    <div>Menu</div>
+    <div>
+      <div>
+        <BsChatLeftDots />
+      </div>
+    </div>
   )
 }
 

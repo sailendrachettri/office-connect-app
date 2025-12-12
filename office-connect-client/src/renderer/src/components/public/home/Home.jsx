@@ -14,7 +14,7 @@ const Home = () => {
         </div>
 
         {/* LEFT SIDEBAR (CHAT LIST) */}
-        <div className="w-[320px] bg-white border-r border-gray-200">
+        <div className="w-[420px] bg-white border-r border-gray-200">
           <Sidebar />
         </div>
 
