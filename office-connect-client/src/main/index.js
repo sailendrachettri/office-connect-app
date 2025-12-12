@@ -15,7 +15,8 @@ function createWindow() {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+       fontFamily: "Segoe UI Emoji, Noto Color Emoji, Apple Color Emoji"
     }
   })
 
@@ -27,6 +28,22 @@ function createWindow() {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  app.commandLine.appendSwitch("enable-font-antialiasing");
+  app.commandLine.appendSwitch("enable-color-correct-rendering");
+  app.commandLine.appendSwitch("disable-skia-runtime-opts");
+  app.commandLine.appendSwitch("enable-gpu-rasterization");
+  app.commandLine.appendSwitch("enable-zero-copy");
+  app.commandLine.appendSwitch("enable-blink-features", "ColorEmojiFont"); 
+
+
+  mainWindow.webContents.on("did-finish-load", () => {
+  mainWindow.webContents.insertCSS(`
+    * {
+      font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", sans-serif !important;
+    }
+  `);
+});
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
