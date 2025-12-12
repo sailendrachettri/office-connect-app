@@ -9,7 +9,7 @@ const Home = () => {
     <>
       <div className="w-screen h-screen overflow-hidden bg-gray-100 flex">
         {/* LEFT VERTICAL MENU */}
-        <div className="w-[70px] bg-gray-900 text-white flex flex-col items-center py-4 gap-6 p-1">
+        <div className="w-[70px] bg-slate-50 border border-slate-200 flex flex-col items-center py-4 gap-6 p-1">
           <Menu />
         </div>
 

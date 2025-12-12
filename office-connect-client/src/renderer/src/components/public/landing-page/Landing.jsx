@@ -1,4 +1,8 @@
 import React from "react";
+import { BsCheck2All } from "react-icons/bs";
+import { PiCheck } from "react-icons/pi";
+
+
 
 const Landing = () => {
   // message.status → "sent" | "delivered" | "read"
@@ -55,24 +59,24 @@ const Landing = () => {
 
     // Blue double check (Read)
     if (status === "read") {
-      return <span className="text-blue-500 ml-1 text-xs">✓✓</span>;
+      return <span className="text-green-300 ml-1 text-xs"><BsCheck2All size={21} /></span>;
     }
 
     // Gray double check (Delivered)
     if (status === "delivered") {
-      return <span className="text-slate-400 ml-1 text-xs">✓✓</span>;
+      return <span className="text-slate-200 ml-1 text-xs"><BsCheck2All size={21} /></span>;
     }
 
     // Single gray check (Sent)
     if (status === "sent") {
-      return <span className="text-slate-400 ml-1 text-xs">✓</span>;
+      return <span className="text-slate-200 ml-1 text-xs"><PiCheck size={21} /></span>;
     }
 
     return null;
   };
 
   return (
-    <div className="h-full w-full bg-gray-50 p-4 flex flex-col justify-end overflow-y-auto">
+    <div className="h-full w-full bg-slate-50 p-4 flex flex-col justify-end overflow-y-auto">
 
       <div className="flex flex-col gap-3">
 
@@ -84,7 +88,7 @@ const Landing = () => {
             <div
               className={`max-w-xs px-4 py-2 rounded-xl shadow-sm text-sm ${
                 msg.fromMe
-                  ? "bg-green-500 text-white rounded-br-none"
+                  ? "bg-primary text-white rounded-br-none"
                   : "bg-white text-slate-900 border rounded-bl-none"
               }`}
             >
@@ -92,7 +96,7 @@ const Landing = () => {
 
               {/* Time + Status */}
               <span
-                className={`text-xs flex justify-end items-center gap-1 mt-1 ${
+                className={` text-xs flex justify-end items-center gap-1 mt-1 ${
                   msg.fromMe ? "text-green-100" : "text-slate-500"
                 }`}
               >

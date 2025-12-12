@@ -2,7 +2,7 @@ import React from "react";
 import { IoSearch } from "react-icons/io5";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import profilePic from "../../../assets/peoples/asmi_passphoto.jpeg";
+import profilePic from "../../../assets/peoples/default_user.jpg";
 
 const Headers = () => {
   return (

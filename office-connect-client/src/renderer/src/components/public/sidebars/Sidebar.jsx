@@ -1,4 +1,4 @@
-import profilePic from "../../../assets/peoples/asmi_passphoto.jpeg";
+import profilePic from "../../../assets/peoples/default_user.jpg";
 
 
 const Sidebar = () => {
@@ -33,7 +33,7 @@ const Sidebar = () => {
     <div className="w-full h-full flex flex-col bg-white">
 
       {/* Title */}
-      <h2 className="text-xl font-semibold px-4 py-[19px] border-b border-slate-200 text-slate-800">
+      <h2 className="text-xl font-semibold px-4 py-4.75 border-b border-slate-200 text-primary">
         Office Connect
       </h2>
 
@@ -74,7 +74,7 @@ const Sidebar = () => {
               <div className="text-xs text-slate-500">{user.time}</div>
 
               {user.unread > 0 && (
-                <div className="mt-1 bg-blue-600 text-white text-xs px-2 py-[2px] rounded-full inline-block">
+                <div className="mt-1 bg-primary text-white text-xs px-2 py-[2px] rounded-full inline-block">
                   {user.unread}
                 </div>
               )}
