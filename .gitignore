@@ -7,6 +7,9 @@ obj/
 out/
 **/bin/
 **/obj/
+.github
+.github/
+build
 
 # .NET Core
 *.user
