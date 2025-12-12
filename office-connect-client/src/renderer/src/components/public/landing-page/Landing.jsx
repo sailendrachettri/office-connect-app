@@ -79,7 +79,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="h-full w-full bg-slate-50 p-4 flex flex-col justify-between">
+    <div className="h-full w-full  p-4 flex flex-col justify-between">
 
       {/* CHAT AREA */}
       <div className="flex flex-col gap-3 overflow-y-auto mb-4 h-[85vh] pr-2">

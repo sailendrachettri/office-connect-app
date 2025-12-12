@@ -12,7 +12,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="w-full h-10 bg-ternary text-slate-700 flex items-center px-4 select-none drag-region">
+      <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-4 select-none drag-region">
         {/* <div className="text-sm font-medium">Office Connect</div> */}
 
         <div className="ml-auto flex gap-3 no-drag">
@@ -48,7 +48,7 @@ const Home = () => {
             </div>
 
             {/* CHAT BODY */}
-            <div className="flex-1 overflow-y-auto bg-gray-50">
+            <div className="flex-1 max-h-[88vh] overflow-y-auto ">
               <Landing />
             </div>
           </div>

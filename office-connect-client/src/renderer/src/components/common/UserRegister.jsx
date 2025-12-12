@@ -36,7 +36,7 @@ const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
 
         {/* RIGHT SIDE FORM */}
         <div className="w-full md:w-1/2 p-8 bg-white">
-          <h2 className="text-3xl font-semibold text-slate-700 mb-3">Create New Account</h2>
+          <h2 className="text-3xl font-semibold text-primary mb-3">Create New Account</h2>
           <p className="text-slate-500 mb-6 text-sm">
             Register your profile to access the messaging system.
           </p>
@@ -110,7 +110,7 @@ const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-slate-800 text-white py-3 rounded-lg hover:bg-slate-900 transition font-medium shadow"
+              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 cursor-pointer transition font-medium shadow"
             >
               Register User
             </button>

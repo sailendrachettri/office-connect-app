@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaEnvelope, FaLock } from "react-icons/fa";
-import banner from "../../assets/svgs/banner.svg";
+import banner from "../../assets/svgs/banner_login.svg";
 
 const LoginUser = ({setShowLogin, setIsLoggedIn}) => {
 const [form, setForm] = useState({
@@ -25,12 +25,12 @@ const [form, setForm] = useState({
 
         {/* LEFT SIDE SVG */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
-          <img src={banner} alt="Banner" className="w-80 drop-shadow-xl" />
+          <img src={banner} alt="Banner" className="w-80 drop-shadow-xl scale-x-[-1]" />
         </div>
 
         {/* RIGHT SIDE LOGIN FORM */}
         <div className="w-full md:w-1/2 p-8 bg-white">
-          <h2 className="text-3xl font-semibold text-slate-700 mb-3">Welcome Back</h2>
+          <h2 className="text-3xl font-semibold text-primary mb-3">Welcome Back</h2>
           <p className="text-slate-500 mb-6 text-sm">
             Login to access your messaging dashboard.
           </p>
@@ -73,7 +73,7 @@ const [form, setForm] = useState({
             {/* Login Button */} 
             <button
               type="submit"
-              className="w-full bg-slate-800 text-white py-3 rounded-lg hover:bg-slate-900 transition font-medium shadow"
+              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 cursor-pointer transition font-medium shadow"
             >
               Login
             </button>
