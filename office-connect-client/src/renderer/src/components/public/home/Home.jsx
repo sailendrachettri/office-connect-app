@@ -7,7 +7,7 @@ import UserRegister from '../../common/UserRegister'
 import LoginUser from '../../common/LoginUser'
 
 const Home = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
   const [showLogin, setShowLogin] = useState(true)
 
   return (
