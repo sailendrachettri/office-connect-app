@@ -3,7 +3,7 @@ import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa'
 import { MdOutlinePhotoCamera } from 'react-icons/md'
 import banner from '../../assets/svgs/banner.svg'
 
-const UserRegister = () => {
+const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -23,6 +23,7 @@ const UserRegister = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Form Data:', form)
+    setIsLoggedIn(true);
   }
 
   return (
@@ -117,7 +118,7 @@ const UserRegister = () => {
 
           <p className="text-center text-slate-500 text-sm mt-5">
             Already have an account?{' '}
-            <span className="text-slate-800 font-medium cursor-pointer hover:underline">Login</span>
+            <span onClick={()=>setShowLogin(true)} className="text-slate-800 font-medium cursor-pointer hover:underline">Login</span>
           </p>
         </div>
       </div>

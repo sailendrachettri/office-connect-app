@@ -4,13 +4,15 @@ import Sidebar from '../sidebars/Sidebar'
 import Headers from '../headers/Headers'
 import Landing from '../landing-page/Landing'
 import UserRegister from '../../common/UserRegister'
+import LoginUser from '../../common/LoginUser'
 
 const Home = () => {
-  const [userAlreadyRegister, setUserAlreadyRegister] = useState(false)
+   const [isLoggedIn, setIsLoggedIn] = useState(false);  
+  const [showLogin, setShowLogin] = useState(true);     
 
   return (
     <>
-      {userAlreadyRegister ? (
+      {isLoggedIn ? (
         <div className="w-screen h-screen overflow-hidden bg-gray-100 flex">
           {/* LEFT VERTICAL MENU */}
           <div className="w-[70px] bg-slate-50 border border-slate-200 flex flex-col items-center py-4 gap-6 p-1">
@@ -36,9 +38,19 @@ const Home = () => {
           </div>
         </div>
       ) : (
-        <div>
-          <UserRegister />
-        </div>
+        <>
+          {showLogin ? (
+            <LoginUser
+             setShowLogin={setShowLogin}
+             setIsLoggedIn={setIsLoggedIn}
+            />
+          ) : (
+            <UserRegister
+              setShowLogin={setShowLogin}
+             setIsLoggedIn={setIsLoggedIn}
+            />
+          )}
+        </>
       )}
     </>
   )
