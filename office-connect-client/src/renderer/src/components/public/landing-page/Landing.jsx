@@ -88,8 +88,8 @@ const Landing = () => {
             <div
               className={`max-w-xs px-4 py-2 rounded-xl shadow-sm text-sm ${
                 msg.fromMe
-                  ? "bg-primary text-white rounded-br-none"
-                  : "bg-white text-slate-900 border rounded-bl-none"
+                  ? "bg-primary text-white border-slate-300 rounded-br-none"
+                  : "bg-white text-slate-700 border-slate-300  border rounded-bl-none"
               }`}
             >
               <p>{msg.text}</p>
