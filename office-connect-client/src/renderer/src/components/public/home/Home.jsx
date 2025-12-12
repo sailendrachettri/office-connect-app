@@ -12,6 +12,7 @@ const Home = () => {
 
   return (
     <>
+    {/* Icons to minimize, fullscreen and close */}
       <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-4 select-none drag-region">
         {/* <div className="text-sm font-medium">Office Connect</div> */}
 
@@ -32,12 +33,12 @@ const Home = () => {
         <div className="w-screen h-screen overflow-hidden bg-gray-100 flex">
           {/* LEFT VERTICAL MENU */}
           <div className="w-[70px] bg-slate-50 border border-slate-200 flex flex-col items-center py-4 gap-6 p-1">
-            <Menu />
+            <Menu setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
           </div>
 
           {/* LEFT SIDEBAR (CHAT LIST) */}
           <div className="w-[420px] bg-white border-r border-slate-200 p-1">
-            <Sidebar />
+            <Sidebar setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
           </div>
 
           {/* RIGHT MAIN CHAT AREA */}
