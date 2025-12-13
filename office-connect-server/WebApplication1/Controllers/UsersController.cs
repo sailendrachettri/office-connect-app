@@ -4,6 +4,7 @@ using OfficeConnectServer.Data;
 using OfficeConnectServer.Models;
 using OfficeConnectServer.Responses;
 using System.Text.Json;
+using OfficeConnectServer.Helpers;
 
 namespace OfficeConnectServer.Controllers
 {
@@ -21,6 +22,8 @@ namespace OfficeConnectServer.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] UserCreateRequest req)
         {
+            string hashedPassword = PasswordHelper.HashPassword(req.Password);
+
             try
             {
                 const string sql = @"
@@ -42,7 +45,7 @@ namespace OfficeConnectServer.Controllers
              cmd.Parameters.AddWithValue("full_name_i", req.FullName);
              cmd.Parameters.AddWithValue("mobile_i", req.Mobile);
              cmd.Parameters.AddWithValue("email_i", req.Email);
-             cmd.Parameters.AddWithValue("password_hash_i", req.PasswordHash);
+             cmd.Parameters.AddWithValue("password_hash_i", hashedPassword);
              cmd.Parameters.AddWithValue("profile_image_i", (object?)req.ProfileImage ?? DBNull.Value);
          }
      );
