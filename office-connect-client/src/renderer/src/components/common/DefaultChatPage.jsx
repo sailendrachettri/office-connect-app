@@ -6,7 +6,7 @@ import { RiShieldCheckLine } from 'react-icons/ri'
 
 const DefaultChatPage = () => {
   return (
-    <div className="flex-1 h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="flex-1 h-full flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100">
       <div className="max-w-xl text-center px-6">
         {/* SVG / Illustration Placeholder */}
         <div className="mb-6 flex justify-center">

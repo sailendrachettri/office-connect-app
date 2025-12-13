@@ -71,8 +71,8 @@ const Home = () => {
                 {/* CHAT AREA */}
                 <div className="flex-1 flex flex-col">
                   {/* HEADER */}
-                  <div className="h-[70px] bg-white border-b border-slate-200 shadow-sm px-4 flex items-center">
-                    <Headers />
+                  <div className="h-[70px] bg-linear-to-t from-slate-50 to-slate-100">
+                    <Headers selectedUsersProfileId={selectedUsersProfileId}/>
                   </div>
 
                   {/* BODY */}
