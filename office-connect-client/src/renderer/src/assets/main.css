@@ -17,9 +17,31 @@ html, body, #root {
   -webkit-app-region: no-drag;
 }
 
-
+/*---------------------------------------- Tailwind CSS---------------------------------------- */
 @theme {
   --color-primary: #6f9eea;
   --color-secondary: #262751;
   --color-ternary: #fffeff;
+}
+
+
+/* ---------------------------------Scroll Bar--------------------------------- */
+.custom-scroll {
+  overflow-y: auto;
+}
+
+/* WebKit */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 9999px;
+}
+
+/* Firefox */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af transparent;
 }

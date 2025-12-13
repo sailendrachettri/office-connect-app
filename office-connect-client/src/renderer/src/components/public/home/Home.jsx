@@ -9,6 +9,7 @@ import LoginUser from '../../common/LoginUser'
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true)
   const [showLogin, setShowLogin] = useState(true)
+  const [selectedUsersProfileId, setSelectedUsersProfileId] = useState(null);
 
   return (
     <>
@@ -38,7 +39,7 @@ const Home = () => {
 
           {/* LEFT SIDEBAR (CHAT LIST) */}
           <div className="w-[420px] bg-white border-r border-slate-200 p-1">
-            <Sidebar setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+            <Sidebar setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} setSelectedUsersProfileId={setSelectedUsersProfileId} />
           </div>
 
           {/* RIGHT MAIN CHAT AREA */}
@@ -50,7 +51,7 @@ const Home = () => {
 
             {/* CHAT BODY */}
             <div className="flex-1 max-h-[88vh] overflow-y-auto ">
-              <Landing />
+              <Landing selectedUsersProfileId={selectedUsersProfileId} />
             </div>
           </div>
         </div>
