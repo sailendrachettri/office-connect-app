@@ -28,7 +28,6 @@ namespace OfficeConnectServer.Controllers
             {
                 const string sql = @"
                     SELECT add_user_create(
-                        @user_name_i,
                         @full_name_i,
                         @mobile_i,
                         @email_i,
@@ -40,8 +39,7 @@ namespace OfficeConnectServer.Controllers
                 var json = await _db.ExecuteScalarAsync<string>(
          sql,
          cmd =>
-         {
-             cmd.Parameters.AddWithValue("user_name_i", req.UserName);
+         {  
              cmd.Parameters.AddWithValue("full_name_i", req.FullName);
              cmd.Parameters.AddWithValue("mobile_i", req.Mobile);
              cmd.Parameters.AddWithValue("email_i", req.Email);

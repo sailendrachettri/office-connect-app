@@ -4,8 +4,11 @@ import { MdOutlinePhotoCamera } from 'react-icons/md'
 import banner from '../../assets/svgs/banner.svg'
 import { axiosInstance } from '../../api/api'
 import { REGISTER_USER_URL } from '../../api/routes_urls'
+import toast from 'react-hot-toast'
 
 const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -23,22 +26,30 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   }
 
   const handleSubmit = async (e) => {
+    setLoading(true);
+
     try {
       e.preventDefault()
       console.log('Form Data:', form)
       const payload = {
-        UserName: '1',
-        FullName: '1',
-        Mobile: '1',
-        Email: '1',
-        Password: '1',
-        ProfileImage: '1'
+        FullName: form?.fullName || null,
+        Mobile: form?.phone || null,
+        Email: form?.email || null,
+        Password: form?.password || null,
+        ProfileImage: form?.profile || null
       }
       console.log(payload)
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
       console.log(" res", res);
-      setIsLoggedIn(true)
-    } catch (error) {}
+      if(res?.data?.success == true && res?.status == 200){
+        toast.success(res?.data?.message || "User registered successful!");
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.error("Not able to create user", error);
+    }finally{
+      setLoading(false);
+    }
   }
 
   return (
@@ -124,10 +135,11 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
 
             {/* Submit Button */}
             <button
+            disabled={loading? 'disable' : ''}
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 cursor-pointer transition font-medium shadow"
+              className={`w-full ${loading ? ' bg-slate-500 text-slate-300 cursor-not-allowed' : ' bg-primary text-white hover:bg-primary/90'}  py-3 rounded-lg cursor-pointer transition font-medium shadow`}
             >
-              Register User
+              {loading ? 'Registering, Please wait...' : 'Register User'}
             </button>
           </form>
 
