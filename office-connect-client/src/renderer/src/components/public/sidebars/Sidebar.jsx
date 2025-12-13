@@ -167,7 +167,7 @@ const Sidebar = ({setSelectedUsersProfileId}) => {
 
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-white pb-10">
 
       {/* Title */}
       <h2 className="text-xl font-semibold px-4 py-4.75 border-b border-slate-200 text-primary">

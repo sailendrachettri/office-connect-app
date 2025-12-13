@@ -34,8 +34,8 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
       <div className="relative">
         {/* Settings icon */}
         <div
-          onClick={() => {setOpen(!open); setSelectedTab('settings')}}
-          className={`rounded-full  ${selectedTab == 'settings' ? ' bg-ternary' : 'bg-slate-100'} p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
+          onClick={() => {setOpen(!open); }}
+          className={`rounded-full p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
         >
           <IoSettingsOutline size={22} />
         </div>
