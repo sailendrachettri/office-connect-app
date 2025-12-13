@@ -3,20 +3,18 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+ipcMain.on('window-minimize', () => {
+  BrowserWindow.getFocusedWindow().minimize()
+})
 
-ipcMain.on("window-minimize", () => {
-  BrowserWindow.getFocusedWindow().minimize();
-});
+ipcMain.on('window-maximize', () => {
+  const win = BrowserWindow.getFocusedWindow()
+  win.isMaximized() ? win.unmaximize() : win.maximize()
+})
 
-ipcMain.on("window-maximize", () => {
-  const win = BrowserWindow.getFocusedWindow();
-  win.isMaximized() ? win.unmaximize() : win.maximize();
-});
-
-ipcMain.on("window-close", () => {
-  BrowserWindow.getFocusedWindow().close();
-});
-
+ipcMain.on('window-close', () => {
+  BrowserWindow.getFocusedWindow().close()
+})
 
 function createWindow() {
   // Create the browser window.
@@ -24,8 +22,8 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     autoHideMenuBar: true,
     menuBarVisible: false,
-    frame: false,                
-    titleBarOverlay: false,  
+    frame: false,
+    titleBarOverlay: false,
     // fullscreen: true,
     width,
     height,
@@ -35,10 +33,10 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      fontFamily: 'Segoe UI Emoji, Noto Color Emoji, Apple Color Emoji'
+      webSecurity: false
     }
   })
-  mainWindow.setMenu(null);
+  mainWindow.setMenu(null)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

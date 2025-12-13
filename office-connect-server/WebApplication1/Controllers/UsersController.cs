@@ -9,7 +9,7 @@ using OfficeConnectServer.Helpers;
 namespace OfficeConnectServer.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/v1/users")]
     public class UsersController : ControllerBase
     {
         private readonly DbHelper _db;

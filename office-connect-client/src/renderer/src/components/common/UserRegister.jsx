@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa'
 import { MdOutlinePhotoCamera } from 'react-icons/md'
 import banner from '../../assets/svgs/banner.svg'
+import { axiosInstance } from '../../api/api'
+import { REGISTER_USER_URL } from '../../api/routes_urls'
 
-const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
+const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -20,10 +22,23 @@ const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
     setForm({ ...form, profile: e.target.files[0] })
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form Data:', form)
-    setIsLoggedIn(true);
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault()
+      console.log('Form Data:', form)
+      const payload = {
+        UserName: '1',
+        FullName: '1',
+        Mobile: '1',
+        Email: '1',
+        Password: '1',
+        ProfileImage: '1'
+      }
+      console.log(payload)
+      const res = await axiosInstance.post(REGISTER_USER_URL, payload)
+      console.log(" res", res);
+      setIsLoggedIn(true)
+    } catch (error) {}
   }
 
   return (
@@ -118,7 +133,12 @@ const UserRegister = ({setShowLogin, setIsLoggedIn}) => {
 
           <p className="text-center text-slate-500 text-sm mt-5">
             Already have an account?{' '}
-            <span onClick={()=>setShowLogin(true)} className="text-slate-800 font-medium cursor-pointer hover:underline">Login</span>
+            <span
+              onClick={() => setShowLogin(true)}
+              className="text-slate-800 font-medium cursor-pointer hover:underline"
+            >
+              Login
+            </span>
           </p>
         </div>
       </div>

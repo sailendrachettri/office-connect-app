@@ -3,6 +3,18 @@ using OfficeConnectServer.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowViteDevServer", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173") 
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
 // Configure Kestrel BEFORE Build()
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -24,6 +36,8 @@ builder.Services.AddScoped<DbConnectionFactory>();
 builder.Services.AddScoped<DbHelper>();
 
 var app = builder.Build();
+
+app.UseCors("AllowViteDevServer");
 
 // Middleware
 if (app.Environment.IsDevelopment())

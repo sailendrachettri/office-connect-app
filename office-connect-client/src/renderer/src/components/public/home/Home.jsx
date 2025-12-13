@@ -8,8 +8,8 @@ import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
 
 const Home = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-  const [showLogin, setShowLogin] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
   const [selectedUsersProfileId, setSelectedUsersProfileId] = useState(null)
   const [selectedTab, setSelectedTab] = useState('chat');
  
