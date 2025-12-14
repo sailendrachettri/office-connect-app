@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { SEARCH_FRIEND_URL } from '../../api/routes_urls'
-import { axiosInstance } from '../../api/api'
+import { SEARCH_FRIEND_URL, SEND_FRIEND_REQUEST_URL } from '../../api/routes_urls'
+import { axiosInstance, axiosPrivate } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 
 const FriendsSection = ({ userId }) => {
@@ -36,6 +36,10 @@ const FriendsSection = ({ userId }) => {
 
   const sendFriendRequest = async(user)=>{
     console.log(user)
+    const payload = {
+      ReceiverId: user?.user_id
+    }
+    const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload);
   }
 
   return (

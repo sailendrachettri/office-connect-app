@@ -1,31 +1,37 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt; // ✅ needed
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace OfficeConnectServer.Helpers
 {
-    public static class JwtTokenHelper
+    public class JwtTokenHelper
     {
-        private static readonly string SecretKey = "YourSuperSecureSecretKeyHere!ChangeIt"; // store in appsettings
-        private static readonly string Issuer = "OfficeConnectServer";
-        private static readonly string Audience = "OfficeConnectClient";
+        private readonly IConfiguration _config;
 
-        public static string GenerateToken(Guid userId, int expireMinutes = 60)
+        public JwtTokenHelper(IConfiguration config)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+            _config = config;
+        }
+
+        public string GenerateToken(Guid userId, int expireMinutes = 60)
+        {
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+            );
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim("userId", userId.ToString())
             };
 
             var token = new JwtSecurityToken(
-                issuer: Issuer,
-                audience: Audience,
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(expireMinutes),
                 signingCredentials: creds
@@ -34,12 +40,11 @@ namespace OfficeConnectServer.Helpers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public static ClaimsPrincipal? ValidateToken(string token)
+        public ClaimsPrincipal? ValidateToken(string token)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(SecretKey);
 
                 var validationParameters = new TokenValidationParameters
                 {
@@ -47,12 +52,23 @@ namespace OfficeConnectServer.Helpers
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Issuer,
-                    ValidAudience = Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+
+                    ValidIssuer = _config["Jwt:Issuer"],
+                    ValidAudience = _config["Jwt:Audience"],
+
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
+                    ),
+
+                    ClockSkew = TimeSpan.Zero
                 };
 
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                var principal = tokenHandler.ValidateToken(
+                    token,
+                    validationParameters,
+                    out _
+                );
+
                 return principal;
             }
             catch

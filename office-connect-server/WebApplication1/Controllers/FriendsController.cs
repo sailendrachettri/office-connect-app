@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OfficeConnectServer.Models;
 using OfficeConnectServer.Responses;
 using System.Text.Json;
@@ -15,6 +16,69 @@ namespace OfficeConnectServer.Controllers
         {
             _db = db;
         }
+
+
+        [Authorize]
+        [HttpPost("send-request")]
+        public async Task<IActionResult> SendFriendRequest(
+            [FromBody] SendFriendRequestModel req
+        )
+        {
+            if (req.ReceiverId == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>(
+                    false,
+                    "Invalid receiver",
+                    null!
+                ));
+            }
+
+            var senderObj = HttpContext.Items["UserId"];
+            if (senderObj == null)
+            {
+                return Unauthorized(new ApiResponse<string>(
+                    false,
+                    "Unauthorized",
+                    null!
+                ));
+            }
+
+            var senderId = (Guid)senderObj;
+
+            try
+            {
+                const string sql = @"
+                    SELECT send_friend_request(
+                        @sender_id,
+                        @receiver_id
+                    );
+                ";
+
+                var result = await _db.ExecuteScalarAsync<string>(
+                    sql,
+                    cmd =>
+                    {
+                        cmd.Parameters.AddWithValue("sender_id", senderId);
+                        cmd.Parameters.AddWithValue("receiver_id", req.ReceiverId);
+                    }
+                );
+
+                return Ok(new ApiResponse<string>(
+                    true,
+                    result,
+                    null!
+                ));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    ex.Message,
+                    null!
+                ));
+            }
+        }
+    
 
         [HttpPost("search")]
         public async Task<IActionResult> SearchUsersForFriend(

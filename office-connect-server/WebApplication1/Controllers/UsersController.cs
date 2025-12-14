@@ -12,10 +12,12 @@ namespace OfficeConnectServer.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DbHelper _db;
+        private readonly JwtTokenHelper _jwt;
 
-        public UsersController(DbHelper db)
+        public UsersController(DbHelper db, JwtTokenHelper jwt)
         {
             _db = db;
+            _jwt = jwt;
         }
 
         [HttpPost("refresh-token")]
@@ -26,19 +28,26 @@ namespace OfficeConnectServer.Controllers
         WHERE refresh_token = @refresh_token AND expires_at > NOW();
     ";
 
-            var userId = await _db.ExecuteScalarAsync<Guid?>(sql, cmd => {
+            var userId = await _db.ExecuteScalarAsync<Guid?>(sql, cmd =>
+            {
                 cmd.Parameters.AddWithValue("refresh_token", req.RefreshToken);
             });
 
             if (userId == null)
                 return Unauthorized(new ApiResponse<string>(false, "Invalid refresh token", null!));
 
-            string newAccessToken = JwtTokenHelper.GenerateToken(userId.Value, expireMinutes: 60);
-            return Ok(new ApiResponse<object>(true, "Token refreshed", new { accessToken = newAccessToken }));
+            string newAccessToken = _jwt.GenerateToken(userId.Value, 60);
+
+            return Ok(new ApiResponse<object>(
+                true,
+                "Token refreshed",
+                new { accessToken = newAccessToken }
+            ));
         }
 
 
-                
+
+
         [HttpPost("details-by-id")]
         public async Task<IActionResult> GetUserDetails(
     [FromBody] GetUserDetailsRequest req
@@ -119,14 +128,15 @@ namespace OfficeConnectServer.Controllers
                     return Unauthorized(new ApiResponse<string>(false, "Invalid password", null!));
 
                 Guid userId = result.GetProperty("user_id").GetGuid();
-                string accessToken = JwtTokenHelper.GenerateToken(userId, expireMinutes: 60); // 1 hour
-                string refreshToken = JwtTokenHelper.GenerateToken(userId, expireMinutes: 1440); // 1 day
+
+                string accessToken = _jwt.GenerateToken(userId, 60);
+                string refreshToken = _jwt.GenerateToken(userId, 1440);
 
                 var data = new LoginResponseDto
                 {
                     UserId = userId,
-                    AccessToken = JwtTokenHelper.GenerateToken(userId, expireMinutes: 60),
-                    RefreshToken = JwtTokenHelper.GenerateToken(userId, expireMinutes: 1440)
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
                 };
 
                 return Ok(new ApiResponse<LoginResponseDto>(
@@ -190,9 +200,8 @@ namespace OfficeConnectServer.Controllers
 
                 Guid userId = result.GetProperty("user_id").GetGuid();
 
-                // Generate tokens
-                string accessToken = JwtTokenHelper.GenerateToken(userId, 60);
-                string refreshToken = JwtTokenHelper.GenerateToken(userId, 1440);
+                string accessToken = _jwt.GenerateToken(userId, 60);
+                string refreshToken = _jwt.GenerateToken(userId, 1440);
 
                 // Store refresh token in DB
                 const string insertTokenSql = @"
