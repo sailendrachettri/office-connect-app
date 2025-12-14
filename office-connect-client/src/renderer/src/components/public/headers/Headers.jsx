@@ -188,19 +188,20 @@ const people = [
   }
 ]
 
-const Headers = ({ selectedUsersProfileId }) => {
+const Headers = ({ selectedFriendProfileId }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
-  const [selectedUserDetails, setSelectedUserDetails] = useState({})
+  const [selectedFriendDetails, setSelectedFriendDetails] = useState({})
 
   useEffect(() => {
-    const filteredData = people?.find((obj) => obj?.id === selectedUsersProfileId)
+    const filteredData = people?.find((obj) => obj?.id === selectedFriendProfileId)
+    console.log({filteredData})
 
-    setSelectedUserDetails(filteredData || {})
-  }, [selectedUsersProfileId])
+    setSelectedFriendDetails(filteredData || {})
+  }, [selectedFriendProfileId])
 
   return (
     <>
-      {selectedUsersProfileId && (
+      {selectedFriendProfileId && (
         <div className="w-full h-full flex items-center justify-between px-4  bg-white border-b border-slate-200 shadow-sm ">
           {/* LEFT: Profile & User Info */}
           <div className="flex items-center gap-3">
@@ -209,8 +210,8 @@ const Headers = ({ selectedUsersProfileId }) => {
 
             {/* Chat Details */}
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">{selectedUserDetails?.name}</h3>
-              <p className="text-sm text-green-600">{selectedUserDetails?.status}</p>
+              <h3 className="text-lg font-semibold text-slate-900">{selectedFriendDetails?.name}</h3>
+              <p className="text-sm text-green-600">{selectedFriendDetails?.status}</p>
             </div>
           </div>
 

@@ -1,28 +1,59 @@
-import React, { useState } from "react";
-import { FaEnvelope, FaLock } from "react-icons/fa";
-import banner from "../../assets/svgs/banner_login.svg";
+import React, { useState } from 'react'
+import { FaEnvelope, FaLock } from 'react-icons/fa'
+import banner from '../../assets/svgs/banner_login.svg'
+import { REGEX } from '../../utils/regex'
+import InputField from '../../reusables/input-fields/InputField'
+import { useForm } from 'react-hook-form'
+import { axiosInstance } from '../../api/api'
+import { LOGIN_USER_URL } from '../../api/routes_urls'
+import toast from 'react-hot-toast'
 
-const LoginUser = ({setShowLogin, setIsLoggedIn}) => {
-const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm()
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handlLogin = async (data) => {
+    try {
+      console.log('Login Data:', data)
+      const payload = {
+        Email: data?.email,
+        Password: data?.password
+      }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login Data:", form);
-    // TODO: call login API
-    setIsLoggedIn(true);
-  };
+      console.log(payload)
+
+      const res = await axiosInstance.post(LOGIN_USER_URL, payload)
+      console.log(res)
+
+      const accessToken = res?.data?.data?.accessToken
+      const refreshToken = res?.data?.data?.refreshToken
+      const userId = res?.data?.data?.userId
+
+      console.log({userId})
+      
+
+      if (res?.data?.success) {
+        await window.store.set('accessToken', accessToken)
+        await window.store.set('refreshToken', refreshToken)
+        await window.store.set('userId', userId)
+        setIsLoggedIn(true)
+
+        toast.success('Login successful!')
+      } else {
+        toast.error('Please enter a valid credentials')
+      }
+    } catch (error) {
+      toast.error('Please enter a valid credentials')
+      console.error('Invalid credentials', error)
+    }
+  }
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-ternary rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-
         {/* LEFT SIDE SVG */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
           <img src={banner} alt="Banner" className="w-80 drop-shadow-xl scale-x-[-1]" />
@@ -31,37 +62,37 @@ const [form, setForm] = useState({
         {/* RIGHT SIDE LOGIN FORM */}
         <div className="w-full md:w-1/2 p-8 bg-white">
           <h2 className="text-3xl font-semibold text-primary mb-3">Welcome Back</h2>
-          <p className="text-slate-500 mb-6 text-sm">
-            Login to access your messaging dashboard.
-          </p>
+          <p className="text-slate-500 mb-6 text-sm">Login to access your messaging dashboard.</p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
+          <form onSubmit={handleSubmit(handlLogin)} className="flex flex-col gap-4">
             {/* Email */}
-            <div className="flex items-center gap-3 border border-slate-300 p-3 rounded-lg bg-slate-50">
-              <FaEnvelope className="text-slate-500" />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full outline-none bg-transparent text-slate-700"
-              />
-            </div>
+
+            <InputField
+              label="Email"
+              name="email"
+              icon={FaEnvelope}
+              placeholder="Enter email"
+              register={register}
+              errors={errors}
+              required
+              regex={REGEX.EMAIL}
+              regexMessage="Invalid email address"
+            />
 
             {/* Password */}
-            <div className="flex items-center gap-3 border border-slate-300 p-3 rounded-lg bg-slate-50">
-              <FaLock className="text-slate-500" />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full outline-none bg-transparent text-slate-700"
-              />
-            </div>
+
+            <InputField
+              label="Password"
+              name="password"
+              type="password"
+              icon={FaLock}
+              placeholder="Create password"
+              register={register}
+              errors={errors}
+              required
+              regex={REGEX.PASSWORD}
+              regexMessage="Min 6 chars, include number"
+            />
 
             {/* Forgot Password */}
             <div className="text-right">
@@ -70,7 +101,7 @@ const [form, setForm] = useState({
               </span>
             </div>
 
-            {/* Login Button */} 
+            {/* Login Button */}
             <button
               type="submit"
               className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 cursor-pointer transition font-medium shadow"
@@ -80,15 +111,21 @@ const [form, setForm] = useState({
           </form>
 
           <p className="text-center text-slate-500 text-sm mt-5">
-            Don’t have an account?{" "}
-            <span onClick={()=> {setShowLogin(false); setIsLoggedIn(false)}} className="text-slate-800 font-medium cursor-pointer hover:underline">
+            Don’t have an account?{' '}
+            <span
+              onClick={() => {
+                setShowLogin(false)
+                setIsLoggedIn(false)
+              }}
+              className="text-slate-800 font-medium cursor-pointer hover:underline"
+            >
               Register
             </span>
           </p>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default LoginUser

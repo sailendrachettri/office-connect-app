@@ -3,6 +3,23 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+import Store from 'electron-store';
+
+const store = new Store({
+  name: 'office-connect',
+  defaults: {
+    user: null,
+    accessToken: null,
+    refreshToken: null
+  }
+});
+
+ipcMain.handle('store-get', (_, key) => store.get(key));
+ipcMain.handle('store-set', (_, key, value) => store.set(key, value));
+ipcMain.handle('store-delete', (_, key) => store.delete(key));
+ipcMain.handle('store-clear', () => store.clear());
+
+
 ipcMain.on('window-minimize', () => {
   BrowserWindow.getFocusedWindow().minimize()
 })
@@ -15,6 +32,8 @@ ipcMain.on('window-maximize', () => {
 ipcMain.on('window-close', () => {
   BrowserWindow.getFocusedWindow().close()
 })
+
+
 
 function createWindow() {
   // Create the browser window.
@@ -36,6 +55,11 @@ function createWindow() {
       webSecurity: false
     }
   })
+
+  if (is.dev) {
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+}
+
   mainWindow.setMenu(null)
 
   mainWindow.on('ready-to-show', () => {
@@ -87,6 +111,7 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+  
 
   createWindow()
 

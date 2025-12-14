@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Menu from '../menu/Menu'
 import Sidebar from '../sidebars/Sidebar'
 import Headers from '../headers/Headers'
@@ -6,13 +6,51 @@ import Landing from '../landing-page/Landing'
 import UserRegister from '../../common/UserRegister'
 import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
+import { axiosInstance } from '../../../api/api'
+import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
+  const [showLogin, setShowLogin] = useState(true)
   const [selectedUsersProfileId, setSelectedUsersProfileId] = useState(null)
-  const [selectedTab, setSelectedTab] = useState('chat');
- 
+  const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
+  const [userFullDetails, setUserFullDetails] = useState({});
+  const [selectedTab, setSelectedTab] = useState('chat')
+
+  
+
+  useEffect(() => {
+  async function restoreSession() {
+    const token = await window.store.get('accessToken');
+
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }
+
+  restoreSession();
+}, []);
+
+
+
+
+  useEffect(() => {
+
+    if (selectedUsersProfileId) {
+      ;(async () => {
+        try {
+          const payload = {
+            UserId : selectedUsersProfileId
+          }
+          const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload);
+          setUserFullDetails(res?.data?.data || {})
+        } catch (error) {}
+      })()
+    }
+  }, [selectedUsersProfileId])
+
+  
+  console.log({selectedFriendProfileId})
 
   return (
     <>
@@ -64,7 +102,7 @@ const Home = () => {
                   <Sidebar
                     setShowLogin={setShowLogin}
                     setIsLoggedIn={setIsLoggedIn}
-                    setSelectedUsersProfileId={setSelectedUsersProfileId}
+                    setSelectedFriendProfileId={setSelectedFriendProfileId}
                   />
                 </div>
 
@@ -72,12 +110,12 @@ const Home = () => {
                 <div className="flex-1 flex flex-col">
                   {/* HEADER */}
                   <div className="h-[70px] bg-linear-to-t from-slate-50 to-slate-100">
-                    <Headers selectedUsersProfileId={selectedUsersProfileId}/>
+                    <Headers selectedFriendProfileId={selectedFriendProfileId} />
                   </div>
 
                   {/* BODY */}
                   <div className="flex-1 overflow-y-auto">
-                    <Landing selectedUsersProfileId={selectedUsersProfileId} />
+                    <Landing selectedFriendProfileId={selectedFriendProfileId} userFullDetails={userFullDetails} />
                   </div>
                 </div>
               </>
@@ -102,7 +140,10 @@ const Home = () => {
       ) : (
         <>
           {showLogin ? (
-            <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+            <LoginUser
+              setShowLogin={setShowLogin}
+              setIsLoggedIn ={setIsLoggedIn}
+            />
           ) : (
             <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
           )}

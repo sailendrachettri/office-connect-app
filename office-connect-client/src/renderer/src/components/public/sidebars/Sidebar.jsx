@@ -1,7 +1,7 @@
 import profilePic from "../../../assets/peoples/default_user.jpg";
 
 
-const Sidebar = ({setSelectedUsersProfileId}) => {
+const Sidebar = ({setSelectedFriendProfileId}) => {
  const people = [
   {
     id: 1,
@@ -189,7 +189,7 @@ const Sidebar = ({setSelectedUsersProfileId}) => {
         {people.map((user) => (
           <div
             key={user.id}
-            onClick={()=>{setSelectedUsersProfileId(user?.id)}}
+            onClick={()=>{setSelectedFriendProfileId(user?.id)}}
             className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer hover:bg-gray-100"
           >
             {/* Image */}

@@ -2,7 +2,6 @@
 import Home from './components/public/home/Home'
 
 function App() {
-
   return (
     <>
     <Home  />

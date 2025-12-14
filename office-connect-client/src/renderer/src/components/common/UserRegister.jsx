@@ -32,8 +32,16 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
       }
 
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
+      console.log(res)
+
+      const accessToken = res?.data?.data?.accessToken
+      const refreshToken = res?.data?.data?.refreshToken
+      const userId = res?.data?.data?.userId
 
       if (res?.data?.success) {
+        await window.store.set('accessToken', accessToken)
+        await window.store.set('refreshToken', refreshToken)
+        await window.store.set('userId', userId)
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }
@@ -48,7 +56,6 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-
         {/* LEFT */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
           <img src={banner} className="w-80" />
@@ -56,9 +63,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
 
         {/* RIGHT */}
         <div className="w-full md:w-1/2 p-8">
-          <h2 className="text-3xl font-semibold text-primary mb-6">
-            Create Account
-          </h2>
+          <h2 className="text-3xl font-semibold text-primary mb-6">Create Account</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <InputField
@@ -86,7 +91,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
             <InputField
               label="Phone"
               name="phone"
-              type='number'
+              type="number"
               icon={FaPhone}
               placeholder="10-digit mobile number"
               register={register}
@@ -118,11 +123,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
 
               <label className="cursor-pointer">
                 <MdOutlinePhotoCamera size={24} />
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => setProfile(e.target.files[0])}
-                />
+                <input type="file" hidden onChange={(e) => setProfile(e.target.files[0])} />
               </label>
             </div>
 
@@ -130,9 +131,10 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg font-medium transition
-                ${loading
-                  ? 'bg-slate-400 cursor-not-allowed'
-                  : 'bg-primary text-white hover:bg-primary/90 cursor-pointer'
+                ${
+                  loading
+                    ? 'bg-slate-400 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-primary/90 cursor-pointer'
                 }
               `}
             >

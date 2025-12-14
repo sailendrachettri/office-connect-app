@@ -5,7 +5,9 @@ import { AiOutlinePaperClip } from 'react-icons/ai'
 import { IoMdSend } from 'react-icons/io'
 import DefaultChatPage from '../../common/DefaultChatPage'
 
-const Landing = ({ selectedUsersProfileId }) => {
+const Landing = ({ selectedFriendProfileId, userFullDetails }) => {
+
+  console.log({userFullDetails});
   const [message, setMessage] = useState('')
 
   const generateConversation = (userId) =>
@@ -21,13 +23,13 @@ const Landing = ({ selectedUsersProfileId }) => {
     Array.from({ length: 20 }, (_, i) => [i + 1, generateConversation(i + 1)])
   )
 
-  if (!selectedUsersProfileId) {
+  if (!selectedFriendProfileId) {
     return (
      <DefaultChatPage />
     )
   }
 
-  const messages = conversations[selectedUsersProfileId] || []
+  const messages = conversations[selectedFriendProfileId] || []
 
   const renderStatus = (status) => {
     if (!status) return null

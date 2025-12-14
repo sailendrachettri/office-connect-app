@@ -20,17 +20,22 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@reduxjs/toolkit": "^2.11.1",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
+    "electron-store": "^8.2.0",
     "emoji-picker-react": "^4.16.1",
+    "jwt-decode": "^4.0.0",
     "react-hook-form": "^7.68.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
+    "@types/node": "^25.0.2",
     "@vitejs/plugin-react": "^5.1.1",
     "electron": "^39.2.6",
     "electron-builder": "^26.0.12",

@@ -7,7 +7,8 @@ import { FaRegUser } from 'react-icons/fa6'
 const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
   const [open, setOpen] = useState(false)
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
+    await window.store.clear();
     setShowLogin(true)
     setIsLoggedIn(false)
   }
