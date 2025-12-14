@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
-import { SEARCH_FRIEND_URL, SEND_FRIEND_REQUEST_URL } from '../../api/routes_urls'
+import {
+  GET_FRIEND_LIST_URL,
+  SEARCH_FRIEND_URL,
+  SEND_FRIEND_REQUEST_URL
+} from '../../api/routes_urls'
 import { axiosInstance, axiosPrivate } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import toast from 'react-hot-toast'
@@ -8,6 +12,29 @@ const FriendsSection = ({ userId }) => {
   const [searchText, setSearchText] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [searching, setSearching] = useState(false)
+  const [activeTab, setActiveTab] = useState('FRIEND')
+  const [friendList, setFriendList] = useState([])
+
+  const sendFriendRequest = async (user) => {
+    try {
+      const payload = {
+        ReceiverId: user?.user_id
+      }
+      const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload)
+      console.log(res)
+      if (res?.data?.success == true) {
+        toast.success(res?.data?.message || 'Friend request sent!')
+      }
+      setSearchText('')
+    } catch (error) {
+      console.error('not able to send friend request')
+      toast.error(res?.data?.message || 'Something went wrong!')
+    }
+  }
+
+  const filteredList = friendList.filter((item) => 
+    item.relation_status === activeTab
+  )
 
   useEffect(() => {
     if (!searchText || searchText.length < 2) {
@@ -19,7 +46,7 @@ const FriendsSection = ({ userId }) => {
       try {
         setSearching(true)
         const payload = {
-          UserId : userId,
+          UserId: userId,
           SearchText: searchText
         }
         const res = await axiosInstance.post(SEARCH_FRIEND_URL, payload)
@@ -35,27 +62,25 @@ const FriendsSection = ({ userId }) => {
     return () => clearTimeout(timeout)
   }, [searchText])
 
-  const sendFriendRequest = async(user)=>{
-   try {
-    
-     const payload = {
-       ReceiverId: user?.user_id
-     }
-     const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload);
-     console.log(res);
-     if(res?.data?.success == true){
-
-       toast.success(res?.data?.message || "Friend request sent!");
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+        console.log(res)
+        if (res?.data?.success == true) {
+          setFriendList(res?.data?.data || [])
+          console.log({ friendList })
+        }
+      } catch (error) {
+        console.error('not able to get the friend list', error)
       }
-   } catch (error) {
-      console.error("not able to send friend request");
-      toast.error(res?.data?.message || "Something went wrong!")
-   }
-  }
+    })()
+  }, [activeTab])
 
   return (
     <>
       {/* SEARCH FRIEND SECTION */}
+
       <div className="mt-10 bg-white shadow rounded-2xl p-6 relative">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Friend</h3>
 
@@ -105,6 +130,76 @@ const FriendsSection = ({ userId }) => {
               ))}
           </div>
         )}
+      </div>
+
+      <div>
+        {/* Tabs */}
+
+        <div>
+          {/* Tabs */}
+          <div className="flex gap-2 bg-gray-100 p-1 rounded-xl w-full justify-around mt-7">
+            {['FRIEND', 'PENDING_RECEIVED', 'PENDING_SENT'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition
+        ${
+          activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+        }`}
+              >
+                {tab === 'FRIEND' && 'Friends'}
+                {tab === 'PENDING_RECEIVED' && 'Pending'}
+                {tab === 'PENDING_SENT' && 'Sent'}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            {filteredList?.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-6">No users found</p>
+            )}
+
+            {filteredList?.map((user) => (
+              <div
+                key={user?.user_id}
+                className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition"
+              >
+                <div className="flex items-center gap-3">
+                  <img
+                    src={user?.profile_image || defaultUser}
+                    alt={user?.full_name}
+                    className="w-12 h-12 rounded-full object-cover border"
+                  />
+
+                  <div>
+                    <p className="font-semibold text-gray-800">{user?.full_name}</p>
+                    <p className="text-sm text-gray-500">@{user?.username}</p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div>
+                  {activeTab === 'FRIEND' && (
+                    <button className="text-sm text-red-500 hover:underline">Remove</button>
+                  )}
+
+                  {activeTab === 'PENDING_RECEIVED' && (
+                    <div className="flex gap-2">
+                      <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg">
+                        Accept
+                      </button>
+                      <button className="px-3 py-1 text-sm bg-gray-200 rounded-lg">Reject</button>
+                    </div>
+                  )}
+
+                  {activeTab === 'PENDING_SENT' && (
+                    <button className="text-sm text-gray-500">Pending</button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   )

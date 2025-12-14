@@ -36,7 +36,7 @@ namespace OfficeConnectServer.Controllers
             try
             {
                 const string sql = @"
-                    SELECT get_user_friends_and_requests(
+                    SELECT get_user_friends_and_requests_list(
                         @user_id_i
                     );
                 ";
