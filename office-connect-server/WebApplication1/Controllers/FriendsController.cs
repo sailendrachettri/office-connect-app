@@ -17,6 +17,70 @@ namespace OfficeConnectServer.Controllers
             _db = db;
         }
 
+        [Authorize]
+        [HttpGet("list")]
+        public async Task<IActionResult> GetFriendsAndRequests()
+        {
+            var senderObj = HttpContext.Items["UserId"];
+            if (senderObj == null)
+            {
+                return Unauthorized(new ApiResponse<string>(
+                    false,
+                    "Unauthorized",
+                    null!
+                ));
+            }
+
+            var userId = (Guid)senderObj;
+
+            try
+            {
+                const string sql = @"
+                    SELECT get_user_friends_and_requests(
+                        @user_id_i
+                    );
+                ";
+
+                var json = await _db.ExecuteScalarAsync<string>(
+                    sql,
+                    cmd =>
+                    {
+                        cmd.Parameters.AddWithValue("user_id_i", userId);
+                    }
+                );
+
+                var result = JsonSerializer.Deserialize<JsonElement>(json);
+
+                bool success = result.GetProperty("success").GetBoolean();
+                string message = result.GetProperty("message").GetString()!;
+
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse<string>(
+                        false,
+                        message,
+                        null!
+                    ));
+                }
+
+                var data = result.GetProperty("data");
+
+                return Ok(new ApiResponse<JsonElement>(
+                    true,
+                    message,
+                    data
+                ));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    ex.Message,
+                    null!
+                ));
+            }
+        }
+
 
         [Authorize]
         [HttpPost("send-request")]

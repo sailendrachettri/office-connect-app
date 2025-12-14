@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { SEARCH_FRIEND_URL, SEND_FRIEND_REQUEST_URL } from '../../api/routes_urls'
 import { axiosInstance, axiosPrivate } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
+import toast from 'react-hot-toast'
 
 const FriendsSection = ({ userId }) => {
   const [searchText, setSearchText] = useState('')
@@ -35,11 +36,21 @@ const FriendsSection = ({ userId }) => {
   }, [searchText])
 
   const sendFriendRequest = async(user)=>{
-    console.log(user)
-    const payload = {
-      ReceiverId: user?.user_id
-    }
-    const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload);
+   try {
+    
+     const payload = {
+       ReceiverId: user?.user_id
+     }
+     const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload);
+     console.log(res);
+     if(res?.data?.success == true){
+
+       toast.success(res?.data?.message || "Friend request sent!");
+      }
+   } catch (error) {
+      console.error("not able to send friend request");
+      toast.error(res?.data?.message || "Something went wrong!")
+   }
   }
 
   return (
