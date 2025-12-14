@@ -3,16 +3,23 @@ import { GET_USER_DETAILS_URL } from '../../api/routes_urls'
 import { axiosInstance } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
+import InputField from '../../reusables/input-fields/InputField'
+import { useForm } from 'react-hook-form'
+import FriendsSection from './FriendsSection'
 
 const UserProfile = () => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState(null);
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userId = await window.store.get('userId')
-        if (!userId) return
+        if (!userId) return;
+
+        setUserId(userId);
 
         const res = await axiosInstance.post(GET_USER_DETAILS_URL, { UserId: userId })
         setUser(res?.data?.data)
@@ -25,6 +32,8 @@ const UserProfile = () => {
 
     fetchUserDetails()
   }, [])
+
+ 
 
   if (loading) return <div className="p-6">Loading profile...</div>
   if (!user) return <div className="p-6 text-red-500">Failed to load profile</div>
@@ -91,6 +100,10 @@ const UserProfile = () => {
           </div>
         </div>
       </div>
+
+    {/* Search friend and request */}
+    <FriendsSection userId={userId} /> 
+      
     </div>
   )
 }
