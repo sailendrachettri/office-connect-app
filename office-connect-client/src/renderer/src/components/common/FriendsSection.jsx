@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  CANCEL_FRIEND_REQUEST_URL ,
   GET_FRIEND_LIST_URL,
   SEARCH_FRIEND_URL,
   SEND_FRIEND_REQUEST_URL
@@ -14,6 +15,7 @@ const FriendsSection = ({ userId }) => {
   const [searching, setSearching] = useState(false)
   const [activeTab, setActiveTab] = useState('FRIEND')
   const [friendList, setFriendList] = useState([])
+  const [refreshPage, setRefreshPage] = useState(false);
 
   const sendFriendRequest = async (user) => {
     try {
@@ -29,12 +31,30 @@ const FriendsSection = ({ userId }) => {
     } catch (error) {
       console.error('not able to send friend request')
       toast.error(res?.data?.message || 'Something went wrong!')
+    }finally{
+      setRefreshPage(prev => !prev);
     }
   }
 
   const filteredList = friendList.filter((item) => 
     item.relation_status === activeTab
   )
+
+  const handleCancleFreindRequest = async(frienduserId)=>{
+   try {
+     const payload = {
+       ReceiverId: frienduserId
+     }
+     const res = await axiosPrivate.post(CANCEL_FRIEND_REQUEST_URL , payload);
+     if(res?.data?.success == true){
+      toast.success(res?.data?.message || '');
+     }
+   } catch (error) {
+    console.error("not able to cancle friend request", error);
+   }finally{
+    setRefreshPage(prev => !prev);
+   }
+  }
 
   useEffect(() => {
     if (!searchText || searchText.length < 2) {
@@ -60,22 +80,22 @@ const FriendsSection = ({ userId }) => {
     }, 400) // debounce
 
     return () => clearTimeout(timeout)
-  }, [searchText])
+  }, [searchText, refreshPage])
 
   useEffect(() => {
     ;(async () => {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-        console.log(res)
+        // console.log(res)
         if (res?.data?.success == true) {
           setFriendList(res?.data?.data || [])
-          console.log({ friendList })
+          // console.log({ friendList })
         }
       } catch (error) {
         console.error('not able to get the friend list', error)
       }
     })()
-  }, [activeTab])
+  }, [refreshPage])
 
   return (
     <>
@@ -193,7 +213,10 @@ const FriendsSection = ({ userId }) => {
                   )}
 
                   {activeTab === 'PENDING_SENT' && (
-                    <button className="text-sm text-gray-500">Pending</button>
+                    <div className='gap-x-6 flex items-center justify-center flex-row'>
+                      <button onClick={()=> {handleCancleFreindRequest(user?.user_id)}} className="text-sm  bg-red-100 px-3 py-1 text-red-500 rounded-md">Cancle</button>
+                    {/* <button className="text-sm text-gray-500">Pending</button> */}
+                    </div>
                   )}
                 </div>
               </div>

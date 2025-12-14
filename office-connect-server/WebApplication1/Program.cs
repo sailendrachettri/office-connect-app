@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddScoped<JwtTokenHelper>();
+builder.Services.AddSingleton<JwtTokenHelper>();
 
 builder.Services.AddCors(options =>
 {

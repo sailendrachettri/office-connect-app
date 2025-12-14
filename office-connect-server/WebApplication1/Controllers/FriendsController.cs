@@ -18,6 +18,70 @@ namespace OfficeConnectServer.Controllers
         }
 
         [Authorize]
+        [HttpPost("cancel-request")]
+        public async Task<IActionResult> CancelFriendRequest(
+    [FromBody] CancelFriendRequestModel req
+)
+        {
+            if (req.ReceiverId == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>(
+                    false,
+                    "Invalid receiver",
+                    null!
+                ));
+            }
+
+            var senderObj = HttpContext.Items["UserId"];
+            if (senderObj == null)
+            {
+                return Unauthorized(new ApiResponse<string>(
+                    false,
+                    "Unauthorized",
+                    null!
+                ));
+            }
+
+            var senderId = (Guid)senderObj;
+
+            try
+            {
+                const string sql = @"
+            SELECT cancel_friend_request(
+                @sender_id_i,
+                @receiver_id_i
+            );
+        ";
+
+                var result = await _db.ExecuteScalarAsync<string>(
+                    sql,
+                    cmd =>
+                    {
+                        cmd.Parameters.AddWithValue("sender_id_i", senderId);
+                        cmd.Parameters.AddWithValue("receiver_id_i", req.ReceiverId);
+                    }
+                );
+
+                bool success = result == "Friend request cancelled";
+
+                return Ok(new ApiResponse<string>(
+                    success,
+                    result,
+                    null!
+                ));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    ex.Message,
+                    null!
+                ));
+            }
+        }
+
+
+        [Authorize]
         [HttpGet("list")]
         public async Task<IActionResult> GetFriendsAndRequests()
         {

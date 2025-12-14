@@ -1,6 +1,12 @@
 ﻿namespace OfficeConnectServer.Models
 {
 
+    public class CancelFriendRequestModel
+    {
+        public Guid SenderId { get; set; }
+        public Guid ReceiverId { get; set; }
+    }
+
     public class SendFriendRequestModel
     {
         public Guid ReceiverId { get; set; }

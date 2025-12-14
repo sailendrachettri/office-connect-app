@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { REFRESH_URL } from './routes_urls'
 
 const API_BASE_URL = 'https://localhost:44303'
 
@@ -20,17 +21,59 @@ export const axiosPrivate = axios.create({
 })
 
 // Attach token automatically for private requests
-axiosPrivate.interceptors.request.use(
-  async (config) => {
-    // ✅ GET TOKEN FROM ELECTRON STORE
-    const token = await window.store.get('accessToken')
+// axiosPrivate.interceptors.request.use(
+//   async (config) => {
+//     // ✅ GET TOKEN FROM ELECTRON STORE
+//     const token = await window.store.get('accessToken')
 
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`
+//     }
+
+//     return config
+//   },
+//   (error) => Promise.reject(error)
+// )
+
+
+axiosPrivate.interceptors.response.use(
+  res => res,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Only retry once
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Get refresh token from electron-store
+        const refreshToken = await window.store.get('refreshToken');
+
+        if (!refreshToken) throw new Error("No refresh token");
+
+        // Call refresh endpoint
+        const response = await axiosInstance.post(REFRESH_URL, { refreshToken });
+
+        const newAccessToken = response.data.accessToken;
+
+        // Save new access token in Electron-Store
+        await window.store.set('accessToken', newAccessToken);
+
+        // Update axios headers
+        axiosPrivate.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        // Retry original request
+        return axiosPrivate(originalRequest);
+      } catch (err) {
+        console.error("Refresh token failed", err);
+        return Promise.reject(error);
+      }
     }
 
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+    return Promise.reject(error);
+  }
+);
+
+
