@@ -6,6 +6,8 @@ import { AiOutlinePaperClip } from 'react-icons/ai'
 import { IoMdSend } from 'react-icons/io'
 import DefaultChatPage from '../../common/DefaultChatPage'
 import { createChatConnection } from '../../../signalr/chatConnection'
+import { MESSAGES_URL } from '../../../api/routes_urls'
+import { axiosPrivate } from '../../../api/api'
 
 const Landing = ({ selectedFriendProfileId }) => {
   const [messages, setMessages] = useState([])
@@ -28,13 +30,12 @@ const Landing = ({ selectedFriendProfileId }) => {
   useEffect(() => {
     if (!currentUserId || !selectedFriendProfileId) return
 
+
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(
-          `https://localhost:44303/api/messages/${currentUserId}/${selectedFriendProfileId}`
-        )
-        setMessages(res.data)
-        console.log(res?.data)
+        const res = await axiosPrivate.get(`${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}`);
+        setMessages(res.data || [])
+        // console.log(res?.data)
       } catch (err) {
         console.error('Failed to load messages:', err)
       }
