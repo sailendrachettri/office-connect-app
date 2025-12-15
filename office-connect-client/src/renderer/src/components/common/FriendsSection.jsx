@@ -25,7 +25,7 @@ const FriendsSection = ({ userId }) => {
         ReceiverId: user?.user_id
       }
       const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload)
-      console.log(res)
+      // console.log(res)
       if (res?.data?.success == true) {
         toast.success(res?.data?.message || 'Friend request sent!')
       }
@@ -67,7 +67,7 @@ const FriendsSection = ({ userId }) => {
   }
 
   const handleRejectFreindRequest = async (user) => {
-    console.log({ user })
+    // console.log({ user })
     try {
       const payload = {
         reqId: user?.req_id
@@ -120,7 +120,7 @@ const FriendsSection = ({ userId }) => {
           SearchText: searchText
         }
         const res = await axiosInstance.post(SEARCH_FRIEND_URL, payload)
-        console.log('rr', res)
+        // console.log('rr', res)
         setSuggestions(res?.data?.data || [])
       } catch (err) {
         console.error(err)

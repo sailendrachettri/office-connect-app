@@ -32,7 +32,7 @@ const Home = () => {
     ;(async () => {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-        console.log(res)
+        // console.log(res)
         if (res?.data?.success == true) {
           const data = res?.data?.data;
            const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
@@ -66,7 +66,7 @@ const Home = () => {
     }
   }, [selectedUsersProfileId])
 
-  console.log({ selectedFriendProfileId })
+  // console.log({ selectedFriendProfileId })
 
   return (
     <>

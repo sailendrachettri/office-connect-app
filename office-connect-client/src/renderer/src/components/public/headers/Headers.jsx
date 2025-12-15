@@ -194,7 +194,7 @@ const Headers = ({ selectedFriendProfileId }) => {
 
   useEffect(() => {
     const filteredData = people?.find((obj) => obj?.id === selectedFriendProfileId)
-    console.log({filteredData})
+    // console.log({filteredData})
 
     setSelectedFriendDetails(filteredData || {})
   }, [selectedFriendProfileId])

@@ -6,7 +6,7 @@ import { IoMdSend } from 'react-icons/io'
 import DefaultChatPage from '../../common/DefaultChatPage'
 
 const Landing = ({ selectedFriendProfileId, userFullDetails }) => {
-  console.log({ userFullDetails })
+  // console.log({ userFullDetails })
   const [message, setMessage] = useState('')
 
   const generateConversation = (userId) =>
