@@ -109,27 +109,34 @@ const Landing = ({ selectedFriendProfileId }) => {
   }, [messages])
 
   /* ---------------- Send message ---------------- */
-  const sendMessage = async () => {
-    if (!text.trim() || !connected) return
+ const sendMessage = async () => {
+  if (!text.trim() || !connected) return
 
-    await connection.invoke('SendMessage', currentUserId, selectedFriendProfileId, text)
-
-    // Optimistic update
-    setMessages((prev) => [
-      [...prev].sort(
-      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-    ),
-      {
-        senderId: currentUserId,
-        receiverId: selectedFriendProfileId,
-        messageText: text,
-        createdAt: new Date(),
-        isRead: false
-      }
-    ])
-
-    setText('')
+  const optimisticMessage = {
+    senderId: currentUserId,
+    receiverId: selectedFriendProfileId,
+    messageText: text,
+    createdAt: new Date().toISOString(),
+    isRead: false
   }
+
+  // Optimistic UI update (NO sorting here)
+  setMessages((prev) => [...prev, optimisticMessage])
+
+  setText('')
+
+  try {
+    await connection.invoke(
+      'SendMessage',
+      currentUserId,
+      selectedFriendProfileId,
+      text
+    )
+  } catch (err) {
+    console.error('Failed to send message', err)
+  }
+}
+
 
   /* ---------------- Status Icon ---------------- */
   const renderStatus = (status) => {
