@@ -19,7 +19,6 @@ ipcMain.handle('store-set', (_, key, value) => store.set(key, value));
 ipcMain.handle('store-delete', (_, key) => store.delete(key));
 ipcMain.handle('store-clear', () => store.clear());
 
-
 ipcMain.on('window-minimize', () => {
   BrowserWindow.getFocusedWindow().minimize()
 })
@@ -77,6 +76,7 @@ function createWindow() {
   app.commandLine.appendSwitch('enable-gpu-rasterization')
   app.commandLine.appendSwitch('enable-zero-copy')
   app.commandLine.appendSwitch('enable-blink-features', 'ColorEmojiFont')
+  app.commandLine.appendSwitch("ignore-certificate-errors");
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.insertCSS(`

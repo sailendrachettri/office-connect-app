@@ -8,6 +8,9 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSignalR();
+builder.Services.AddScoped<MessageRepository>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -63,7 +66,9 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("http://localhost:5173") 
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -72,10 +77,10 @@ builder.Services.AddCors(options =>
 builder.WebHost.ConfigureKestrel(options =>
 {
     // HTTP
-    options.ListenAnyIP(5030);
+    options.ListenAnyIP(44303);
 
     // HTTPS (requires dev certificate installed)
-    options.ListenAnyIP(7171, listen =>
+    options.ListenAnyIP(44303, listen =>
     {
         listen.UseHttps();
     });
@@ -90,6 +95,8 @@ builder.Services.AddScoped<DbHelper>();
 
 var app = builder.Build();
 
+
+
 app.UseCors("AllowViteDevServer");
 
 // Middleware
@@ -103,5 +110,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

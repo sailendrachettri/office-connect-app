@@ -12,7 +12,6 @@ import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL } from '../../../api/routes_u
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showLogin, setShowLogin] = useState(true)
-  const [selectedUsersProfileId, setSelectedUsersProfileId] = useState(null)
   const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
@@ -53,18 +52,18 @@ const Home = () => {
   }, [pendingFriendReq])
 
   useEffect(() => {
-    if (selectedUsersProfileId) {
+    if (selectedFriendProfileId) {
       ;(async () => {
         try {
           const payload = {
-            UserId: selectedUsersProfileId
+            UserId: selectedFriendProfileId
           }
           const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload)
           setUserFullDetails(res?.data?.data || {})
         } catch (error) {}
       })()
     }
-  }, [selectedUsersProfileId])
+  }, [selectedFriendProfileId])
 
   // console.log({ selectedFriendProfileId })
 
