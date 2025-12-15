@@ -8,6 +8,9 @@ import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
 import { axiosInstance, axiosPrivate } from '../../../api/api'
 import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL } from '../../../api/routes_urls'
+import { IoChatbubblesOutline } from "react-icons/io5";
+import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
+
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -82,6 +85,11 @@ const Home = () => {
           {isLoggedIn && (
             <section>
               <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-4 select-none drag-region">
+                <div className='flex items-center justify-start gap-x-3 no-drag'>
+                  <IoChatbubblesOutline />
+                  <TopHelpMenu />
+                </div>
+
                 <div className="ml-auto flex gap-3 no-drag">
                   <button
                     onClick={() => window.api.minimize()}
@@ -106,7 +114,7 @@ const Home = () => {
 
               <section className="w-screen h-[calc(100vh-28px)] overflow-hidden bg-gray-100 flex">
                 {/* LEFT VERTICAL MENU — COMMON */}
-                <div className="w-[70px] bg-slate-50 border-r border-slate-200 flex flex-col items-center py-4 gap-6">
+                <div className="w-12.5 bg-slate-50 border-r border-slate-200 flex flex-col items-center py-4 gap-6">
                   <Menu
                     setShowLogin={setShowLogin}
                     setIsLoggedIn={setIsLoggedIn}

@@ -33,16 +33,16 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
   // console.log(selectedTab)
 
   return (
-    <div className="fixed left-1 top-10 bottom-5 flex flex-col justify-between">
+    <div className="fixed left-2 top-10 bottom-5 flex flex-col justify-between">
       <div>
         {/* Chats */}
         <div
           onClick={() => {
             setSelectedTab('chat')
           }}
-          className={`${selectedTab == 'chat' ? 'bg-ternary' : 'bg-slate-100'} rounded-full  p-4 text-slate-600 cursor-pointer hover:bg-ternary transition`}
+          className={`${selectedTab == 'chat' ? 'bg-ternary' : 'bg-slate-100'} rounded-full  p-2 text-slate-600 cursor-pointer hover:bg-ternary transition`}
         >
-          <BsChatLeftDots size={22} />
+          <BsChatLeftDots size={17} />
         </div>
 
         {/* User profile */}
@@ -56,11 +56,11 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
 
           {/* Circle with icon */}
           <div
-            className={`rounded-full p-4 text-slate-600 transition ${
+            className={`rounded-full p-2 text-slate-600 transition ${
               selectedTab === 'profile' ? 'bg-ternary' : 'bg-slate-100'
             } hover:bg-ternary`}
           >
-            <FaRegUser size={22} />
+            <FaRegUser size={17} />
           </div>
         </div>
       </div>
@@ -72,9 +72,9 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
           onClick={() => {
             setOpen(!open)
           }}
-          className={`rounded-full p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
+          className={`rounded-full p-2 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
         >
-          <IoSettingsOutline size={22} />
+          <IoSettingsOutline size={17} />
         </div>
 
         {/* Popup menu */}
@@ -85,7 +85,7 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
                 onClick={() => handleLogout()}
                 className="p-2 hover:bg-slate-100 rounded cursor-pointer text-red-500 flex items-center  gap-x-1 flex-nowrap"
               >
-                <IoPowerOutline size={20} /> Logout
+                <IoPowerOutline size={17} /> Logout
               </li>
             </ul>
           </div>
