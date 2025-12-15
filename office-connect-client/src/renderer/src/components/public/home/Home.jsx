@@ -135,6 +135,7 @@ const Home = () => {
                           setShowLogin={setShowLogin}
                           setIsLoggedIn={setIsLoggedIn}
                           setSelectedFriendProfileId={setSelectedFriendProfileId}
+                          selectedFriendProfileId = {selectedFriendProfileId}
                           friendList={friendList}
                         />
                       </div>

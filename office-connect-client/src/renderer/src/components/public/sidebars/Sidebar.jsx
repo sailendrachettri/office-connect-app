@@ -1,6 +1,6 @@
 import profilePic from '../../../assets/peoples/default_user.jpg'
 
-const Sidebar = ({ setSelectedFriendProfileId, friendList }) => {
+const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfileId }) => {
 
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
@@ -30,7 +30,7 @@ const Sidebar = ({ setSelectedFriendProfileId, friendList }) => {
                 onClick={() => {
                   setSelectedFriendProfileId(user?.user_id)
                 }}
-                className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer hover:bg-gray-100"
+                className={`${selectedFriendProfileId == user?.user_id ? 'bg-gray-100' : 'bg-white'} flex rounded-md my-1 hover:bg-gray-50 items-center gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer`}
               >
                 {/* Image */}
                 <img src={user?.profile_image ||  profilePic} alt="" className="w-12 h-12 rounded-full object-cover" />
