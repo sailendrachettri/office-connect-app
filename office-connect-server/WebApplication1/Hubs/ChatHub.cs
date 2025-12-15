@@ -1,8 +1,16 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OfficeConnectServer.Data;
+using System.Text.RegularExpressions;
 
 public class ChatHub : Hub
 {
-    // userId -> connection mapping
+    private readonly MessageRepository _repo;
+
+    public ChatHub(MessageRepository repo)
+    {
+        _repo = repo;
+    }
+
     public override async Task OnConnectedAsync()
     {
         var var_userId = Context.GetHttpContext()?.Request.Query["userId"].ToString();
@@ -15,19 +23,27 @@ public class ChatHub : Hub
         await base.OnConnectedAsync();
     }
 
-    public async Task SendMessage(
-        Guid sender_id_i,
-        Guid receiver_id_i,
-        string message_text_i)
+    public async Task SendMessage(Guid sender_id_i, Guid receiver_id_i, string message_text_i)
     {
-        // Send to receiver
-        await Clients.Group(receiver_id_i.ToString())
-            .SendAsync("ReceiveMessage", new
+        try
+        {
+            // Save to DB
+            var messageId = await _repo.AddMessageAsync(sender_id_i, receiver_id_i, message_text_i);
+
+            // Send to receiver
+            await Clients.Group(receiver_id_i.ToString()).SendAsync("ReceiveMessage", new
             {
+                message_id = messageId,
                 sender_id = sender_id_i,
                 receiver_id = receiver_id_i,
                 message_text = message_text_i,
                 created_at = DateTime.UtcNow
             });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("SendMessage error: " + ex.Message);
+            throw;
+        }
     }
 }
