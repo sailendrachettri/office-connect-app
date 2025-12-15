@@ -115,7 +115,7 @@ const Landing = ({ selectedFriendProfileId }) => {
   if (!selectedFriendProfileId) return <DefaultChatPage />
 
   return (
-    <div className="max-h-[88vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
+    <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
       {/* ================= MESSAGES ================= */}
       <div className="flex-1 overflow-y-auto custom-scroll">
         {messages?.map((msg, i) => {
@@ -152,7 +152,7 @@ const Landing = ({ selectedFriendProfileId }) => {
       </div>
 
       {/* ================= INPUT BAR ================= */}
-      <div className="mt-3 flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow">
+      <div className="mt-3 flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow me-10">
         <AiOutlinePaperClip size={22} className="text-slate-500 cursor-pointer" />
 
         <input
