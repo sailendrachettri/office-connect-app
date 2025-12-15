@@ -18,7 +18,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
   const [friendList, setFriendList] = useState([])
-  
 
   useEffect(() => {
     async function restoreSession() {
@@ -28,22 +27,24 @@ const Home = () => {
         setIsLoggedIn(true)
       }
 
-    ;(async () => {
-      try {
-        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-        // console.log(res)
-        if (res?.data?.success == true) {
-          const data = res?.data?.data;
-           const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
-           const countPendingFriendReq = data.filter((item) => item.relation_status === 'PENDING_RECEIVED').length;
-           setPendingFriendReq(countPendingFriendReq || null)
-          setFriendList(filteredList || [])
-          // console.log({ friendList })
+      ;(async () => {
+        try {
+          const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+          // console.log(res)
+          if (res?.data?.success == true) {
+            const data = res?.data?.data
+            const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
+            const countPendingFriendReq = data.filter(
+              (item) => item.relation_status === 'PENDING_RECEIVED'
+            ).length
+            setPendingFriendReq(countPendingFriendReq || null)
+            setFriendList(filteredList || [])
+            // console.log({ friendList })
+          }
+        } catch (error) {
+          console.error('not able to get the friend list', error)
         }
-      } catch (error) {
-        console.error('not able to get the friend list', error)
-      }
-    })()
+      })()
 
       setLoading(false)
     }
@@ -59,6 +60,7 @@ const Home = () => {
             UserId: selectedFriendProfileId
           }
           const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload)
+          // console.log(res?.data)
           setUserFullDetails(res?.data?.data || {})
         } catch (error) {}
       })()
@@ -133,11 +135,11 @@ const Home = () => {
                     <div className="flex-1 flex flex-col">
                       {/* HEADER */}
                       <div className="h-[70px] bg-linear-to-t from-slate-50 to-slate-100">
-                        <Headers selectedFriendProfileId={selectedFriendProfileId} />
+                        <Headers userFullDetails={userFullDetails} />
                       </div>
 
                       {/* BODY */}
-                      <div className="flex-1 overflow-y-auto">
+                      <div className="flex-1 flex">
                         <Landing
                           selectedFriendProfileId={selectedFriendProfileId}
                           userFullDetails={userFullDetails}
@@ -157,7 +159,7 @@ const Home = () => {
 
                     {/* BODY */}
                     <div className="flex-1 overflow-y-auto bg-white">
-                      <UserProfile  />
+                      <UserProfile />
                     </div>
                   </div>
                 )}
@@ -166,10 +168,14 @@ const Home = () => {
           )}
 
           <>
-            {showLogin ? (
-              <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
-            ) : (
-              <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+            {!isLoggedIn && (
+              <>
+                {showLogin ? (
+                  <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+                ) : (
+                  <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+                )}
+              </>
             )}
           </>
         </section>

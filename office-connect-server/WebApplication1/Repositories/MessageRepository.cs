@@ -19,12 +19,19 @@ namespace OfficeConnectServer.Data
             await conn.OpenAsync();
 
             string sql = @"
-                SELECT message_id, sender_id, receiver_id, message_text, is_read, created_at
-                FROM utbl_messages
-                WHERE (sender_id=@user1 OR sender_id=@user2)
-                  AND (receiver_id=@user1 OR receiver_id=@user2)
-                ORDER BY created_at ASC
-            ";
+                    SELECT
+                        message_id  AS ""MessageId"",
+                        sender_id   AS ""SenderId"",
+                        receiver_id AS ""ReceiverId"",
+                        message_text AS ""MessageText"",
+                        is_read     AS ""IsRead"",
+                        created_at  AS ""CreatedAt""
+                    FROM utbl_messages
+                    WHERE (sender_id=@user1 AND receiver_id=@user2)
+                       OR (sender_id=@user2 AND receiver_id=@user1)
+                    ORDER BY created_at ASC
+                ";
+
 
             return await conn.QueryAsync<MessageModelDto>(sql, new
             {
