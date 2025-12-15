@@ -14,3 +14,4 @@ contextBridge.exposeInMainWorld('store', {
   delete: (key) => ipcRenderer.invoke('store-delete', key),
   clear: () => ipcRenderer.invoke('store-clear'),
 });
+ 

@@ -3,8 +3,6 @@ import { GET_USER_DETAILS_URL } from '../../api/routes_urls'
 import { axiosInstance } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
-import InputField from '../../reusables/input-fields/InputField'
-import { useForm } from 'react-hook-form'
 import FriendsSection from './FriendsSection'
 
 const UserProfile = ({trigger}) => {

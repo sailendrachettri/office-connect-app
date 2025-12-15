@@ -32,13 +32,18 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
       const refreshToken = res?.data?.data?.refreshToken
       const userId = res?.data?.data?.userId
 
-      console.log({userId})
-      
-
       if (res?.data?.success) {
         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
+        // await window.store.set('user', {
+        //   userId,
+        //   fullName,
+        //   email,
+        //   profileImage
+          
+        // })
+
         setIsLoggedIn(true)
 
         toast.success('Login successful!')

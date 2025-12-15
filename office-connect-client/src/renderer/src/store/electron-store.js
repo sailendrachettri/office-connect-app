@@ -1,4 +1,3 @@
-// src/store/electron-store.js
 import Store from "electron-store";
 
 const schema = {
@@ -19,9 +18,9 @@ const schema = {
 const store = new Store({ schema });
 
 // User
-export const setUserId = (user_id) => store.set("userId", user_id);
-export const getUserId = () => store.get("userId");
-export const removeUser = () => store.delete("userId");
+export const setUser = (user) => store.set("user", user);
+export const getUser = () => store.get("user");
+export const removeUser = () => store.delete("user");
 
 // Access Token
 export const setAccessToken = (token) => store.set("accessToken", token);
@@ -34,6 +33,10 @@ export const getRefreshToken = () => store.get("refreshToken");
 export const removeRefreshToken = () => store.delete("refreshToken");
 
 // Clear all (logout)
-export const clearAll = () => store.clear();
+export const clearAll = () => {
+  removeUser();
+  removeAccessToken();
+  removeRefreshToken();
+};
 
 export default store;

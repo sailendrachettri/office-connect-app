@@ -39,9 +39,17 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
       const userId = res?.data?.data?.userId
 
       if (res?.data?.success) {
-        await window.store.set('accessToken', accessToken)
+         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
+        // await window.store.set('user', {
+        //   userId,
+        //   fullName,
+        //   email,
+        //   profileImage
+          
+        // })
+
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }

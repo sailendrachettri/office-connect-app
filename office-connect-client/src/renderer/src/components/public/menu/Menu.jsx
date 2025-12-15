@@ -10,26 +10,25 @@ import toast from 'react-hot-toast'
 const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq }) => {
   const [open, setOpen] = useState(false)
 
-  const handleLogout = async () => {
-    try {
-      const refreshToken = await window.store.get('refreshToken')
-      const payload = {
-        RefreshToken: refreshToken
-      }
-      const res = await axiosInstance.post(LOGOUT_URL, payload)
-      console.log(res)
+ const handleLogout = async () => {
+  try {
+    const refreshToken = await window.store.get('refreshToken');
+    const payload = { RefreshToken: refreshToken };
 
-      if (res?.data?.success == true) {
-        toast.success(res?.data?.message || 'Logged out!')
-      }
+    const res = await axiosInstance.post(LOGOUT_URL, payload);
 
-      await window.store.clear()
-      setShowLogin(true)
-      setIsLoggedIn(false)
-    } catch (error) {
-      console.error('Not able to logout', error)
+    if (res?.data?.success) {
+      toast.success(res?.data?.message || 'Logged out!');
     }
+
+    await window.store.clear();
+    setShowLogin(true);
+    setIsLoggedIn(false);
+  } catch (error) {
+    console.error('Not able to logout', error);
   }
+}
+
 
   console.log(selectedTab)
 
