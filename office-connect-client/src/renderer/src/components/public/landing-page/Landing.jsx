@@ -18,6 +18,29 @@ const Landing = ({ selectedFriendProfileId }) => {
 
   const bottomRef = useRef(null)
 
+  const isSameDay = (d1, d2) => {
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+    )
+  }
+
+  const formatDateLabel = (date) => {
+    const today = new Date()
+    const yesterday = new Date()
+    yesterday.setDate(today.getDate() - 1)
+
+    if (isSameDay(date, today)) return 'Today'
+    if (isSameDay(date, yesterday)) return 'Yesterday'
+
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
   /* ---------------- Load current user ---------------- */
   useEffect(() => {
     ;(async () => {
@@ -30,10 +53,11 @@ const Landing = ({ selectedFriendProfileId }) => {
   useEffect(() => {
     if (!currentUserId || !selectedFriendProfileId) return
 
-
     const fetchMessages = async () => {
       try {
-        const res = await axiosPrivate.get(`${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}`);
+        const res = await axiosPrivate.get(
+          `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}`
+        )
         setMessages(res.data || [])
         // console.log(res?.data)
       } catch (err) {
@@ -92,7 +116,9 @@ const Landing = ({ selectedFriendProfileId }) => {
 
     // Optimistic update
     setMessages((prev) => [
-      ...prev,
+      [...prev].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    ),
       {
         senderId: currentUserId,
         receiverId: selectedFriendProfileId,
@@ -118,36 +144,52 @@ const Landing = ({ selectedFriendProfileId }) => {
     <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
       {/* ================= MESSAGES ================= */}
       <div className="flex-1 overflow-y-auto custom-scroll">
-        {messages?.map((msg, i) => {
-         const fromMe = msg.senderId === currentUserId;
+        {messages.map((msg, i) => {
+          const fromMe = msg.senderId === currentUserId
+          const msgDate = new Date(msg.createdAt)
+          const prevMsg = messages[i - 1]
+          const showDate = !prevMsg || !isSameDay(new Date(prevMsg.createdAt), msgDate)
 
           return (
-            <div key={i} className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}>
-              <div
-                className={`max-w-xs px-4 py-2 rounded-xl text-sm shadow
-                  ${
-                    fromMe
-                      ? 'bg-primary text-white rounded-br-none'
-                      : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
-                  }`}
-              >
-                <p>{msg?.messageText}</p>
+            <div key={i}>
+              {/* DATE SEPARATOR */}
+              {showDate && (
+                <div className="flex justify-center my-4">
+                  <span className="px-3 py-1 text-xs rounded-full bg-slate-200 text-slate-600">
+                    {formatDateLabel(msgDate)}
+                  </span>
+                </div>
+              )}
 
-                <span
-                  className={`text-xs flex justify-end items-center gap-1 mt-1
-                    ${fromMe ? 'text-green-100' : 'text-slate-400'}
-                  `}
+              {/* MESSAGE BUBBLE */}
+              <div className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}>
+                <div
+                  className={`max-w-xs px-4 py-2 rounded-xl text-sm shadow
+            ${
+              fromMe
+                ? 'bg-primary text-white rounded-br-none'
+                : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
+            }`}
                 >
-                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                  {fromMe && renderStatus(msg.isRead)}
-                </span>
+                  <p>{msg.messageText}</p>
+
+                  <span
+                    className={`text-xs flex justify-end items-center gap-1 mt-1
+              ${fromMe ? 'text-green-100' : 'text-slate-400'}
+            `}
+                  >
+                    {msgDate.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                    {fromMe && renderStatus(msg.isRead)}
+                  </span>
+                </div>
               </div>
             </div>
           )
         })}
+
         <div ref={bottomRef} />
       </div>
 
