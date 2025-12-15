@@ -7,7 +7,7 @@ import { axiosInstance } from '../../../api/api'
 import { LOGOUT_URL } from '../../../api/routes_urls'
 import toast from 'react-hot-toast'
 
-const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
+const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq }) => {
   const [open, setOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -18,16 +18,16 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
       }
       const res = await axiosInstance.post(LOGOUT_URL, payload)
       console.log(res)
-  
+
       if (res?.data?.success == true) {
         toast.success(res?.data?.message || 'Logged out!')
       }
-  
+
       await window.store.clear()
       setShowLogin(true)
       setIsLoggedIn(false)
     } catch (error) {
-      console.error("Not able to logout", error);
+      console.error('Not able to logout', error)
     }
   }
 
@@ -47,13 +47,22 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
         </div>
 
         {/* User profile */}
-        <div
-          onClick={() => {
-            setSelectedTab('profile')
-          }}
-          className={`rounded-full  ${selectedTab == 'profile' ? ' bg-ternary' : 'bg-slate-100'} p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
-        >
-          <FaRegUser size={22} />
+        <div onClick={() => setSelectedTab('profile')} className="relative mt-6 cursor-pointer">
+          {/* Notification badge */}
+          {pendingFriendReq > 0 && (
+            <span className="absolute -top-1 -right-1 flex items-center justify-center h-5 w-5 text-xs font-semibold text-white bg-red-500 rounded-full">
+              {pendingFriendReq}
+            </span>
+          )}
+
+          {/* Circle with icon */}
+          <div
+            className={`rounded-full p-4 text-slate-600 transition ${
+              selectedTab === 'profile' ? 'bg-ternary' : 'bg-slate-100'
+            } hover:bg-ternary`}
+          >
+            <FaRegUser size={22} />
+          </div>
         </div>
       </div>
 

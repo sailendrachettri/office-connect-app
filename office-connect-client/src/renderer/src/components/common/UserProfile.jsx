@@ -7,7 +7,7 @@ import InputField from '../../reusables/input-fields/InputField'
 import { useForm } from 'react-hook-form'
 import FriendsSection from './FriendsSection'
 
-const UserProfile = () => {
+const UserProfile = ({trigger}) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState(null);
@@ -39,7 +39,7 @@ const UserProfile = () => {
   if (!user) return <div className="p-6 text-red-500">Failed to load profile</div>
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6 pb-32">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* LEFT PROFILE CARD */}
         <div className="bg-white shadow rounded-2xl p-6 flex flex-col items-center">
@@ -102,7 +102,7 @@ const UserProfile = () => {
       </div>
 
     {/* Search friend and request */}
-    <FriendsSection userId={userId} /> 
+    <FriendsSection trigger={trigger} userId={userId} /> 
       
     </div>
   )

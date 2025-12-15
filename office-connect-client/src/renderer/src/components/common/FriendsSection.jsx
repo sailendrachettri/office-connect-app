@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  ACCEPT_FRIEND_REQUEST_URL,
   CANCEL_FRIEND_REQUEST_URL,
   GET_FRIEND_LIST_URL,
   REJECT_FRIEND_REQUEST_URL,
@@ -39,6 +40,16 @@ const FriendsSection = ({ userId }) => {
 
   const filteredList = friendList.filter((item) => item.relation_status === activeTab)
 
+  const friendsCount = friendList.filter((item) => item.relation_status === 'FRIEND').length
+
+  const pendingReceivedCount = friendList.filter(
+    (item) => item.relation_status === 'PENDING_RECEIVED'
+  ).length
+
+  const pendingSentCount = friendList.filter(
+    (item) => item.relation_status === 'PENDING_SENT'
+  ).length
+
   const handleCancleFreindRequest = async (frienduserId) => {
     try {
       const payload = {
@@ -69,6 +80,27 @@ const FriendsSection = ({ userId }) => {
       }
     } catch (error) {
       console.error('not able to reject friend request', error)
+    } finally {
+      setRefreshPage((prev) => !prev)
+    }
+  }
+
+  const handleAcceptFriendRequest = async (user) => {
+    try {
+      const payload = {
+        reqId: user?.req_id
+      }
+
+      const res = await axiosPrivate.post(ACCEPT_FRIEND_REQUEST_URL, payload)
+
+      if (res?.data?.success === true) {
+        toast.success(res?.data?.message || 'Friend request accepted')
+      } else {
+        toast.error(res?.data?.message || 'Failed to accept request')
+      }
+    } catch (error) {
+      console.error('not able to accept friend request', error)
+      toast.error('Something went wrong')
     } finally {
       setRefreshPage((prev) => !prev)
     }
@@ -160,7 +192,7 @@ const FriendsSection = ({ userId }) => {
 
                   <button
                     onClick={() => sendFriendRequest(u)}
-                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
                   >
                     Add
                   </button>
@@ -182,12 +214,44 @@ const FriendsSection = ({ userId }) => {
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition
         ${
-          activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+          activeTab === tab ? 'bg-white shadow text-secondary' : 'text-gray-500 hover:text-gray-700'
         }`}
               >
-                {tab === 'FRIEND' && 'Friends'}
-                {tab === 'PENDING_RECEIVED' && 'Pending'}
-                {tab === 'PENDING_SENT' && 'Sent'}
+                {tab === 'FRIEND' && (
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                     rounded-full bg-secondary text-xs font-semibold text-white"
+                    >
+                      {friendsCount}
+                    </span>
+                    <span>Friends</span>
+                  </span>
+                )}
+
+                {tab === 'PENDING_RECEIVED' && (
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                     rounded-full bg-secondary text-xs font-semibold text-white"
+                    >
+                      {pendingReceivedCount}
+                    </span>
+                    <span>Pending</span>
+                  </span>
+                )}
+
+                {tab === 'PENDING_SENT' && (
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                     rounded-full bg-secondary text-xs font-semibold text-white"
+                    >
+                      {pendingSentCount}
+                    </span>
+                    <span>Sent</span>
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -218,17 +282,21 @@ const FriendsSection = ({ userId }) => {
                 {/* Actions */}
                 <div>
                   {activeTab === 'FRIEND' && (
-                    <button className="text-sm text-red-500 hover:underline">Remove</button>
+                    // <button className="text-sm text-red-500 hover:underline cursor-pointer">Remove</button>
+                    <span></span>
                   )}
 
                   {activeTab === 'PENDING_RECEIVED' && (
                     <div className="flex gap-2">
-                      <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg">
+                      <button
+                        onClick={() => handleAcceptFriendRequest(user)}
+                        className="px-3 py-1 cursor-pointer text-sm bg-blue-500 text-white rounded-lg"
+                      >
                         Accept
                       </button>
                       <button
                         onClick={() => handleRejectFreindRequest(user)}
-                        className="px-3 py-1 text-sm bg-gray-200 rounded-lg"
+                        className="px-3 py-1 text-sm bg-gray-200 rounded-lg cursor-pointer"
                       >
                         Reject
                       </button>
@@ -236,12 +304,12 @@ const FriendsSection = ({ userId }) => {
                   )}
 
                   {activeTab === 'PENDING_SENT' && (
-                    <div className="gap-x-6 flex items-center justify-center flex-row">
+                    <div className="gap-x-6 flex items-center justify-center flex-row cursor-pointer">
                       <button
                         onClick={() => {
                           handleCancleFreindRequest(user?.user_id)
                         }}
-                        className="text-sm  bg-red-100 px-3 py-1 text-red-500 rounded-md"
+                        className="text-sm  bg-red-100 px-3 py-1 text-red-500 rounded-md cursor-pointer"
                       >
                         Cancle
                       </button>

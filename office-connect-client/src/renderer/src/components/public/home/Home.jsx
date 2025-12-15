@@ -6,8 +6,8 @@ import Landing from '../landing-page/Landing'
 import UserRegister from '../../common/UserRegister'
 import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
-import { axiosInstance } from '../../../api/api'
-import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
+import { axiosInstance, axiosPrivate } from '../../../api/api'
+import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -17,6 +17,9 @@ const Home = () => {
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
   const [loading, setLoading] = useState(true)
+  const [pendingFriendReq, setPendingFriendReq] = useState(null)
+  const [friendList, setFriendList] = useState([])
+  
 
   useEffect(() => {
     async function restoreSession() {
@@ -26,15 +29,28 @@ const Home = () => {
         setIsLoggedIn(true)
       }
 
-      // setTimeout(() => {
-      //   setLoading(false);
-      // }, 3000);
+    ;(async () => {
+      try {
+        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+        console.log(res)
+        if (res?.data?.success == true) {
+          const data = res?.data?.data;
+           const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
+           const countPendingFriendReq = data.filter((item) => item.relation_status === 'PENDING_RECEIVED').length;
+           setPendingFriendReq(countPendingFriendReq || null)
+          setFriendList(filteredList || [])
+          // console.log({ friendList })
+        }
+      } catch (error) {
+        console.error('not able to get the friend list', error)
+      }
+    })()
 
       setLoading(false)
     }
 
     restoreSession()
-  }, [])
+  }, [pendingFriendReq])
 
   useEffect(() => {
     if (selectedUsersProfileId) {
@@ -95,6 +111,7 @@ const Home = () => {
                   setIsLoggedIn={setIsLoggedIn}
                   selectedTab={selectedTab}
                   setSelectedTab={setSelectedTab}
+                  pendingFriendReq={pendingFriendReq}
                 />
               </div>
 
@@ -109,6 +126,7 @@ const Home = () => {
                         setShowLogin={setShowLogin}
                         setIsLoggedIn={setIsLoggedIn}
                         setSelectedFriendProfileId={setSelectedFriendProfileId}
+                        friendList={friendList}
                       />
                     </div>
 
@@ -140,7 +158,7 @@ const Home = () => {
 
                     {/* BODY */}
                     <div className="flex-1 overflow-y-auto bg-white">
-                      <UserProfile />
+                      <UserProfile  />
                     </div>
                   </div>
                 )}

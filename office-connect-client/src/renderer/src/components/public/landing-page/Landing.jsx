@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
 import { AiOutlinePaperClip } from 'react-icons/ai'
@@ -6,8 +6,7 @@ import { IoMdSend } from 'react-icons/io'
 import DefaultChatPage from '../../common/DefaultChatPage'
 
 const Landing = ({ selectedFriendProfileId, userFullDetails }) => {
-
-  console.log({userFullDetails});
+  console.log({ userFullDetails })
   const [message, setMessage] = useState('')
 
   const generateConversation = (userId) =>
@@ -24,10 +23,10 @@ const Landing = ({ selectedFriendProfileId, userFullDetails }) => {
   )
 
   if (!selectedFriendProfileId) {
-    return (
-     <DefaultChatPage />
-    )
+    return <DefaultChatPage />
   }
+
+
 
   const messages = conversations[selectedFriendProfileId] || []
 

@@ -18,6 +18,68 @@ namespace OfficeConnectServer.Controllers
         }
 
         [Authorize]
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptFriendRequest(
+    [FromBody] AcceptFriendRequest req
+)
+        {
+            if (req.ReqId == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>(
+                    false,
+                    "Invalid request data",
+                    null!
+                ));
+            }
+
+            // ✅ ReceiverId from JWT (safe)
+            var receiverId = (Guid)HttpContext.Items["UserId"];
+
+            try
+            {
+                const string sql = @"
+            SELECT accept_friend_request(
+                @req_id_i,
+                @receiver_id_i
+            );
+        ";
+
+                var result = await _db.ExecuteScalarAsync<string>(
+                    sql,
+                    cmd =>
+                    {
+                        cmd.Parameters.AddWithValue("req_id_i", req.ReqId);
+                        cmd.Parameters.AddWithValue("receiver_id_i", receiverId);
+                    }
+                );
+
+                if (result.Contains("not found"))
+                {
+                    return BadRequest(new ApiResponse<string>(
+                        false,
+                        result,
+                        null!
+                    ));
+                }
+
+                return Ok(new ApiResponse<string>(
+                    true,
+                    result,
+                    null!
+                ));
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new ApiResponse<string>(
+                    false,
+                    "Internal server error",
+                    null!
+                ));
+            }
+        }
+
+
+        [Authorize]
         [HttpPost("reject")]
         public async Task<IActionResult> RejectFriendRequest(
     [FromBody] RejectFriendRequest req
