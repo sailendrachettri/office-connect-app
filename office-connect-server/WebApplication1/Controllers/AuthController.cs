@@ -19,22 +19,58 @@ namespace OfficeConnectServer.Controllers
             _jwtHelper = jwtHelper;
         }
 
-        [HttpPost("refresh")]
-        public IActionResult RefreshToken([FromBody] RefreshTokenRequest req)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest req)
         {
-            if (string.IsNullOrEmpty(req.RefreshToken))
-                return Unauthorized();
+            const string sql = "DELETE FROM utbl_user_refresh_tokens WHERE refresh_token = @token";
+            await _db.ExecuteNonQueryAsync(sql, cmd =>
+            {
+                cmd.Parameters.AddWithValue("token", req.RefreshToken);
+            });
 
-            var principal = _jwtHelper.ValidateToken(req.RefreshToken);
-            if (principal == null)
-                return Unauthorized();
-
-            var userIdClaim = principal.FindFirst("userId")?.Value;
-            var userId = Guid.Parse(userIdClaim);
-
-            var newAccessToken = _jwtHelper.GenerateToken(userId, 60);
-
-            return Ok(new { success = true, accessToken = newAccessToken });
+            return Ok(new ApiResponse<string>(true, "Logged out", null!));
         }
+
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest req)
+        {
+            var userId = await _db.ExecuteScalarAsync<Guid?>(
+                @"SELECT user_id FROM utbl_user_refresh_tokens
+          WHERE refresh_token = @token AND expires_at > NOW()",
+                cmd => cmd.Parameters.AddWithValue("token", req.RefreshToken)
+            );
+
+            if (userId == null)
+                return Unauthorized();
+
+            // DELETE OLD TOKEN
+            await _db.ExecuteNonQueryAsync(
+                "DELETE FROM utbl_user_refresh_tokens WHERE refresh_token = @token",
+                cmd => cmd.Parameters.AddWithValue("token", req.RefreshToken)
+            );
+
+            // ROTATE
+            var newRefreshToken = RefreshTokenHelper.Generate();
+            var accessToken = _jwtHelper.GenerateToken(userId.Value, 15);
+
+            await _db.ExecuteNonQueryAsync(
+                @"INSERT INTO utbl_user_refresh_tokens
+          (user_id, refresh_token, expires_at)
+          VALUES (@uid, @token, NOW() + INTERVAL '7 days')",
+                cmd =>
+                {
+                    cmd.Parameters.AddWithValue("uid", userId);
+                    cmd.Parameters.AddWithValue("token", newRefreshToken);
+                }
+            );
+
+            return Ok(new
+            {
+                accessToken,
+                refreshToken = newRefreshToken
+            });
+        }
+
     }
 }

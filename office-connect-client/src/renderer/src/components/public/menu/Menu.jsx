@@ -3,14 +3,32 @@ import { BsChatLeftDots } from 'react-icons/bs'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { IoPowerOutline } from 'react-icons/io5'
 import { FaRegUser } from 'react-icons/fa6'
+import { axiosInstance } from '../../../api/api'
+import { LOGOUT_URL } from '../../../api/routes_urls'
+import toast from 'react-hot-toast'
 
 const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
   const [open, setOpen] = useState(false)
 
-  const handleLogout = async() => {
-    await window.store.clear();
-    setShowLogin(true)
-    setIsLoggedIn(false)
+  const handleLogout = async () => {
+    try {
+      const refreshToken = await window.store.get('refreshToken')
+      const payload = {
+        RefreshToken: refreshToken
+      }
+      const res = await axiosInstance.post(LOGOUT_URL, payload)
+      console.log(res)
+  
+      if (res?.data?.success == true) {
+        toast.success(res?.data?.message || 'Logged out!')
+      }
+  
+      await window.store.clear()
+      setShowLogin(true)
+      setIsLoggedIn(false)
+    } catch (error) {
+      console.error("Not able to logout", error);
+    }
   }
 
   console.log(selectedTab)
@@ -19,12 +37,20 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
     <div className="fixed left-1 top-10 bottom-5 flex flex-col justify-between">
       <div>
         {/* Chats */}
-        <div onClick={()=>{setSelectedTab('chat')}} className={`${selectedTab == 'chat' ? 'bg-ternary' : 'bg-slate-100'} rounded-full  p-4 text-slate-600 cursor-pointer hover:bg-ternary transition`}>
+        <div
+          onClick={() => {
+            setSelectedTab('chat')
+          }}
+          className={`${selectedTab == 'chat' ? 'bg-ternary' : 'bg-slate-100'} rounded-full  p-4 text-slate-600 cursor-pointer hover:bg-ternary transition`}
+        >
           <BsChatLeftDots size={22} />
         </div>
 
         {/* User profile */}
-        <div onClick={()=>{setSelectedTab('profile')}}
+        <div
+          onClick={() => {
+            setSelectedTab('profile')
+          }}
           className={`rounded-full  ${selectedTab == 'profile' ? ' bg-ternary' : 'bg-slate-100'} p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
         >
           <FaRegUser size={22} />
@@ -35,7 +61,9 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab }) => {
       <div className="relative">
         {/* Settings icon */}
         <div
-          onClick={() => {setOpen(!open); }}
+          onClick={() => {
+            setOpen(!open)
+          }}
           className={`rounded-full p-4 mt-6  text-slate-600 cursor-pointer hover:bg-ternary transition`}
         >
           <IoSettingsOutline size={22} />

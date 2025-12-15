@@ -22,32 +22,7 @@ namespace OfficeConnectServer.Controllers
             _jwt = jwt;
         }
 
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest req)
-        {
-            const string sql = @"
-        SELECT user_id FROM utbl_user_refresh_tokens 
-        WHERE refresh_token = @refresh_token AND expires_at > NOW();
-    ";
-
-            var userId = await _db.ExecuteScalarAsync<Guid?>(sql, cmd =>
-            {
-                cmd.Parameters.AddWithValue("refresh_token", req.RefreshToken);
-            });
-
-            if (userId == null)
-                return Unauthorized(new ApiResponse<string>(false, "Invalid refresh token", null!));
-
-            string newAccessToken = _jwt.GenerateToken(userId.Value, 60);
-
-            return Ok(new ApiResponse<object>(
-                true,
-                "Token refreshed",
-                new { accessToken = newAccessToken }
-            ));
-        }
-
-
+        
 
 
         [HttpPost("details-by-id")]
@@ -131,8 +106,32 @@ namespace OfficeConnectServer.Controllers
 
                 Guid userId = result.GetProperty("user_id").GetGuid();
 
+                // 🔐 Generate tokens
                 string accessToken = _jwt.GenerateToken(userId, 60);
                 string refreshToken = _jwt.GenerateToken(userId, 1440);
+
+                // 🔁 OPTIONAL BUT RECOMMENDED: remove old refresh tokens
+                const string deleteOldTokensSql = @"
+            DELETE FROM utbl_user_refresh_tokens
+            WHERE user_id = @user_id;
+        ";
+
+                await _db.ExecuteNonQueryAsync(deleteOldTokensSql, cmd =>
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                });
+
+                // 💾 Save new refresh token
+                const string insertTokenSql = @"
+            INSERT INTO utbl_user_refresh_tokens(user_id, refresh_token, expires_at)
+            VALUES(@user_id, @refresh_token, NOW() + INTERVAL '1 day');
+        ";
+
+                await _db.ExecuteNonQueryAsync(insertTokenSql, cmd =>
+                {
+                    cmd.Parameters.AddWithValue("user_id", userId);
+                    cmd.Parameters.AddWithValue("refresh_token", refreshToken);
+                });
 
                 var data = new LoginResponseDto
                 {
@@ -144,8 +143,7 @@ namespace OfficeConnectServer.Controllers
                 return Ok(new ApiResponse<LoginResponseDto>(
                     true,
                     "Login successful",
-                   data
-
+                    data
                 ));
             }
             catch (PostgresException ex)
@@ -161,6 +159,7 @@ namespace OfficeConnectServer.Controllers
                 ));
             }
         }
+
 
 
         [HttpPost("register")]

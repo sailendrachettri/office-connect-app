@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using OfficeConnectServer.Data;
 using OfficeConnectServer.Helpers;
+using System.Security.Claims;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -30,11 +32,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnTokenValidated = context =>
             {
-                var userId = context.Principal!
-                    .Claims.First(x => x.Type == "userId")
-                    .Value;
+                var userIdClaim = context.Principal?
+                    .Claims.FirstOrDefault(c =>
+                        c.Type == JwtRegisteredClaimNames.Sub ||
+                        c.Type == ClaimTypes.NameIdentifier
+                    );
 
-                context.HttpContext.Items["UserId"] = Guid.Parse(userId);
+                if (userIdClaim == null)
+                {
+                    context.Fail("UserId claim missing");
+                    return Task.CompletedTask;
+                }
+
+                // Store UserId for controllers
+                context.HttpContext.Items["UserId"] =
+                    Guid.Parse(userIdClaim.Value);
+
                 return Task.CompletedTask;
             }
         };

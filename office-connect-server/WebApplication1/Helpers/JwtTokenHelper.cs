@@ -25,9 +25,11 @@ namespace OfficeConnectServer.Helpers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
-            {
-                new Claim("userId", userId.ToString())
+             {
+                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
