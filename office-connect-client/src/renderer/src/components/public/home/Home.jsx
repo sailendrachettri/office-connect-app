@@ -21,6 +21,25 @@ const Home = () => {
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
   const [friendList, setFriendList] = useState([])
 
+  const getFriendList = async () => {
+    try {
+      const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+
+      if (res?.data?.success == true) {
+        const data = res?.data?.data
+        const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
+        console.log({ friendList })
+        const countPendingFriendReq = data.filter(
+          (item) => item.relation_status === 'PENDING_RECEIVED'
+        ).length
+        setPendingFriendReq(countPendingFriendReq || null)
+        setFriendList(filteredList || [])
+      }
+    } catch (error) {
+      console.error('not able to get the friend list', error)
+    }
+  }
+
   useEffect(() => {
     async function restoreSession() {
       const token = await window.store.get('accessToken')
@@ -29,24 +48,7 @@ const Home = () => {
         setIsLoggedIn(true)
       }
 
-      ;(async () => {
-        try {
-          const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-
-          if (res?.data?.success == true) {
-            const data = res?.data?.data
-            const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
-            console.log({friendList})
-            const countPendingFriendReq = data.filter(
-              (item) => item.relation_status === 'PENDING_RECEIVED'
-            ).length
-            setPendingFriendReq(countPendingFriendReq || null)
-            setFriendList(filteredList || [])
-          }
-        } catch (error) {
-          console.error('not able to get the friend list', error)
-        }
-      })()
+      getFriendList();
 
       setLoading(false)
     }
@@ -149,6 +151,7 @@ const Home = () => {
                           <Landing
                             selectedFriendProfileId={selectedFriendProfileId}
                             userFullDetails={userFullDetails}
+                            getFriendList={getFriendList}
                           />
                         </div>
                       </div>

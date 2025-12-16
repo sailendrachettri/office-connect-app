@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
@@ -54,7 +53,7 @@ const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfile
                     {user?.last_message?.created_at && getTime24FromDate(user?.last_message?.created_at)}
                   </div>
 
-                  {user?.unread_count > 0 && (
+                  { user?.unread_count > 0 && (
                     <div className="mt-1 bg-primary text-white text-xs px-2 py-0.5 rounded-full inline-block">
                       {user?.unread_count}
                     </div>

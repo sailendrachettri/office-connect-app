@@ -9,8 +9,7 @@ import { MESSAGES_URL } from '../../../api/routes_urls'
 import { axiosPrivate } from '../../../api/api'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
-const Landing = ({ selectedFriendProfileId, refresh }) => {
- 
+const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [connection, setConnection] = useState(null)
@@ -77,10 +76,6 @@ const Landing = ({ selectedFriendProfileId, refresh }) => {
 
     return () => observerRef.current?.disconnect()
   }, [currentUserId])
-
-  useEffect(() => {
-    markMessagesAsRead()
-  }, [messages.length])
 
   useEffect(() => {
     if (!messages.length) return
@@ -199,12 +194,10 @@ const Landing = ({ selectedFriendProfileId, refresh }) => {
       await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
     } catch (err) {
       console.error('Failed to mark messages as read', err)
+    } finally {
+      getFriendList()
     }
   }
-
-  useEffect(() => {
-    markMessagesAsRead()
-  }, [messages.length])
 
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()
@@ -285,18 +278,14 @@ const Landing = ({ selectedFriendProfileId, refresh }) => {
     }
   }
 
-  console.log({messages})
-
   /* ---------------- Status Icon ---------------- */
   const renderStatus = (status) => {
-    console.log({status})
     if (status == true) return <BsCheck2All size={16} className="text-green-400" />
     // if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
     return <PiCheck size={16} className="text-slate-400" />
   }
 
   if (!selectedFriendProfileId) return <DefaultChatPage />
-  
 
   return (
     <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
@@ -366,7 +355,6 @@ const Landing = ({ selectedFriendProfileId, refresh }) => {
               ${fromMe ? 'text-green-100' : 'text-slate-400'}
             `}
                   >
-                    
                     {msgDate && getTime24FromDate(msgDate)}
                     {fromMe && renderStatus(msg?.isRead)}
                   </span>
