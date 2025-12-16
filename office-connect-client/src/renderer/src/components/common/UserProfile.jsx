@@ -5,7 +5,7 @@ import defaultUser from '../../assets/peoples/default_user.jpg'
 import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
 import FriendsSection from './FriendsSection'
 
-const UserProfile = ({trigger}) => {
+const UserProfile = ({trigger, getFriendList}) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState(null);
@@ -100,7 +100,7 @@ const UserProfile = ({trigger}) => {
       </div>
 
     {/* Search friend and request */}
-    <FriendsSection trigger={trigger} userId={userId} /> 
+    <FriendsSection getFriendList={getFriendList} trigger={trigger} userId={userId} /> 
       
     </div>
   )

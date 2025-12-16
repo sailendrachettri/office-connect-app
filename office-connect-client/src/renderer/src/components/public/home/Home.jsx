@@ -168,7 +168,7 @@ const Home = () => {
 
                       {/* BODY */}
                       <div className="flex-1 overflow-y-auto bg-white">
-                        <UserProfile />
+                        <UserProfile getFriendList={getFriendList} />
                       </div>
                     </div>
                   )}

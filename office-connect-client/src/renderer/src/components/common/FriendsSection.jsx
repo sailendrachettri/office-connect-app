@@ -11,7 +11,7 @@ import { axiosInstance, axiosPrivate } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import toast from 'react-hot-toast'
 
-const FriendsSection = ({ userId }) => {
+const FriendsSection = ({ userId, getFriendList }) => {
   const [searchText, setSearchText] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [searching, setSearching] = useState(false)
@@ -63,6 +63,7 @@ const FriendsSection = ({ userId }) => {
       console.error('not able to cancle friend request', error)
     } finally {
       setRefreshPage((prev) => !prev)
+      getFriendList();
     }
   }
 
@@ -81,7 +82,8 @@ const FriendsSection = ({ userId }) => {
     } catch (error) {
       console.error('not able to reject friend request', error)
     } finally {
-      setRefreshPage((prev) => !prev)
+      setRefreshPage((prev) => !prev);
+      getFriendList();
     }
   }
 
@@ -102,7 +104,8 @@ const FriendsSection = ({ userId }) => {
       console.error('not able to accept friend request', error)
       toast.error('Something went wrong')
     } finally {
-      setRefreshPage((prev) => !prev)
+      setRefreshPage((prev) => !prev);
+      getFriendList();
     }
   }
 
