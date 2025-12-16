@@ -33,7 +33,7 @@ const Home = () => {
       ;(async () => {
         try {
           const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-          // console.log(res)
+         
           if (res?.data?.success == true) {
             const data = res?.data?.data
             const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
@@ -42,7 +42,7 @@ const Home = () => {
             ).length
             setPendingFriendReq(countPendingFriendReq || null)
             setFriendList(filteredList || [])
-            // console.log({ friendList })
+           
           }
         } catch (error) {
           console.error('not able to get the friend list', error)
@@ -53,7 +53,7 @@ const Home = () => {
     }
 
     restoreSession()
-  }, [pendingFriendReq])
+  }, [pendingFriendReq, isLoggedIn])
 
   useEffect(() => {
     if (selectedFriendProfileId) {
@@ -63,14 +63,14 @@ const Home = () => {
             UserId: selectedFriendProfileId
           }
           const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload)
-          // console.log(res?.data)
+         
           setUserFullDetails(res?.data?.data || {})
         } catch (error) {}
       })()
     }
-  }, [selectedFriendProfileId])
+  }, [selectedFriendProfileId, isLoggedIn])
 
-  // console.log({ selectedFriendProfileId })
+ 
 
   return (
     <>

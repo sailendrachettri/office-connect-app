@@ -73,7 +73,6 @@ const Landing = ({ selectedFriendProfileId }) => {
           `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}?pageSize=50`
         )
         
-        console.log({res})
         const data = res.data
         setMessages(data || [])
         setHasMore(data.hasMore)

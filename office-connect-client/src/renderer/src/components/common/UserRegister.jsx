@@ -32,7 +32,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
       }
 
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
-      // console.log(res)
+     
 
       const accessToken = res?.data?.data?.accessToken
       const refreshToken = res?.data?.data?.refreshToken

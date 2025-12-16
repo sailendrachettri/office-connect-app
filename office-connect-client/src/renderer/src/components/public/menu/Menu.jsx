@@ -30,7 +30,6 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
 }
 
 
-  // console.log(selectedTab)
 
   return (
     <div className="fixed left-2 top-10 bottom-5 flex flex-col justify-between">

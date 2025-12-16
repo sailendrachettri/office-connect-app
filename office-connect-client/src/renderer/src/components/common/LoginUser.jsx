@@ -17,16 +17,12 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
 
   const handlLogin = async (data) => {
     try {
-      // console.log('Login Data:', data)
       const payload = {
         Email: data?.email,
         Password: data?.password
       }
 
-      // console.log(payload)
-
       const res = await axiosInstance.post(LOGIN_USER_URL, payload)
-      // console.log(res)
 
       const accessToken = res?.data?.data?.accessToken
       const refreshToken = res?.data?.data?.refreshToken
@@ -41,7 +37,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
         //   fullName,
         //   email,
         //   profileImage
-          
+
         // })
 
         setIsLoggedIn(true)

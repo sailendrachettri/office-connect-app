@@ -190,7 +190,7 @@ const people = [
 
 const Headers = ({ userFullDetails }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
-  console.log({ userFullDetails })
+
 
   return (
     <>
