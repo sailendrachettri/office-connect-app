@@ -1,7 +1,8 @@
 import profilePic from '../../../assets/peoples/default_user.jpg'
+import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
 const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfileId }) => {
-
+  console.log({ friendList })
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
       {/* Title */}
@@ -26,28 +27,36 @@ const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfile
           <div>
             {friendList?.map((user) => (
               <div
-                key={user.user_id}
+                key={user?.user_id}
                 onClick={() => {
                   setSelectedFriendProfileId(user?.user_id)
                 }}
                 className={`${selectedFriendProfileId == user?.user_id ? 'bg-gray-100' : 'bg-white'} flex rounded-md my-1 hover:bg-gray-50 items-center gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer`}
               >
                 {/* Image */}
-                <img src={user?.profile_image ||  profilePic} alt="" className="w-12 h-12 rounded-full object-cover" />
+                <img
+                  src={user?.profile_image || profilePic}
+                  alt=""
+                  className="w-12 h-12 rounded-full object-cover"
+                />
 
                 {/* Name + Last Message */}
                 <div className="flex-1">
-                  <div className="font-medium text-slate-900">{user.full_name}</div>
-                  <div className="text-sm text-slate-500 truncate w-[180px]">{user.lastMsg}</div>
+                  <div className="font-medium text-slate-900">{user?.full_name}</div>
+                  <div className="text-sm text-slate-500 truncate w-45">
+                    {user?.last_message?.message_text}
+                  </div>
                 </div>
 
                 {/* Time + Unread */}
                 <div className="text-right">
-                  <div className="text-xs text-slate-500">{user.time}</div>
+                  <div className="text-xs text-slate-500">
+                    {getTime24FromDate(user?.last_message?.created_at)}
+                  </div>
 
-                  {user.unread > 0 && (
-                    <div className="mt-1 bg-primary text-white text-xs px-2 py-[2px] rounded-full inline-block">
-                      {user.unread}
+                  {user?.unread_count > 0 && (
+                    <div className="mt-1 bg-primary text-white text-xs px-2 py-0.5 rounded-full inline-block">
+                      {user?.unread_count}
                     </div>
                   )}
                 </div>
