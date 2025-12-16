@@ -10,6 +10,8 @@ using System.IdentityModel.Tokens.Jwt;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 builder.Services.AddScoped<MessageRepository>();
+builder.Services.AddScoped<DbConnectionFactory>();
+builder.Services.AddScoped<DbHelper>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -90,8 +92,6 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<DbConnectionFactory>();
-builder.Services.AddScoped<DbHelper>();
 
 var app = builder.Build();
 

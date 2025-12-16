@@ -1,8 +1,8 @@
+import { useEffect } from 'react'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
 const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfileId }) => {
-  console.log({ friendList })
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
       {/* Title */}
@@ -29,7 +29,7 @@ const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfile
               <div
                 key={user?.user_id}
                 onClick={() => {
-                  setSelectedFriendProfileId(user?.user_id)
+                  setSelectedFriendProfileId(user?.user_id);
                 }}
                 className={`${selectedFriendProfileId == user?.user_id ? 'bg-gray-100' : 'bg-white'} flex rounded-md my-1 hover:bg-gray-50 items-center gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer`}
               >
@@ -51,7 +51,7 @@ const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfile
                 {/* Time + Unread */}
                 <div className="text-right">
                   <div className="text-xs text-slate-500">
-                    {getTime24FromDate(user?.last_message?.created_at)}
+                    {user?.last_message?.created_at && getTime24FromDate(user?.last_message?.created_at)}
                   </div>
 
                   {user?.unread_count > 0 && (

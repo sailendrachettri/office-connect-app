@@ -13,6 +13,32 @@ namespace OfficeConnectServer.Data
             _dbFactory = dbFactory;
         }
 
+        public async Task MarkMessagesReadAsync(
+    List<long> messageIds,
+    Guid userId
+)
+        {
+            const string sql = @"
+        UPDATE utbl_messages
+        SET is_read = true
+        WHERE message_id = ANY(@message_ids)
+          AND receiver_id = @user_id
+          AND is_read = false;
+    ";
+
+            using var conn = _dbFactory.CreateConnection();
+            await conn.OpenAsync();
+
+            await conn.ExecuteAsync(sql, new
+            {
+                message_ids = messageIds,
+                user_id = userId
+            });
+        }
+
+
+
+
         // NEW: Paginated method for loading messages in chunks
         public async Task<MessagePageResult> GetChatPaginatedAsync(
             Guid user1_id,

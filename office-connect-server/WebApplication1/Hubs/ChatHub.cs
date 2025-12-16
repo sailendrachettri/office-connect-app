@@ -11,6 +11,22 @@ public class ChatHub : Hub
         _repo = repo;
     }
 
+    public async Task MarkMessagesAsRead(
+    List<long> messageIds,
+    Guid senderId
+)
+    {
+        var userId = Guid.Parse(
+            Context.GetHttpContext()!.Request.Query["userId"]!
+        );
+
+        await _repo.MarkMessagesReadAsync(messageIds, userId);
+
+        await Clients.Group(senderId.ToString())
+            .SendAsync("MessagesRead", messageIds);
+    }
+
+
     public override async Task OnConnectedAsync()
     {
         var var_userId = Context.GetHttpContext()?.Request.Query["userId"].ToString();

@@ -7,14 +7,19 @@ import DefaultChatPage from '../../common/DefaultChatPage'
 import { createChatConnection } from '../../../signalr/chatConnection'
 import { MESSAGES_URL } from '../../../api/routes_urls'
 import { axiosPrivate } from '../../../api/api'
+import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
-const Landing = ({ selectedFriendProfileId }) => {
+const Landing = ({ selectedFriendProfileId, refresh }) => {
+ 
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [connection, setConnection] = useState(null)
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
-  
+
+  const observerRef = useRef(null)
+  const unreadMessageIdsRef = useRef(new Set())
+
   // Pagination states
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -48,6 +53,45 @@ const Landing = ({ selectedFriendProfileId }) => {
     })
   }
 
+  /* --------------View message--------------------- */
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const messageId = Number(entry.target.dataset.messageId)
+            if (!Number.isNaN(messageId)) {
+              unreadMessageIdsRef.current.add(messageId)
+            }
+            const senderId = entry.target.dataset.senderId
+
+            // Only mark messages NOT sent by me
+            if (senderId !== currentUserId && messageId) {
+              unreadMessageIdsRef.current.add(messageId)
+            }
+          }
+        })
+      },
+      { threshold: 0.6 } // 60% visible
+    )
+
+    return () => observerRef.current?.disconnect()
+  }, [currentUserId])
+
+  useEffect(() => {
+    markMessagesAsRead()
+  }, [messages.length])
+
+  useEffect(() => {
+    if (!messages.length) return
+
+    const timer = setTimeout(() => {
+      markMessagesAsRead()
+    }, 500) // wait for observer to trigger
+
+    return () => clearTimeout(timer)
+  }, [messages.length])
+
   /* ---------------- Load current user ---------------- */
   useEffect(() => {
     ;(async () => {
@@ -72,7 +116,7 @@ const Landing = ({ selectedFriendProfileId }) => {
         const res = await axiosPrivate.get(
           `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}?pageSize=50`
         )
-        
+
         const data = res.data
         setMessages(data || [])
         setHasMore(data.hasMore)
@@ -111,10 +155,10 @@ const Landing = ({ selectedFriendProfileId }) => {
       )
 
       const data = res.data
-      
+
       if (data.messages && data.messages.length > 0) {
         // Prepend older messages
-        setMessages(prev => [...data.messages, ...prev])
+        setMessages((prev) => [...data.messages, ...prev])
         setHasMore(data.hasMore)
         setOldestMessageId(data.oldestMessageId)
 
@@ -145,6 +189,29 @@ const Landing = ({ selectedFriendProfileId }) => {
     }
   }
 
+  const markMessagesAsRead = async () => {
+    if (!connection || unreadMessageIdsRef.current.size === 0) return
+
+    const ids = Array.from(unreadMessageIdsRef.current)
+    unreadMessageIdsRef.current.clear()
+
+    try {
+      await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
+    } catch (err) {
+      console.error('Failed to mark messages as read', err)
+    }
+  }
+
+  useEffect(() => {
+    markMessagesAsRead()
+  }, [messages.length])
+
+  useEffect(() => {
+    const onFocus = () => markMessagesAsRead()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
+
   /* ---------------- SignalR connection ---------------- */
   useEffect(() => {
     if (!currentUserId || !selectedFriendProfileId) return
@@ -158,12 +225,12 @@ const Landing = ({ selectedFriendProfileId }) => {
 
     conn.on('ReceiveMessage', (msg) => {
       const normalized = {
-        messageId: msg.messageId ?? msg.message_id,
-        senderId: msg.senderId ?? msg.sender_id,
-        receiverId: msg.receiverId ?? msg.receiver_id,
-        messageText: msg.messageText ?? msg.message_text,
-        createdAt: msg.createdAt ?? msg.created_at,
-        isRead: msg.isRead ?? false
+        messageId: msg?.messageId ?? msg?.message_id,
+        senderId: msg?.senderId ?? msg?.sender_id,
+        receiverId: msg?.receiverId ?? msg?.receiver_id,
+        messageText: msg?.messageText ?? msg?.message_text,
+        createdAt: msg?.createdAt ?? msg?.created_at,
+        isRead: msg?.isRead ?? false
       }
 
       if (
@@ -172,6 +239,12 @@ const Landing = ({ selectedFriendProfileId }) => {
       ) {
         setMessages((prev) => [...prev, normalized])
       }
+    })
+
+    conn.on('MessagesRead', (ids) => {
+      setMessages((prev) =>
+        prev.map((m) => (ids.includes(m.messageId) ? { ...m, isRead: true } : m))
+      )
     })
 
     setConnection(conn)
@@ -206,30 +279,29 @@ const Landing = ({ selectedFriendProfileId }) => {
     setText('')
 
     try {
-      await connection.invoke(
-        'SendMessage',
-        currentUserId,
-        selectedFriendProfileId,
-        text
-      )
+      await connection.invoke('SendMessage', currentUserId, selectedFriendProfileId, text)
     } catch (err) {
       console.error('Failed to send message', err)
     }
   }
 
+  console.log({messages})
+
   /* ---------------- Status Icon ---------------- */
   const renderStatus = (status) => {
-    if (status === 'read') return <BsCheck2All size={16} className="text-blue-400" />
-    if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
+    console.log({status})
+    if (status == true) return <BsCheck2All size={16} className="text-green-400" />
+    // if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
     return <PiCheck size={16} className="text-slate-400" />
   }
 
   if (!selectedFriendProfileId) return <DefaultChatPage />
+  
 
   return (
     <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
       {/* ================= MESSAGES ================= */}
-      <div 
+      <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto custom-scroll"
@@ -243,19 +315,17 @@ const Landing = ({ selectedFriendProfileId }) => {
 
         {/* No more messages indicator */}
         {!hasMore && messages.length > 0 && (
-          <div className="text-center py-2 text-slate-400 text-xs">
-            No more messages
-          </div>
+          <div className="text-center py-2 text-slate-400 text-xs">No more messages</div>
         )}
 
         {messages.map((msg, i) => {
-          const fromMe = msg.senderId === currentUserId
-          const msgDate = new Date(msg.createdAt)
+          const fromMe = msg?.senderId === currentUserId
+          const msgDate = new Date(msg?.createdAt)
           const prevMsg = messages[i - 1]
-          const showDate = !prevMsg || !isSameDay(new Date(prevMsg.createdAt), msgDate)
+          const showDate = !prevMsg || !isSameDay(new Date(prevMsg?.createdAt), msgDate)
 
           return (
-            <div key={msg.messageId || i}>
+            <div key={msg?.messageId || i}>
               {/* DATE SEPARATOR */}
               {showDate && (
                 <div className="flex justify-center my-4">
@@ -266,7 +336,21 @@ const Landing = ({ selectedFriendProfileId }) => {
               )}
 
               {/* MESSAGE BUBBLE */}
-              <div className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}>
+              <div
+                data-message-id={msg?.messageId}
+                data-sender-id={msg?.senderId}
+                ref={(el) => {
+                  if (
+                    el &&
+                    !msg?.isRead &&
+                    msg?.senderId !== currentUserId &&
+                    typeof msg?.messageId === 'number'
+                  ) {
+                    observerRef.current.observe(el)
+                  }
+                }}
+                className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}
+              >
                 <div
                   className={`max-w-xs px-4 py-2 rounded-xl text-sm shadow
             ${
@@ -275,18 +359,16 @@ const Landing = ({ selectedFriendProfileId }) => {
                 : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
             }`}
                 >
-                  <p>{msg.messageText}</p>
+                  <p>{msg?.messageText}</p>
 
                   <span
                     className={`text-xs flex justify-end items-center gap-1 mt-1
               ${fromMe ? 'text-green-100' : 'text-slate-400'}
             `}
                   >
-                    {msgDate.toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                    {fromMe && renderStatus(msg.isRead)}
+                    
+                    {msgDate && getTime24FromDate(msgDate)}
+                    {fromMe && renderStatus(msg?.isRead)}
                   </span>
                 </div>
               </div>

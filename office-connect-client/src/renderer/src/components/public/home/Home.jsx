@@ -8,9 +8,8 @@ import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
 import { axiosInstance, axiosPrivate } from '../../../api/api'
 import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL } from '../../../api/routes_urls'
-import { IoChatbubblesOutline } from "react-icons/io5";
+import { IoChatbubblesOutline } from 'react-icons/io5'
 import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
-
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -33,16 +32,16 @@ const Home = () => {
       ;(async () => {
         try {
           const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-         
+
           if (res?.data?.success == true) {
             const data = res?.data?.data
             const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
+            console.log({friendList})
             const countPendingFriendReq = data.filter(
               (item) => item.relation_status === 'PENDING_RECEIVED'
             ).length
             setPendingFriendReq(countPendingFriendReq || null)
             setFriendList(filteredList || [])
-           
           }
         } catch (error) {
           console.error('not able to get the friend list', error)
@@ -53,7 +52,7 @@ const Home = () => {
     }
 
     restoreSession()
-  }, [pendingFriendReq, isLoggedIn])
+  }, [pendingFriendReq, isLoggedIn, selectedFriendProfileId])
 
   useEffect(() => {
     if (selectedFriendProfileId) {
@@ -63,14 +62,12 @@ const Home = () => {
             UserId: selectedFriendProfileId
           }
           const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload)
-         
+
           setUserFullDetails(res?.data?.data || {})
         } catch (error) {}
       })()
     }
   }, [selectedFriendProfileId, isLoggedIn])
-
- 
 
   return (
     <>
@@ -85,7 +82,7 @@ const Home = () => {
           {isLoggedIn && (
             <section>
               <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-4 select-none drag-region">
-                <div className='flex items-center justify-start gap-x-3 no-drag'>
+                <div className="flex items-center justify-start gap-x-3 no-drag">
                   <IoChatbubblesOutline />
                   <TopHelpMenu />
                 </div>
@@ -130,12 +127,12 @@ const Home = () => {
                   {selectedTab === 'chat' && (
                     <>
                       {/* CHAT LIST */}
-                      <div className="w-[420px] bg-white border-r border-slate-200 p-1">
+                      <div className="w-105 bg-white border-r border-slate-200 p-1">
                         <Sidebar
                           setShowLogin={setShowLogin}
                           setIsLoggedIn={setIsLoggedIn}
                           setSelectedFriendProfileId={setSelectedFriendProfileId}
-                          selectedFriendProfileId = {selectedFriendProfileId}
+                          selectedFriendProfileId={selectedFriendProfileId}
                           friendList={friendList}
                         />
                       </div>
@@ -143,7 +140,7 @@ const Home = () => {
                       {/* CHAT AREA */}
                       <div className="flex-1 flex flex-col">
                         {/* HEADER */}
-                        <div className="h-[70px] bg-linear-to-t from-slate-50 to-slate-100">
+                        <div className="h-17.5 bg-linear-to-t from-slate-50 to-slate-100">
                           <Headers userFullDetails={userFullDetails} />
                         </div>
 
@@ -162,7 +159,7 @@ const Home = () => {
                   {selectedTab === 'profile' && (
                     <div className="flex-1 flex flex-col">
                       {/* HEADER */}
-                      <div className="h-[70px] bg-white border-b border-slate-200 shadow-sm px-4 flex items-center">
+                      <div className="h-17.5 bg-white border-b border-slate-200 shadow-sm px-4 flex items-center">
                         Profile
                       </div>
 
