@@ -7,7 +7,7 @@ import { axiosInstance } from '../../../api/api'
 import { LOGOUT_URL } from '../../../api/routes_urls'
 import toast from 'react-hot-toast'
 
-const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq }) => {
+const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq, setSelectedFriendProfileId }) => {
   const [open, setOpen] = useState(false)
 
  const handleLogout = async () => {
@@ -19,7 +19,12 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
 
     if (res?.data?.success) {
       toast.success(res?.data?.message || 'Logged out!');
+      
     }
+
+    setTimeout(() => {
+      setSelectedFriendProfileId(null);
+    }, 100);
 
     await window.store.clear();
     setShowLogin(true);

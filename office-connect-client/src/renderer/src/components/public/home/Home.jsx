@@ -120,6 +120,7 @@ const Home = () => {
                     selectedTab={selectedTab}
                     setSelectedTab={setSelectedTab}
                     pendingFriendReq={pendingFriendReq}
+                    setSelectedFriendProfileId={setSelectedFriendProfileId}
                   />
                 </div>
 
@@ -143,7 +144,7 @@ const Home = () => {
                       <div className="flex-1 flex flex-col">
                         {/* HEADER */}
                         <div className="h-17.5 bg-linear-to-t from-slate-50 to-slate-100">
-                          <Headers userFullDetails={userFullDetails} />
+                          <Headers selectedFriendProfileId={selectedFriendProfileId} userFullDetails={userFullDetails} />
                         </div>
 
                         {/* BODY */}
