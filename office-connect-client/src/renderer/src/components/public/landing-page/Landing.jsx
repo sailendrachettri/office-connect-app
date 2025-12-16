@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import axios from 'axios'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
 import { AiOutlinePaperClip } from 'react-icons/ai'
@@ -15,8 +14,16 @@ const Landing = ({ selectedFriendProfileId }) => {
   const [connection, setConnection] = useState(null)
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
+  
+  // Pagination states
+  const [hasMore, setHasMore] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [oldestMessageId, setOldestMessageId] = useState(null)
 
   const bottomRef = useRef(null)
+  const scrollContainerRef = useRef(null)
+  const isLoadingRef = useRef(false)
+  const initialLoadDoneRef = useRef(false)
 
   const isSameDay = (d1, d2) => {
     return (
@@ -49,24 +56,95 @@ const Landing = ({ selectedFriendProfileId }) => {
     })()
   }, [])
 
-  /* ---------------- Load previous chat ---------------- */
+  /* ---------------- Load initial messages (paginated) ---------------- */
   useEffect(() => {
     if (!currentUserId || !selectedFriendProfileId) return
 
-    const fetchMessages = async () => {
+    // Reset state for new chat
+    setMessages([])
+    setHasMore(true)
+    setOldestMessageId(null)
+    initialLoadDoneRef.current = false
+
+    const fetchInitialMessages = async () => {
+      setLoading(true)
       try {
         const res = await axiosPrivate.get(
-          `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}`
+          `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}?pageSize=50`
         )
-        setMessages(res.data || [])
-        // console.log(res?.data)
+        
+        console.log({res})
+        const data = res.data
+        setMessages(data || [])
+        setHasMore(data.hasMore)
+        setOldestMessageId(data.oldestMessageId)
+        initialLoadDoneRef.current = true
+
+        // Scroll to bottom after initial load
+        setTimeout(() => {
+          bottomRef.current?.scrollIntoView()
+        }, 100)
       } catch (err) {
         console.error('Failed to load messages:', err)
+      } finally {
+        setLoading(false)
       }
     }
 
-    fetchMessages()
+    fetchInitialMessages()
   }, [currentUserId, selectedFriendProfileId])
+
+  /* ---------------- Load older messages when scrolling up ---------------- */
+  const loadOlderMessages = async () => {
+    if (!hasMore || isLoadingRef.current || !oldestMessageId || !initialLoadDoneRef.current) return
+
+    isLoadingRef.current = true
+    setLoading(true)
+
+    // Save scroll position
+    const container = scrollContainerRef.current
+    const oldScrollHeight = container.scrollHeight
+    const oldScrollTop = container.scrollTop
+
+    try {
+      const res = await axiosPrivate.get(
+        `${MESSAGES_URL}/paginated/${currentUserId}/${selectedFriendProfileId}?beforeMessageId=${oldestMessageId}&pageSize=50`
+      )
+
+      const data = res.data
+      
+      if (data.messages && data.messages.length > 0) {
+        // Prepend older messages
+        setMessages(prev => [...data.messages, ...prev])
+        setHasMore(data.hasMore)
+        setOldestMessageId(data.oldestMessageId)
+
+        // Restore scroll position (maintain visual position)
+        setTimeout(() => {
+          const newScrollHeight = container.scrollHeight
+          container.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight)
+        }, 0)
+      } else {
+        setHasMore(false)
+      }
+    } catch (err) {
+      console.error('Failed to load older messages:', err)
+    } finally {
+      setLoading(false)
+      isLoadingRef.current = false
+    }
+  }
+
+  /* ---------------- Handle scroll events ---------------- */
+  const handleScroll = () => {
+    const container = scrollContainerRef.current
+    if (!container || !initialLoadDoneRef.current) return
+
+    // Check if scrolled near top (within 150px)
+    if (container.scrollTop < 150 && hasMore && !isLoadingRef.current) {
+      loadOlderMessages()
+    }
+  }
 
   /* ---------------- SignalR connection ---------------- */
   useEffect(() => {
@@ -81,6 +159,7 @@ const Landing = ({ selectedFriendProfileId }) => {
 
     conn.on('ReceiveMessage', (msg) => {
       const normalized = {
+        messageId: msg.messageId ?? msg.message_id,
         senderId: msg.senderId ?? msg.sender_id,
         receiverId: msg.receiverId ?? msg.receiver_id,
         messageText: msg.messageText ?? msg.message_text,
@@ -103,40 +182,41 @@ const Landing = ({ selectedFriendProfileId }) => {
     }
   }, [currentUserId, selectedFriendProfileId])
 
-  /* ---------------- Auto scroll (NO smooth) ---------------- */
+  /* ---------------- Auto scroll to bottom for new messages ---------------- */
   useEffect(() => {
-    bottomRef.current?.scrollIntoView()
-  }, [messages])
+    if (initialLoadDoneRef.current) {
+      bottomRef.current?.scrollIntoView()
+    }
+  }, [messages.length])
 
   /* ---------------- Send message ---------------- */
- const sendMessage = async () => {
-  if (!text.trim() || !connected) return
+  const sendMessage = async () => {
+    if (!text.trim() || !connected) return
 
-  const optimisticMessage = {
-    senderId: currentUserId,
-    receiverId: selectedFriendProfileId,
-    messageText: text,
-    createdAt: new Date().toISOString(),
-    isRead: false
+    const optimisticMessage = {
+      messageId: Date.now(), // Temporary ID
+      senderId: currentUserId,
+      receiverId: selectedFriendProfileId,
+      messageText: text,
+      createdAt: new Date().toISOString(),
+      isRead: false
+    }
+
+    // Optimistic UI update
+    setMessages((prev) => [...prev, optimisticMessage])
+    setText('')
+
+    try {
+      await connection.invoke(
+        'SendMessage',
+        currentUserId,
+        selectedFriendProfileId,
+        text
+      )
+    } catch (err) {
+      console.error('Failed to send message', err)
+    }
   }
-
-  // Optimistic UI update (NO sorting here)
-  setMessages((prev) => [...prev, optimisticMessage])
-
-  setText('')
-
-  try {
-    await connection.invoke(
-      'SendMessage',
-      currentUserId,
-      selectedFriendProfileId,
-      text
-    )
-  } catch (err) {
-    console.error('Failed to send message', err)
-  }
-}
-
 
   /* ---------------- Status Icon ---------------- */
   const renderStatus = (status) => {
@@ -150,7 +230,25 @@ const Landing = ({ selectedFriendProfileId }) => {
   return (
     <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
       {/* ================= MESSAGES ================= */}
-      <div className="flex-1 overflow-y-auto custom-scroll">
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto custom-scroll"
+      >
+        {/* Loading indicator at top */}
+        {loading && hasMore && (
+          <div className="flex justify-center py-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+
+        {/* No more messages indicator */}
+        {!hasMore && messages.length > 0 && (
+          <div className="text-center py-2 text-slate-400 text-xs">
+            No more messages
+          </div>
+        )}
+
         {messages.map((msg, i) => {
           const fromMe = msg.senderId === currentUserId
           const msgDate = new Date(msg.createdAt)
@@ -158,7 +256,7 @@ const Landing = ({ selectedFriendProfileId }) => {
           const showDate = !prevMsg || !isSameDay(new Date(prevMsg.createdAt), msgDate)
 
           return (
-            <div key={i}>
+            <div key={msg.messageId || i}>
               {/* DATE SEPARATOR */}
               {showDate && (
                 <div className="flex justify-center my-4">
