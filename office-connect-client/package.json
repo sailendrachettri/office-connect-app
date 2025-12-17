@@ -20,6 +20,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@microsoft/signalr": "^10.0.0",
     "@reduxjs/toolkit": "^2.11.1",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
