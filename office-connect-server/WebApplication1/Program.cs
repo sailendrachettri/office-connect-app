@@ -66,7 +66,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowViteDevServer", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173") 
+            //.WithOrigins("http://localhost:5173") 
             .AllowAnyHeader()
             .SetIsOriginAllowed(_ => true)
             .AllowAnyMethod()
@@ -79,13 +79,13 @@ builder.Services.AddCors(options =>
 builder.WebHost.ConfigureKestrel(options =>
 {
     // HTTP
-    options.ListenAnyIP(44303);
+    options.ListenAnyIP(5171);
 
     // HTTPS (requires dev certificate installed)
-    options.ListenAnyIP(44303, listen =>
-    {
-        listen.UseHttps();
-    });
+    //options.ListenAnyIP(t171, listen =>
+    //{
+    //    listen.UseHttps();
+    //});
 });
 
 // Add services
@@ -106,7 +106,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

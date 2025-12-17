@@ -10,7 +10,10 @@
     script-src 'self';
     style-src 'self' 'unsafe-inline';
     img-src 'self' data:;
-    connect-src 'self' https://localhost:44303 wss://localhost:44303;
+    connect-src 'self'  
+    http://192.168.1.3:5171
+      ws://192.168.1.3:5171
+      wss://192.168.1.3:5171;
     font-src 'self';
   "
     />
