@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OfficeConnectServer.Helpers;
 using OfficeConnectServer.Models;
 using OfficeConnectServer.Responses;
 using System;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace OfficeConnectServer.Controllers
 {
@@ -18,6 +21,39 @@ namespace OfficeConnectServer.Controllers
             _db = db;
             _jwtHelper = jwtHelper;
         }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            var userIdStr =
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            if (string.IsNullOrEmpty(userIdStr))
+                return Unauthorized(new { success = false });
+
+            var userId = Guid.Parse(userIdStr);
+
+            const string sql = @"
+        SELECT user_id, username, full_name, email, profile_image
+        FROM utbl_users
+        WHERE user_id = @uid
+    ";
+
+            var user = await _db.ExecuteQuerySingleAsync<AuthUserModel>(
+                sql,
+                cmd => cmd.Parameters.AddWithValue("uid", userId)
+            );
+
+            return Ok(new
+            {
+                success = true,
+                data = user
+            });
+        }
+
+
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest req)

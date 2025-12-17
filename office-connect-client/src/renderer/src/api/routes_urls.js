@@ -12,3 +12,4 @@ export const MESSAGES_URL = 'api/messages'
 
 export const REFRESH_URL = "/api/v1/auth/refresh";
 export const LOGOUT_URL = "/api/v1/auth/logout";
+export const ME_URL = "/api/v1/auth/me";

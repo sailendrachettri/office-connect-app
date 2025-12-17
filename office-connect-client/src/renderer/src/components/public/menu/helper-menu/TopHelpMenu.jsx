@@ -27,7 +27,7 @@ const TopHelpMenu = () => {
     <div className="relative inline-block" ref={menuRef}>
       {/* Trigger */}
       <div
-        onClick={() => {setOpen(prev => !prev); console.log('sss')}}
+        onClick={() => {setOpen(prev => !prev);}}
         className="cursor-pointer text-sm font-medium text-slate-700 hover:text-slate-900"
       >
         Help

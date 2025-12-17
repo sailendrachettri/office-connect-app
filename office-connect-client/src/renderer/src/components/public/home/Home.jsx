@@ -7,7 +7,7 @@ import UserRegister from '../../common/UserRegister'
 import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
 import { axiosInstance, axiosPrivate } from '../../../api/api'
-import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL } from '../../../api/routes_urls'
+import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL, ME_URL } from '../../../api/routes_urls'
 import { IoChatbubblesOutline } from 'react-icons/io5'
 import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
 
@@ -22,39 +22,75 @@ const Home = () => {
   const [friendList, setFriendList] = useState([])
 
   const getFriendList = async () => {
-    try {
-      const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+    const userId = await window.store.get('userId')
 
-      if (res?.data?.success == true) {
-        const data = res?.data?.data
-        const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
-        console.log({ friendList })
-        const countPendingFriendReq = data.filter(
-          (item) => item.relation_status === 'PENDING_RECEIVED'
-        ).length
-        setPendingFriendReq(countPendingFriendReq || null)
-        setFriendList(filteredList || [])
+    if (userId) {
+      try {
+        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+
+        if (res?.data?.success == true) {
+          const data = res?.data?.data
+          const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
+          const countPendingFriendReq = data.filter(
+            (item) => item.relation_status === 'PENDING_RECEIVED'
+          ).length
+          setPendingFriendReq(countPendingFriendReq || null)
+          setFriendList(filteredList || [])
+        }
+      } catch (error) {
+        console.error('not able to get the friend list', error)
       }
-    } catch (error) {
-      console.error('not able to get the friend list', error)
     }
   }
 
   useEffect(() => {
-    async function restoreSession() {
-      const token = await window.store.get('accessToken')
+    const restoreSession = async () => {
+      try {
+        const res = await axiosPrivate.get(ME_URL)
+        console.log("Logged In user details");
+        console.table(res?.data?.data)
+        if (res?.data?.success == true) {
+          const email = res?.data?.data?.email
+          const full_name = res?.data?.data?.full_Name
+          const pic = res?.data?.data?.profile_Image
+          // const username = res?.data?.data?.username
+          const user_Id = res?.data?.data?.user_Id
 
-      if (token) {
-        setIsLoggedIn(true)
+          await window.store.set('userId', user_Id)
+          await window.store.set('user', {
+            user_Id,
+            full_name,
+            email,
+            pic
+          })
+          await getFriendList()
+          setIsLoggedIn(true)
+        }
+      } catch {
+        setIsLoggedIn(false)
+      } finally {
+        setLoading(false)
       }
-
-      getFriendList();
-
-      setLoading(false)
     }
 
     restoreSession()
-  }, [pendingFriendReq, isLoggedIn, selectedFriendProfileId])
+  }, [showLogin, loading])
+
+  // useEffect(() => {
+  //   async function restoreSession() {
+  //     const token = await window.store.get('accessToken')
+
+  //     if (token) {
+  //       setIsLoggedIn(true)
+  //     }
+
+  //     getFriendList();
+
+  //     setLoading(false)
+  //   }
+
+  //   restoreSession()
+  // }, [pendingFriendReq, isLoggedIn, selectedFriendProfileId])
 
   useEffect(() => {
     if (selectedFriendProfileId) {
@@ -69,6 +105,10 @@ const Home = () => {
         } catch (error) {}
       })()
     }
+
+    ;(async () => {
+      await getFriendList()
+    })()
   }, [selectedFriendProfileId, isLoggedIn])
 
   return (
@@ -144,7 +184,10 @@ const Home = () => {
                       <div className="flex-1 flex flex-col">
                         {/* HEADER */}
                         <div className="h-17.5 bg-linear-to-t from-slate-50 to-slate-100">
-                          <Headers selectedFriendProfileId={selectedFriendProfileId} userFullDetails={userFullDetails} />
+                          <Headers
+                            selectedFriendProfileId={selectedFriendProfileId}
+                            userFullDetails={userFullDetails}
+                          />
                         </div>
 
                         {/* BODY */}
