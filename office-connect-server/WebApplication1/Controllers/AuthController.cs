@@ -22,6 +22,7 @@ namespace OfficeConnectServer.Controllers
             _jwtHelper = jwtHelper;
         }
 
+
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> Me()
