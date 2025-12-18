@@ -55,16 +55,15 @@ axiosPrivate.interceptors.response.use(
         // Call refresh endpoint
         const response = await axiosInstance.post(REFRESH_URL, { refreshToken })
 
-        const newAccessToken = response.data.accessToken
+        const { accessToken, refreshToken: newRefreshToken } = response.data
+        console.log("heeheh: ", response);
 
-        // Save new access token in Electron-Store
-        await window.store.set('accessToken', newAccessToken)
+        await window.store.set('accessToken', accessToken)
+        await window.store.set('refreshToken', newRefreshToken)
+        axiosPrivate.defaults.headers.Authorization = `Bearer ${accessToken}`
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
 
-        // Update axios headers
-        axiosPrivate.defaults.headers.Authorization = `Bearer ${newAccessToken}`
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-
-        const connection = createChatConnection(res?.data?.data?.user_Id)
+        const connection = createChatConnection(response?.data?.data?.user_Id)
 
         connection
           .start()
@@ -77,7 +76,10 @@ axiosPrivate.interceptors.response.use(
         // Retry original request
         return axiosPrivate(originalRequest)
       } catch (err) {
-        console.error('Refresh token failed', err)
+        console.error('Session expired, please login again')
+        await window.store.delete('accessToken')
+        await window.store.delete('refreshToken')
+        // console.error('Refresh token failed', err)
         return Promise.reject(error)
       }
     }

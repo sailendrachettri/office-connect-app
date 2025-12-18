@@ -162,7 +162,7 @@ namespace OfficeConnectServer.Data
                     FROM utbl_messages
                     WHERE (sender_id=@user1 AND receiver_id=@user2)
                        OR (sender_id=@user2 AND receiver_id=@user1)
-                    ORDER BY created_at ASC
+                    ORDER BY message_id DESC
                 ";
 
             return await conn.QueryAsync<MessageModelDto>(sql, new

@@ -262,6 +262,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     if (initialLoadDoneRef.current) {
       bottomRef.current?.scrollIntoView()
     }
+    getFriendList();
   }, [messages.length])
 
   /* ---------------- Send message ---------------- */

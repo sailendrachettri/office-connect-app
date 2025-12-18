@@ -28,7 +28,7 @@ const Home = () => {
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
-    console.log("sss");
+
     if (userId) {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
@@ -56,7 +56,7 @@ const Home = () => {
       try {
         const res = await axiosPrivate.get(ME_URL)
         console.log('Logged In user details')
-        // console.table(res?.data?.data)
+        console.table(res?.data?.data)
         if (res?.data?.success == true) {
           const email = res?.data?.data?.email
           const full_name = res?.data?.data?.full_Name
@@ -92,8 +92,13 @@ const Home = () => {
 
        
       } catch (err) {
-        toast.error(err?.data?.message || 'Something went wrong!')
-        console.error("not able to register", err);
+        if(err?.code == 'ERR_BAD_REQUEST'){
+          toast.error('Session expired, please login again');
+        }else{
+
+          toast.error('Not able to login');
+        }
+        console.error("not able to login", err);
         setIsLoggedIn(false)
       } finally {
         setLoading(false)
