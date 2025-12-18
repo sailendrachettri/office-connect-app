@@ -47,7 +47,7 @@ const Home = () => {
     const restoreSession = async () => {
       try {
         const res = await axiosPrivate.get(ME_URL)
-        console.log("Logged In user details");
+        console.log('Logged In user details')
         console.table(res?.data?.data)
         if (res?.data?.success == true) {
           const email = res?.data?.data?.email
@@ -69,28 +69,14 @@ const Home = () => {
       } catch {
         setIsLoggedIn(false)
       } finally {
-        setLoading(false)
+        setTimeout(() => {
+          setLoading(false)
+        }, 1500)
       }
     }
 
     restoreSession()
   }, [showLogin, loading])
-
-  // useEffect(() => {
-  //   async function restoreSession() {
-  //     const token = await window.store.get('accessToken')
-
-  //     if (token) {
-  //       setIsLoggedIn(true)
-  //     }
-
-  //     getFriendList();
-
-  //     setLoading(false)
-  //   }
-
-  //   restoreSession()
-  // }, [pendingFriendReq, isLoggedIn, selectedFriendProfileId])
 
   useEffect(() => {
     if (selectedFriendProfileId) {
@@ -115,7 +101,9 @@ const Home = () => {
     <>
       {loading ? (
         <section>
-          <div className="min-h-screen w-full flex items-center justify-center">Loading...</div>
+          <div className="min-h-screen w-full flex items-center justify-center">
+            <div class="loader"></div>
+          </div>
         </section>
       ) : (
         <section>
