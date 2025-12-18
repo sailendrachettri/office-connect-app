@@ -1,7 +1,8 @@
 import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
+import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+
 
 import Store from 'electron-store';
 
@@ -38,6 +39,7 @@ function createWindow() {
   // Create the browser window.
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
   const mainWindow = new BrowserWindow({
+    icon: path.join(process.cwd(), 'resources', 'icon.ico'),
     autoHideMenuBar: true,
     menuBarVisible: false,
     frame: false,
@@ -47,7 +49,7 @@ function createWindow() {
     height,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    // ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,

@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux'
 import { setConnected, setDisconnected } from '../../../store/connectionSlice'
 import { createChatConnection } from '../../../signalr/chatConnection'
 import { store } from '../../../store'
+import toast from 'react-hot-toast'
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -73,9 +74,8 @@ const Home = () => {
           await getFriendList()
 
           setIsLoggedIn(true)
-        }
 
-        const connection = createChatConnection(res?.data?.data?.user_Id)
+           const connection = createChatConnection(res?.data?.data?.user_Id)
   
 
         connection
@@ -86,7 +86,13 @@ const Home = () => {
           .catch(() => {
             store.dispatch(setDisconnected())
           })
+        }else{
+          toast.error(res?.data?.message || 'Something went wrong!')
+        }
+
+       
       } catch (err) {
+        toast.error(err?.data?.message || 'Something went wrong!')
         console.error("not able to register", err);
         setIsLoggedIn(false)
       } finally {

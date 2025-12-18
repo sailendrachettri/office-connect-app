@@ -76,6 +76,8 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
         toast.error(
           'Unable to connect. Please ensure you are on the same local network as the server.'
         )
+      }else if(error?.response?.data?.success == false){
+        toast.error('Please enter a valid credentials')
       }
       console.error('Invalid credentials', error)
     } finally {
@@ -86,7 +88,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   }
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-5">
+    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-ternary rounded-2xl shadow-xl overflow-hidden border border-slate-200">
         {/* LEFT SIDE SVG */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">

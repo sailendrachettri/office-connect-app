@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { REFRESH_URL } from './routes_urls';
+import { REFRESH_URL } from './routes_urls'
+import { createChatConnection } from '../signalr/chatConnection'
+import { setConnected, setDisconnected } from '../store/connectionSlice'
 
 const API_BASE_URL = 'http://192.168.1.3:5171'
 
@@ -33,46 +35,53 @@ axiosPrivate.interceptors.request.use(
     return config
   },
   (error) => Promise.reject(error)
- )
-
+)
 
 axiosPrivate.interceptors.response.use(
-  res => res,
+  (res) => res,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config
 
     // Only retry once
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+      originalRequest._retry = true
 
       try {
         // Get refresh token from electron-store
-        const refreshToken = await window.store.get('refreshToken');
+        const refreshToken = await window.store.get('refreshToken')
 
-        if (!refreshToken) throw new Error("No refresh token");
+        if (!refreshToken) throw new Error('No refresh token')
 
         // Call refresh endpoint
-        const response = await axiosInstance.post(REFRESH_URL, { refreshToken });
+        const response = await axiosInstance.post(REFRESH_URL, { refreshToken })
 
-        const newAccessToken = response.data.accessToken;
+        const newAccessToken = response.data.accessToken
 
         // Save new access token in Electron-Store
-        await window.store.set('accessToken', newAccessToken);
+        await window.store.set('accessToken', newAccessToken)
 
         // Update axios headers
-        axiosPrivate.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        axiosPrivate.defaults.headers.Authorization = `Bearer ${newAccessToken}`
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
 
+        const connection = createChatConnection(res?.data?.data?.user_Id)
+
+        connection
+          .start()
+          .then(() => {
+            store.dispatch(setConnected('signalr'))
+          })
+          .catch(() => {
+            store.dispatch(setDisconnected())
+          })
         // Retry original request
-        return axiosPrivate(originalRequest);
+        return axiosPrivate(originalRequest)
       } catch (err) {
-        console.error("Refresh token failed", err);
-        return Promise.reject(error);
+        console.error('Refresh token failed', err)
+        return Promise.reject(error)
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
-
-
+)
