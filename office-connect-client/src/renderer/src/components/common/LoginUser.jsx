@@ -72,8 +72,16 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
         toast.error('Please enter a valid credentials')
       }
     } catch (error) {
-      toast.error('Please enter a valid credentials')
+      if (error?.code == 'ERR_NETWORK') {
+        toast.error(
+          'Unable to connect. Please ensure you are on the same local network as the server.'
+        )
+      }
       console.error('Invalid credentials', error)
+    } finally {
+      setTimeout(() => {
+        isLoading(false)
+      }, 1000)
     }
   }
 

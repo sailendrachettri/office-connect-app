@@ -32,14 +32,13 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
       }
 
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
-     
 
       const accessToken = res?.data?.data?.accessToken
       const refreshToken = res?.data?.data?.refreshToken
       const userId = res?.data?.data?.userId
 
       if (res?.data?.success) {
-         await window.store.set('accessToken', accessToken)
+        await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
         // await window.store.set('user', {
@@ -47,14 +46,18 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
         //   fullName,
         //   email,
         //   profileImage
-          
+
         // })
 
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }
     } catch (err) {
-      toast.error('Registration failed')
+      if (err?.code == 'ERR_NETWORK') {
+        toast.error(
+          'Unable to register. Please ensure you are on the same local network as the server.'
+        )
+      }
       console.error(err)
     } finally {
       setLoading(false)

@@ -86,12 +86,11 @@ const Home = () => {
           .catch(() => {
             store.dispatch(setDisconnected())
           })
-      } catch {
+      } catch (err) {
+        console.error("not able to register", err);
         setIsLoggedIn(false)
       } finally {
-        setTimeout(() => {
-          setLoading(false)
-        }, 1500)
+        setLoading(false)
       }
     }
 
