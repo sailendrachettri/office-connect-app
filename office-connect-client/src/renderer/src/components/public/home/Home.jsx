@@ -10,6 +10,10 @@ import { axiosInstance, axiosPrivate } from '../../../api/api'
 import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL, ME_URL } from '../../../api/routes_urls'
 import { IoChatbubblesOutline } from 'react-icons/io5'
 import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
+import { useSelector } from 'react-redux'
+import { setConnected, setDisconnected } from '../../../store/connectionSlice'
+import { createChatConnection } from '../../../signalr/chatConnection'
+import { store } from '../../../store'
 
 const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -43,12 +47,15 @@ const Home = () => {
     }
   }
 
+  const isConnected = useSelector((state) => state.connection.isConnected)
+  console.log({ isConnected })
+
   useEffect(() => {
     const restoreSession = async () => {
       try {
         const res = await axiosPrivate.get(ME_URL)
         console.log('Logged In user details')
-        console.table(res?.data?.data)
+        // console.table(res?.data?.data)
         if (res?.data?.success == true) {
           const email = res?.data?.data?.email
           const full_name = res?.data?.data?.full_Name
@@ -64,8 +71,21 @@ const Home = () => {
             pic
           })
           await getFriendList()
+
           setIsLoggedIn(true)
         }
+
+        const connection = createChatConnection(res?.data?.data?.user_Id)
+  
+
+        connection
+          .start()
+          .then(() => {
+            store.dispatch(setConnected('signalr'))
+          })
+          .catch(() => {
+            store.dispatch(setDisconnected())
+          })
       } catch {
         setIsLoggedIn(false)
       } finally {
@@ -111,9 +131,12 @@ const Home = () => {
 
           {isLoggedIn && (
             <section>
-              <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-4 select-none drag-region">
+              <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-6 select-none drag-region">
                 <div className="flex items-center justify-start gap-x-3 no-drag">
-                  <IoChatbubblesOutline />
+                  <div className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}>
+                    <IoChatbubblesOutline />
+                    <small>{isConnected ? 'Connected' : 'Disconnected'}</small>
+                  </div>
                   <TopHelpMenu />
                 </div>
 

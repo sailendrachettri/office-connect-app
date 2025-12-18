@@ -7,10 +7,13 @@ import { useForm } from 'react-hook-form'
 import { axiosInstance } from '../../api/api'
 import { LOGIN_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
+import { setConnected, setDisconnected } from '../../store/connectionSlice'
+import { createChatConnection } from '../../signalr/chatConnection'
+import { store } from '../../store'
 
 const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
-  const [loading, isLoading] = useState(false);
-  
+  const [loading, isLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -18,9 +21,8 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   } = useForm()
 
   const handlLogin = async (data) => {
-
     try {
-      isLoading(true);
+      isLoading(true)
 
       const payload = {
         Email: data?.email,
@@ -45,13 +47,27 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
 
         // })
 
+        // const connection = createChatConnection(userId)
+        // console.log({ connection })
+        // connection.start().then(() => {
+        //   console.log('SignalR CONNECTED')
+        //   store.dispatch(setConnected())
+        // })
+
+        // connection
+        //   .start()
+        //   .then(() => {
+        //     store.dispatch(setConnected('signalr'))
+        //   })
+        //   .catch(() => {
+        //     store.dispatch(setDisconnected())
+        //   })
+
         setTimeout(() => {
-          isLoading(false);
+          isLoading(false)
           setIsLoggedIn(true)
           toast.success('Login successful!')
-        }, 1000);
-
-
+        }, 1000)
       } else {
         toast.error('Please enter a valid credentials')
       }

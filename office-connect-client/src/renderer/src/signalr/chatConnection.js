@@ -1,10 +1,26 @@
-import * as signalR from "@microsoft/signalr";
+import * as signalR from '@microsoft/signalr'
+import { setConnected, setDisconnected } from '../store/connectionSlice'
 
 export const createChatConnection = (userId) => {
-  return new signalR.HubConnectionBuilder()
+  const connection = new signalR.HubConnectionBuilder()
     .withUrl(`http://192.168.1.2:5171/hubs/chat?userId=${userId}`, {
-        withCredentials: true
+      withCredentials: true
     })
     .withAutomaticReconnect()
-    .build();
-};
+    .build()
+
+  connection.onreconnecting(() => {
+    store.dispatch(setDisconnected())
+  })
+
+  connection.onreconnected(() => {
+    store.dispatch(setConnected('signalr'))
+  })
+  
+
+  connection.onclose(() => {
+    store.dispatch(setDisconnected())
+  })
+
+  return connection
+}
