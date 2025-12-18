@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { REFRESH_URL } from './routes_urls';
 
-const API_BASE_URL = 'http://192.168.1.3:5171'
+const API_BASE_URL = 'http://192.168.1.2:5171'
 
 // Public Axios instance (no auth)
 export const axiosInstance = axios.create({

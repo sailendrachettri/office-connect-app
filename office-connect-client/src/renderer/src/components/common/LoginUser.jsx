@@ -9,6 +9,8 @@ import { LOGIN_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
 
 const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
+  const [loading, isLoading] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -16,7 +18,10 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   } = useForm()
 
   const handlLogin = async (data) => {
+
     try {
+      isLoading(true);
+
       const payload = {
         Email: data?.email,
         Password: data?.password
@@ -40,9 +45,13 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
 
         // })
 
-        setIsLoggedIn(true)
+        setTimeout(() => {
+          isLoading(false);
+          setIsLoggedIn(true)
+          toast.success('Login successful!')
+        }, 1000);
 
-        toast.success('Login successful!')
+
       } else {
         toast.error('Please enter a valid credentials')
       }
@@ -105,9 +114,9 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 cursor-pointer transition font-medium shadow"
+              className={`w-full ${loading ? 'bg-slate-400 text-slate-300 cursor-not-allowed' : 'bg-primary text-white hover:bg-primary/90 cursor-pointer'}  py-3 rounded-lg  transition font-medium shadow`}
             >
-              Login
+              {loading ? 'Logging you in...' : 'Login'}
             </button>
           </form>
 
