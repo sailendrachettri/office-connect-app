@@ -15,6 +15,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   const [connection, setConnection] = useState(null)
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
+  const [incomingMessage, setIncomingMessage] = useState(null)
 
   const observerRef = useRef(null)
   const unreadMessageIdsRef = useRef(new Set())
@@ -217,6 +218,8 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       .catch(() => setConnected(false))
 
     conn.on('ReceiveMessage', (msg) => {
+      getFriendList()
+
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
@@ -230,7 +233,8 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
         normalized.senderId === selectedFriendProfileId ||
         normalized.receiverId === selectedFriendProfileId
       ) {
-        setMessages((prev) => [...prev, normalized])
+        // send to Landing via state or context
+        setIncomingMessage(normalized)
       }
     })
 
@@ -247,6 +251,12 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     }
   }, [currentUserId, selectedFriendProfileId])
 
+  useEffect(() => {
+    if (incomingMessage) {
+      setMessages((prev) => [...prev, incomingMessage])
+    }
+  }, [incomingMessage])
+
   /* ---------------- Auto scroll to bottom for new messages ---------------- */
   useEffect(() => {
     if (initialLoadDoneRef.current) {
@@ -256,6 +266,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
 
   /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
+    getFriendList();
     if (!text.trim() || !connected) return
 
     const optimisticMessage = {

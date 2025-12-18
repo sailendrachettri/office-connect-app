@@ -24,11 +24,11 @@ const Home = () => {
   const [selectedTab, setSelectedTab] = useState('chat')
   const [loading, setLoading] = useState(true)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
-  const [friendList, setFriendList] = useState([])
+  const [friendList, setFriendList] = useState([]);
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
-
+    console.log("sss");
     if (userId) {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
