@@ -196,9 +196,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
     } catch (err) {
       console.error('Failed to mark messages as read', err)
-    } finally {
-      getFriendList()
-    }
+    } 
   }
 
   useEffect(() => {
@@ -264,12 +262,10 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     if (initialLoadDoneRef.current) {
       bottomRef.current?.scrollIntoView()
     }
-    getFriendList();
   }, [messages.length])
 
   /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
-    getFriendList();
     if (!text.trim() || !connected) return
 
     const optimisticMessage = {
