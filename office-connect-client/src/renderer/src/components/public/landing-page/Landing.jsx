@@ -28,6 +28,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
 
   const bottomRef = useRef(null)
   const scrollContainerRef = useRef(null)
+  const restoreMessageIdRef = useRef(null)
   const isLoadingRef = useRef(false)
   const initialLoadDoneRef = useRef(false)
 
@@ -146,6 +147,10 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     const oldScrollHeight = container.scrollHeight
     const oldScrollTop = container.scrollTop
 
+    isLoadingRef.current = true
+    setLoading(true)
+    restoreMessageIdRef.current = messages[0]?.messageId
+    
     try {
       const res = await axiosPrivate.get(
         `${MESSAGES_URL}/paginated/${currentUserId}/${selectedFriendProfileId}?beforeMessageId=${oldestMessageId}&pageSize=50`
@@ -196,7 +201,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
     } catch (err) {
       console.error('Failed to mark messages as read', err)
-    } 
+    }
   }
 
   useEffect(() => {
@@ -218,7 +223,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
 
     conn.on('ReceiveMessage', (msg) => {
       getFriendList()
-      
+
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
