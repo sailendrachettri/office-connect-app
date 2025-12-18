@@ -3,7 +3,7 @@ import { REFRESH_URL } from './routes_urls'
 import { createChatConnection } from '../signalr/chatConnection'
 import { setConnected, setDisconnected } from '../store/connectionSlice'
 
-const API_BASE_URL = 'http://192.168.1.3:5171'
+const API_BASE_URL = 'http://192.168.1.50:5171'
 
 // Public Axios instance (no auth)
 export const axiosInstance = axios.create({

@@ -3,7 +3,7 @@ import { setConnected, setDisconnected } from '../store/connectionSlice'
 
 export const createChatConnection = (userId) => {
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`http://192.168.1.3:5171/hubs/chat?userId=${userId}`, {
+    .withUrl(`http://192.168.1.50:5171/hubs/chat?userId=${userId}`, {
       withCredentials: true
     })
     .withAutomaticReconnect()
