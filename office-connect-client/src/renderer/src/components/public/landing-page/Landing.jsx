@@ -8,6 +8,7 @@ import { createChatConnection } from '../../../signalr/chatConnection'
 import { MESSAGES_URL } from '../../../api/routes_urls'
 import { axiosPrivate } from '../../../api/api'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
+import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
 
 const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   const [messages, setMessages] = useState([])
@@ -219,7 +220,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
 
     conn.on('ReceiveMessage', (msg) => {
       getFriendList()
-
+      
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
@@ -228,6 +229,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
         createdAt: msg?.createdAt ?? msg?.created_at,
         isRead: msg?.isRead ?? false
       }
+      showSystemNotification(normalized)
 
       if (
         normalized.senderId === selectedFriendProfileId ||
