@@ -4,10 +4,11 @@ import { IoInformationCircleOutline } from 'react-icons/io5'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import QuickProfile from '../../common/QuickProfile'
+import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
 
 const Headers = ({ userFullDetails, selectedFriendProfileId }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
-
+  console.table(userFullDetails)
 
   return (
     <>
@@ -21,7 +22,15 @@ const Headers = ({ userFullDetails, selectedFriendProfileId }) => {
             {/* Chat Details */}
             <div>
               <h3 className="text-lg font-semibold text-slate-900">{userFullDetails?.full_name}</h3>
-              <p className="text-sm text-green-600">{userFullDetails?.status}</p>
+              <p>
+                {userFullDetails?.status == 'Active' ? (
+                  <span className="text-green-600"> {userFullDetails?.status}</span>
+                ) : (
+                  <small className="text-slate-500">
+                    Last seen at: {formatLastSeen(userFullDetails?.last_seen)}
+                  </small>
+                )}
+              </p>
             </div>
           </div>
 

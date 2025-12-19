@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { setConnected, setDisconnected } from '../../store/connectionSlice'
 import { createChatConnection } from '../../signalr/chatConnection'
 import { store } from '../../store'
+import { IoExitOutline } from 'react-icons/io5'
 
 const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   const [loading, isLoading] = useState(false)
@@ -76,7 +77,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
         toast.error(
           'Unable to connect. Please ensure you are on the same local network as the server.'
         )
-      }else if(error?.response?.data?.success == false){
+      } else if (error?.response?.data?.success == false) {
         toast.error('Please enter a valid credentials')
       }
       console.error('Invalid credentials', error)
@@ -88,7 +89,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   }
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-ternary rounded-2xl shadow-xl overflow-hidden border border-slate-200">
         {/* LEFT SIDE SVG */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
@@ -160,6 +161,17 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
           </p>
         </div>
       </div>
+
+      <section className="pt-7">
+        <div
+          className="text-slate-400 cursor-pointer w-fit hover:text-red-400 flex items-center justify-center gap-x-2 flex-nowrap"
+          onClick={() => window.api.close()}
+        >
+          <IoExitOutline size={23} />
+
+          <span> Exit App</span>
+        </div>
+      </section>
     </div>
   )
 }

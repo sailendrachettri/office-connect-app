@@ -49,14 +49,14 @@ const Home = () => {
   }
 
   const isConnected = useSelector((state) => state.connection.isConnected)
-  console.log({ isConnected })
+  
 
   useEffect(() => {
     const restoreSession = async () => {
       try {
         const res = await axiosPrivate.get(ME_URL)
-        console.log('Logged In user details')
-        console.table(res?.data?.data)
+        // console.log('Logged In user details')
+        // console.table(res?.data?.data)
         if (res?.data?.success == true) {
           const email = res?.data?.data?.email
           const full_name = res?.data?.data?.full_Name

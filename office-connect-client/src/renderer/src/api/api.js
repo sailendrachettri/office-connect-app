@@ -2,6 +2,7 @@ import axios from 'axios'
 import { REFRESH_URL } from './routes_urls'
 import { createChatConnection } from '../signalr/chatConnection'
 import { setConnected, setDisconnected } from '../store/connectionSlice'
+import { store } from '../store'
 
 const API_BASE_URL = 'http://192.168.1.50:5171'
 
@@ -56,7 +57,6 @@ axiosPrivate.interceptors.response.use(
         const response = await axiosInstance.post(REFRESH_URL, { refreshToken })
 
         const { accessToken, refreshToken: newRefreshToken } = response.data
-        console.log("heeheh: ", response);
 
         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', newRefreshToken)
