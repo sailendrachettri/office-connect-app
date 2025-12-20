@@ -392,7 +392,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
                 : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
             }`}
                 >
-                  <p>{msg?.messageText}</p>
+                  <p className='whitespace-pre-wrap break-words'>{msg?.messageText}</p>
 
                   <span
                     className={`text-xs flex justify-end items-center gap-1 mt-1
