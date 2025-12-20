@@ -222,6 +222,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       .catch(() => setConnected(false))
 
     conn.on('ReceiveMessage', (msg) => {
+      getFriendList();
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
