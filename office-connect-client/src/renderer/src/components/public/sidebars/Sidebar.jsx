@@ -2,7 +2,6 @@ import profilePic from '../../../assets/peoples/default_user.jpg'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
 const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfileId, isFriendTyping }) => {
-  console.log({friendList});
   
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">

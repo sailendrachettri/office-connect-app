@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Menu from '../menu/Menu'
 import Sidebar from '../sidebars/Sidebar'
 import Headers from '../headers/Headers'
@@ -24,8 +24,8 @@ const Home = () => {
   const [selectedTab, setSelectedTab] = useState('chat')
   const [loading, setLoading] = useState(true)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
-  const [friendList, setFriendList] = useState([]);
-    const [isFriendTyping, setIsFriendTyping] = useState(false)
+  const [friendList, setFriendList] = useState([])
+  const [isFriendTyping, setIsFriendTyping] = useState(false)
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
@@ -50,7 +50,6 @@ const Home = () => {
   }
 
   const isConnected = useSelector((state) => state.connection.isConnected)
-  
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -76,30 +75,26 @@ const Home = () => {
 
           setIsLoggedIn(true)
 
-           const connection = createChatConnection(res?.data?.data?.user_Id)
-  
+          const connection = createChatConnection(res?.data?.data?.user_Id)
 
-        connection
-          .start()
-          .then(() => {
-            store.dispatch(setConnected('signalr'))
-          })
-          .catch(() => {
-            store.dispatch(setDisconnected())
-          })
-        }else{
+          connection
+            .start()
+            .then(() => {
+              store.dispatch(setConnected('signalr'))
+            })
+            .catch(() => {
+              store.dispatch(setDisconnected())
+            })
+        } else {
           toast.error(res?.data?.message || 'Something went wrong!')
         }
-
-       
       } catch (err) {
-        if(err?.code == 'ERR_BAD_REQUEST'){
-          toast.error('Session expired, please login again');
-        }else{
-
-          toast.error('Not able to login');
+        if (err?.code == 'ERR_BAD_REQUEST') {
+          toast.error('Session expired, please login again')
+        } else {
+          toast.error('Not able to login')
         }
-        console.error("not able to login", err);
+        console.error('not able to login', err)
         setIsLoggedIn(false)
       } finally {
         setLoading(false)
@@ -144,7 +139,9 @@ const Home = () => {
             <section>
               <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-6 select-none drag-region">
                 <div className="flex items-center justify-start gap-x-3 no-drag">
-                  <div className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}>
+                  <div
+                    className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}
+                  >
                     <IoChatbubblesOutline />
                     <small>{isConnected ? 'Connected' : 'Disconnected'}</small>
                   </div>

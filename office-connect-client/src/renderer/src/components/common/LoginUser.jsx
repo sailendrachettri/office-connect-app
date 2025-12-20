@@ -48,22 +48,6 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
 
         // })
 
-        // const connection = createChatConnection(userId)
-        // console.log({ connection })
-        // connection.start().then(() => {
-        //   console.log('SignalR CONNECTED')
-        //   store.dispatch(setConnected())
-        // })
-
-        // connection
-        //   .start()
-        //   .then(() => {
-        //     store.dispatch(setConnected('signalr'))
-        //   })
-        //   .catch(() => {
-        //     store.dispatch(setDisconnected())
-        //   })
-
         setTimeout(() => {
           isLoading(false)
           setIsLoggedIn(true)

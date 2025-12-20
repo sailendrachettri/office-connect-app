@@ -16,17 +16,12 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
   const [incomingMessage, setIncomingMessage] = useState(null)
-  const typingTimeoutRef = useRef(null)
-
-  const observerRef = useRef(null)
-  const unreadMessageIdsRef = useRef(new Set())
-  const isTypingRef = useRef(false)
-
-  // Pagination states
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
   const [oldestMessageId, setOldestMessageId] = useState(null)
 
+  const observerRef = useRef(null)
+  const unreadMessageIdsRef = useRef(new Set())
   const bottomRef = useRef(null)
   const scrollContainerRef = useRef(null)
   const restoreMessageIdRef = useRef(null)
@@ -54,6 +49,108 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
       month: 'short',
       year: 'numeric'
     })
+  }
+  
+  /* ---------------- Load older messages when scrolling up ---------------- */
+  const loadOlderMessages = async () => {
+    if (!hasMore || isLoadingRef.current || !oldestMessageId || !initialLoadDoneRef.current) return
+
+    isLoadingRef.current = true
+    setLoading(true)
+
+    // Save scroll position
+    const container = scrollContainerRef.current
+    const oldScrollHeight = container.scrollHeight
+    const oldScrollTop = container.scrollTop
+
+    isLoadingRef.current = true
+    setLoading(true)
+    restoreMessageIdRef.current = messages[0]?.messageId
+
+    try {
+      const res = await axiosPrivate.get(
+        `${MESSAGES_URL}/paginated/${currentUserId}/${selectedFriendProfileId}?beforeMessageId=${oldestMessageId}&pageSize=50`
+      )
+
+      const data = res.data
+
+      if (data.messages && data.messages.length > 0) {
+        // Prepend older messages
+        setMessages((prev) => [...data.messages, ...prev])
+        setHasMore(data.hasMore)
+        setOldestMessageId(data.oldestMessageId)
+
+        // Restore scroll position (maintain visual position)
+        setTimeout(() => {
+          const newScrollHeight = container.scrollHeight
+          container.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight)
+        }, 0)
+      } else {
+        setHasMore(false)
+      }
+    } catch (err) {
+      console.error('Failed to load older messages:', err)
+    } finally {
+      setLoading(false)
+      isLoadingRef.current = false
+    }
+  }
+
+  /* ---------------- Handle scroll events ---------------- */
+  const handleScroll = () => {
+    const container = scrollContainerRef.current
+    if (!container || !initialLoadDoneRef.current) return
+
+    // Check if scrolled near top (within 150px)
+    if (container.scrollTop < 150 && hasMore && !isLoadingRef.current) {
+      loadOlderMessages()
+    }
+  }
+
+  const markMessagesAsRead = async () => {
+    if (!connection || unreadMessageIdsRef.current.size === 0) return
+
+    const ids = Array.from(unreadMessageIdsRef.current)
+    unreadMessageIdsRef.current.clear()
+
+    try {
+      await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
+    } catch (err) {
+      console.error('Failed to mark messages as read', err)
+    }
+  }
+
+   /* ---------------- Send message ---------------- */
+  const sendMessage = async () => {
+    if (!text.trim() || !connected) return
+
+    connection.invoke('UserStoppedTyping', selectedFriendProfileId)
+
+    const optimisticMessage = {
+      messageId: Date.now(), // Temporary ID
+      senderId: currentUserId,
+      receiverId: selectedFriendProfileId,
+      messageText: text,
+      createdAt: new Date().toISOString(),
+      isRead: false
+    }
+
+    // Optimistic UI update
+    setMessages((prev) => [...prev, optimisticMessage])
+    setText('')
+
+    try {
+      await connection.invoke('SendMessage', currentUserId, selectedFriendProfileId, text)
+    } catch (err) {
+      console.error('Failed to send message', err)
+    }
+  }
+
+  /* ---------------- Status Icon ---------------- */
+  const renderStatus = (status) => {
+    if (status == true) return <BsCheck2All size={16} className="text-green-400" />
+    // if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
+    return <PiCheck size={16} className="text-slate-400" />
   }
 
   /* --------------View message--------------------- */
@@ -136,74 +233,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
     fetchInitialMessages()
   }, [currentUserId, selectedFriendProfileId])
 
-  /* ---------------- Load older messages when scrolling up ---------------- */
-  const loadOlderMessages = async () => {
-    if (!hasMore || isLoadingRef.current || !oldestMessageId || !initialLoadDoneRef.current) return
-
-    isLoadingRef.current = true
-    setLoading(true)
-
-    // Save scroll position
-    const container = scrollContainerRef.current
-    const oldScrollHeight = container.scrollHeight
-    const oldScrollTop = container.scrollTop
-
-    isLoadingRef.current = true
-    setLoading(true)
-    restoreMessageIdRef.current = messages[0]?.messageId
-
-    try {
-      const res = await axiosPrivate.get(
-        `${MESSAGES_URL}/paginated/${currentUserId}/${selectedFriendProfileId}?beforeMessageId=${oldestMessageId}&pageSize=50`
-      )
-
-      const data = res.data
-
-      if (data.messages && data.messages.length > 0) {
-        // Prepend older messages
-        setMessages((prev) => [...data.messages, ...prev])
-        setHasMore(data.hasMore)
-        setOldestMessageId(data.oldestMessageId)
-
-        // Restore scroll position (maintain visual position)
-        setTimeout(() => {
-          const newScrollHeight = container.scrollHeight
-          container.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight)
-        }, 0)
-      } else {
-        setHasMore(false)
-      }
-    } catch (err) {
-      console.error('Failed to load older messages:', err)
-    } finally {
-      setLoading(false)
-      isLoadingRef.current = false
-    }
-  }
-
-  /* ---------------- Handle scroll events ---------------- */
-  const handleScroll = () => {
-    const container = scrollContainerRef.current
-    if (!container || !initialLoadDoneRef.current) return
-
-    // Check if scrolled near top (within 150px)
-    if (container.scrollTop < 150 && hasMore && !isLoadingRef.current) {
-      loadOlderMessages()
-    }
-  }
-
-  const markMessagesAsRead = async () => {
-    if (!connection || unreadMessageIdsRef.current.size === 0) return
-
-    const ids = Array.from(unreadMessageIdsRef.current)
-    unreadMessageIdsRef.current.clear()
-
-    try {
-      await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
-    } catch (err) {
-      console.error('Failed to mark messages as read', err)
-    }
-  }
 
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()
@@ -299,39 +328,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
       bottomRef.current?.scrollIntoView()
     }
   }, [messages.length])
-
-  /* ---------------- Send message ---------------- */
-  const sendMessage = async () => {
-    if (!text.trim() || !connected) return
-
-    connection.invoke('UserStoppedTyping', selectedFriendProfileId)
-
-    const optimisticMessage = {
-      messageId: Date.now(), // Temporary ID
-      senderId: currentUserId,
-      receiverId: selectedFriendProfileId,
-      messageText: text,
-      createdAt: new Date().toISOString(),
-      isRead: false
-    }
-
-    // Optimistic UI update
-    setMessages((prev) => [...prev, optimisticMessage])
-    setText('')
-
-    try {
-      await connection.invoke('SendMessage', currentUserId, selectedFriendProfileId, text)
-    } catch (err) {
-      console.error('Failed to send message', err)
-    }
-  }
-
-  /* ---------------- Status Icon ---------------- */
-  const renderStatus = (status) => {
-    if (status == true) return <BsCheck2All size={16} className="text-green-400" />
-    // if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
-    return <PiCheck size={16} className="text-slate-400" />
-  }
 
   if (!selectedFriendProfileId) return <DefaultChatPage />
 
