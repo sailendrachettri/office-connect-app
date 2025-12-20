@@ -197,7 +197,12 @@ namespace OfficeConnectServer.Controllers
                 string message = result.GetProperty("message").GetString()!;
 
                 if (!success)
-                    return BadRequest(new ApiResponse<string>(false, message, null!));
+                {
+                    var resultJson = JsonSerializer.Deserialize<JsonElement>(json);
+                    return BadRequest(new ApiResponse<JsonElement>(false, resultJson.GetProperty("message").GetString()!, resultJson));
+
+                }
+               
 
                 Guid userId = result.GetProperty("user_id").GetGuid();
 

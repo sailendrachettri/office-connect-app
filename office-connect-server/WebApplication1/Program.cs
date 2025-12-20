@@ -1,17 +1,21 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using OfficeConnectServer.Data;
 using OfficeConnectServer.Helpers;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 builder.Services.AddScoped<MessageRepository>();
 builder.Services.AddScoped<DbConnectionFactory>();
 builder.Services.AddScoped<DbHelper>();
+
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -96,8 +100,16 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
+    RequestPath = "/uploads"
+});
+
 
 app.UseCors("AllowViteDevServer");
+
 
 // Middleware
 if (app.Environment.IsDevelopment())
