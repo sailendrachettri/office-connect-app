@@ -209,12 +209,10 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   const handleTyping = (e) => {
     setText(e.target.value)
 
-    if (!connection) return
+    if (!connection || connection.state !== 'Connected') return
 
-    // Notify typing
     connection.invoke('UserTyping', selectedFriendProfileId)
 
-    // Debounce stop typing
     clearTimeout(typingTimeoutRef.current)
     typingTimeoutRef.current = setTimeout(() => {
       connection.invoke('UserStoppedTyping', selectedFriendProfileId)
@@ -239,13 +237,13 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       .catch(() => setConnected(false))
 
     conn.on('UserTyping', (senderId) => {
-      if (senderId === selectedFriendProfileId) {
+      if (String(senderId) === String(selectedFriendProfileId)) {
         setIsFriendTyping(true)
       }
     })
 
     conn.on('UserStoppedTyping', (senderId) => {
-      if (senderId === selectedFriendProfileId) {
+      if (String(senderId) === String(selectedFriendProfileId)) {
         setIsFriendTyping(false)
       }
     })
@@ -319,6 +317,8 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
     if (!text.trim() || !connected) return
+
+    connection.invoke('UserStoppedTyping', selectedFriendProfileId)
 
     const optimisticMessage = {
       messageId: Date.now(), // Temporary ID
@@ -440,6 +440,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
         <input
           value={text}
           onChange={handleTyping}
+          onBlur={() => connection?.invoke('UserStoppedTyping', selectedFriendProfileId)}
           placeholder="Type a message"
           className="flex-1 outline-none text-slate-700 placeholder-slate-400"
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
