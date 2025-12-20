@@ -150,7 +150,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     isLoadingRef.current = true
     setLoading(true)
     restoreMessageIdRef.current = messages[0]?.messageId
-    
+
     try {
       const res = await axiosPrivate.get(
         `${MESSAGES_URL}/paginated/${currentUserId}/${selectedFriendProfileId}?beforeMessageId=${oldestMessageId}&pageSize=50`
@@ -222,8 +222,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       .catch(() => setConnected(false))
 
     conn.on('ReceiveMessage', (msg) => {
-      getFriendList()
-
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
@@ -257,9 +255,28 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   }, [currentUserId, selectedFriendProfileId])
 
   useEffect(() => {
-    if (incomingMessage) {
-      setMessages((prev) => [...prev, incomingMessage])
-    }
+    if (!incomingMessage) return
+
+    setMessages((prev) => {
+      // If optimistic message exists, replace it
+      const index = prev.findIndex(
+        (m) =>
+          m.senderId === incomingMessage.senderId &&
+          m.receiverId === incomingMessage.receiverId &&
+          m.messageText === incomingMessage.messageText &&
+          typeof m.messageId === 'number' &&
+          m.messageId > 1e12 // Date.now temp id
+      )
+
+      if (index !== -1) {
+        const updated = [...prev]
+        updated[index] = incomingMessage
+        return updated
+      }
+
+      // Otherwise append (for receiver)
+      return [...prev, incomingMessage]
+    })
   }, [incomingMessage])
 
   /* ---------------- Auto scroll to bottom for new messages ---------------- */

@@ -47,14 +47,18 @@ public class ChatHub : Hub
             var messageId = await _repo.AddMessageAsync(sender_id_i, receiver_id_i, message_text_i);
 
             // Send to receiver
-            await Clients.Group(receiver_id_i.ToString()).SendAsync("ReceiveMessage", new
-            {
-                message_id = messageId,
-                sender_id = sender_id_i,
-                receiver_id = receiver_id_i,
-                message_text = message_text_i,
-                created_at = DateTime.UtcNow
-            });
+            await Clients.Groups(
+     sender_id_i.ToString(),
+     receiver_id_i.ToString()
+ ).SendAsync("ReceiveMessage", new
+ {
+     message_id = messageId,
+     sender_id = sender_id_i,
+     receiver_id = receiver_id_i,
+     message_text = message_text_i,
+     created_at = DateTime.UtcNow
+ });
+
         }
         catch (Exception ex)
         {
