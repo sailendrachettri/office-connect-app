@@ -58,7 +58,7 @@ const UserInputMessage = ({ text, setText, sendMessage, connection, selectedFrie
         onKeyDown={handleKeyDown}
         rows={1}
         placeholder="Type a message"
-        className="flex-1 resize-none outline-none text-slate-700 placeholder-slate-400 leading-6 pb-1"
+        className="flex-1 resize-none outline-none text-slate-700 placeholder-slate-400 leading-6 pb-1 custom-scroll"
         onBlur={() => {
           isTypingRef.current = false
           connection?.invoke('UserStoppedTyping', selectedFriendProfileId)

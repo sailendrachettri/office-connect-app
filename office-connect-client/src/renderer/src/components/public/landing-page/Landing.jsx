@@ -8,6 +8,8 @@ import { axiosPrivate } from '../../../api/api'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
 import UserInputMessage from './UserInputMessage'
+import { IoCopyOutline } from 'react-icons/io5'
+import MessageBubble from './MessageBubble'
 
 const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) => {
   const [messages, setMessages] = useState([])
@@ -50,7 +52,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
       year: 'numeric'
     })
   }
-  
+
   /* ---------------- Load older messages when scrolling up ---------------- */
   const loadOlderMessages = async () => {
     if (!hasMore || isLoadingRef.current || !oldestMessageId || !initialLoadDoneRef.current) return
@@ -120,7 +122,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
     }
   }
 
-   /* ---------------- Send message ---------------- */
+  /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
     if (!text.trim() || !connected) return
 
@@ -232,7 +234,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
 
     fetchInitialMessages()
   }, [currentUserId, selectedFriendProfileId])
-
 
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()
@@ -385,15 +386,21 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
                 className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-xl text-sm shadow
+                  className={`max-w-xs px-6 py-3 rounded-xl text-sm shadow
             ${
               fromMe
                 ? 'bg-primary text-white rounded-br-none'
                 : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
             }`}
                 >
-                  <p className='whitespace-pre-wrap break-words'>{msg?.messageText}</p>
+                  {/* <div className="relative whitespace-pre-wrap wrap-break-word">
+                    {}
+                    <span className="absolute inset-1">
+                      <IoCopyOutline />
+                    </span>
+                  </div> */}
 
+                  <MessageBubble text={msg?.messageText} />
                   <span
                     className={`text-xs flex justify-end items-center gap-1 mt-1
               ${fromMe ? 'text-green-100' : 'text-slate-400'}
@@ -418,7 +425,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
         selectedFriendProfileId={selectedFriendProfileId}
         sendMessage={sendMessage}
         setText={setText}
-        text={text} 
+        text={text}
       />
     </div>
   )

@@ -10,6 +10,14 @@
         public bool IsRead { get; set; }           // maps to is_read
         public DateTime CreatedAt { get; set; }    // maps to created_at
     }
+
+    // Result model for paginated queries
+    public class MessagePageResult
+    {
+        public List<MessageModelDto> Messages { get; set; }
+        public bool HasMore { get; set; }
+        public long? OldestMessageId { get; set; }
+    }
     public class MessageSendRequest
     {
         public Guid SenderId { get; set; }

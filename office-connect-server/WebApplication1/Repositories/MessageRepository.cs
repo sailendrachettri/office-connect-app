@@ -192,11 +192,5 @@ namespace OfficeConnectServer.Data
         }
     }
 
-    // Result model for paginated queries
-    public class MessagePageResult
-    {
-        public List<MessageModelDto> Messages { get; set; }
-        public bool HasMore { get; set; }
-        public long? OldestMessageId { get; set; }
-    }
+  
 }
