@@ -148,13 +148,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
     }
   }
 
-  /* ---------------- Status Icon ---------------- */
-  const renderStatus = (status) => {
-    if (status == true) return <BsCheck2All size={16} className="text-green-400" />
-    // if (status === 'delivered') return <BsCheck2All size={16} className="text-slate-400" />
-    return <PiCheck size={16} className="text-slate-400" />
-  }
-
   /* --------------View message--------------------- */
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
@@ -370,47 +363,17 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
               )}
 
               {/* MESSAGE BUBBLE */}
-              <div
-                data-message-id={msg?.messageId}
-                data-sender-id={msg?.senderId}
-                ref={(el) => {
-                  if (
-                    el &&
-                    !msg?.isRead &&
-                    msg?.senderId !== currentUserId &&
-                    typeof msg?.messageId === 'number'
-                  ) {
-                    observerRef.current.observe(el)
-                  }
-                }}
-                className={`flex ${fromMe ? 'justify-end' : 'justify-start'} mb-2 pe-10`}
-              >
-                <div
-                  className={`max-w-xs px-6 py-3 rounded-xl text-sm shadow
-            ${
-              fromMe
-                ? 'bg-primary text-white rounded-br-none'
-                : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
-            }`}
-                >
-                  {/* <div className="relative whitespace-pre-wrap wrap-break-word">
-                    {}
-                    <span className="absolute inset-1">
-                      <IoCopyOutline />
-                    </span>
-                  </div> */}
 
-                  <MessageBubble text={msg?.messageText} />
-                  <span
-                    className={`text-xs flex justify-end items-center gap-1 mt-1
-              ${fromMe ? 'text-green-100' : 'text-slate-400'}
-            `}
-                  >
-                    {msgDate && getTime24FromDate(msgDate)}
-                    {fromMe && renderStatus(msg?.isRead)}
-                  </span>
-                </div>
-              </div>
+              <MessageBubble
+                text={msg?.messageText}
+                isRead={msg?.isRead}
+                msgDate={msgDate}
+                fromMe={fromMe}
+                senderId={msg?.senderId}
+                messageId={msg?.messageId}
+                observerRef={observerRef}
+                currentUserId={currentUserId}
+              />
             </div>
           )
         })}
