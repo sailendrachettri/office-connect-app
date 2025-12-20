@@ -6,9 +6,9 @@ import profilePic from '../../../assets/peoples/default_user.jpg'
 import QuickProfile from '../../common/QuickProfile'
 import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
 
-const Headers = ({ userFullDetails, selectedFriendProfileId }) => {
+const Headers = ({ userFullDetails, selectedFriendProfileId, isFriendTyping }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
-  console.table(userFullDetails)
+  // console.table(userFullDetails)
 
   return (
     <>
@@ -24,7 +24,7 @@ const Headers = ({ userFullDetails, selectedFriendProfileId }) => {
               <h3 className="text-lg font-semibold text-slate-900">{userFullDetails?.full_name}</h3>
               <p>
                 {userFullDetails?.status == 'Active' ? (
-                  <span className="text-green-600"> {userFullDetails?.status}</span>
+                  <span className="text-green-600"> {isFriendTyping ? 'Typing...' : userFullDetails?.status}</span>
                 ) : (
                   <small className="text-slate-500">
                     Last seen at: {formatLastSeen(userFullDetails?.last_seen)}

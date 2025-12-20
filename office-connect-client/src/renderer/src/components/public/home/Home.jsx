@@ -25,6 +25,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
   const [friendList, setFriendList] = useState([]);
+    const [isFriendTyping, setIsFriendTyping] = useState(false)
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
@@ -198,6 +199,7 @@ const Home = () => {
                           setSelectedFriendProfileId={setSelectedFriendProfileId}
                           selectedFriendProfileId={selectedFriendProfileId}
                           friendList={friendList}
+                          isFriendTyping={isFriendTyping}
                         />
                       </div>
 
@@ -208,6 +210,7 @@ const Home = () => {
                           <Headers
                             selectedFriendProfileId={selectedFriendProfileId}
                             userFullDetails={userFullDetails}
+                            isFriendTyping={isFriendTyping}
                           />
                         </div>
 
@@ -217,6 +220,7 @@ const Home = () => {
                             selectedFriendProfileId={selectedFriendProfileId}
                             userFullDetails={userFullDetails}
                             getFriendList={getFriendList}
+                            setIsFriendTyping={setIsFriendTyping}
                           />
                         </div>
                       </div>

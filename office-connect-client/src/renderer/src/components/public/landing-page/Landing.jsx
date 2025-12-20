@@ -10,14 +10,13 @@ import { axiosPrivate } from '../../../api/api'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
 
-const Landing = ({ selectedFriendProfileId, getFriendList }) => {
+const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) => {
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [connection, setConnection] = useState(null)
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
   const [incomingMessage, setIncomingMessage] = useState(null)
-  const [isFriendTyping, setIsFriendTyping] = useState(false)
   const typingTimeoutRef = useRef(null)
 
   const observerRef = useRef(null)
@@ -430,9 +429,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       </div>
 
       {/* ================= INPUT BAR ================= */}
-      {isFriendTyping && (
-        <div className="text-sm text-slate-400 ps-2 pb-1 animate-pulse">Typing…</div>
-      )}
+     
 
       <div className="mt-3 flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow me-10">
         <AiOutlinePaperClip size={22} className="text-slate-500 cursor-pointer" />

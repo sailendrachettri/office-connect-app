@@ -11,6 +11,27 @@ public class ChatHub : Hub
         _repo = repo;
     }
 
+    public async Task UserTyping(Guid receiverId)
+    {
+        var senderId = Guid.Parse(
+            Context.GetHttpContext()!.Request.Query["userId"]!
+        );
+
+        await Clients.Group(receiverId.ToString())
+            .SendAsync("UserTyping", senderId);
+    }
+
+    public async Task UserStoppedTyping(Guid receiverId)
+    {
+        var senderId = Guid.Parse(
+            Context.GetHttpContext()!.Request.Query["userId"]!
+        );
+
+        await Clients.Group(receiverId.ToString())
+            .SendAsync("UserStoppedTyping", senderId);
+    }
+
+
     public async Task MarkMessagesAsRead(
     List<long> messageIds,
     Guid senderId
