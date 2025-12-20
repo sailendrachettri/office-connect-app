@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
-import { AiOutlinePaperClip } from 'react-icons/ai'
-import { IoMdSend } from 'react-icons/io'
 import DefaultChatPage from '../../common/DefaultChatPage'
 import { createChatConnection } from '../../../signalr/chatConnection'
 import { MESSAGES_URL } from '../../../api/routes_urls'
 import { axiosPrivate } from '../../../api/api'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
+import UserInputMessage from './UserInputMessage'
 
 const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) => {
   const [messages, setMessages] = useState([])
@@ -21,6 +20,7 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
 
   const observerRef = useRef(null)
   const unreadMessageIdsRef = useRef(new Set())
+  const isTypingRef = useRef(false)
 
   // Pagination states
   const [hasMore, setHasMore] = useState(true)
@@ -203,19 +203,6 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
     } catch (err) {
       console.error('Failed to mark messages as read', err)
     }
-  }
-
-  const handleTyping = (e) => {
-    setText(e.target.value)
-
-    if (!connection || connection.state !== 'Connected') return
-
-    connection.invoke('UserTyping', selectedFriendProfileId)
-
-    clearTimeout(typingTimeoutRef.current)
-    typingTimeoutRef.current = setTimeout(() => {
-      connection.invoke('UserStoppedTyping', selectedFriendProfileId)
-    }, 800)
   }
 
   useEffect(() => {
@@ -429,24 +416,14 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
       </div>
 
       {/* ================= INPUT BAR ================= */}
-     
 
-      <div className="mt-3 flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow me-10">
-        <AiOutlinePaperClip size={22} className="text-slate-500 cursor-pointer" />
-
-        <input
-          value={text}
-          onChange={handleTyping}
-          onBlur={() => connection?.invoke('UserStoppedTyping', selectedFriendProfileId)}
-          placeholder="Type a message"
-          className="flex-1 outline-none text-slate-700 placeholder-slate-400"
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-        />
-
-        <button onClick={sendMessage}>
-          <IoMdSend size={26} className="text-primary" />
-        </button>
-      </div>
+      <UserInputMessage
+        connection={connection}
+        selectedFriendProfileId={selectedFriendProfileId}
+        sendMessage={sendMessage}
+        setText={setText}
+        text={text} 
+      />
     </div>
   )
 }
