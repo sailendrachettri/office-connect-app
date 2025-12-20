@@ -17,6 +17,8 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
   const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
   const [incomingMessage, setIncomingMessage] = useState(null)
+  const [isFriendTyping, setIsFriendTyping] = useState(false)
+  const typingTimeoutRef = useRef(null)
 
   const observerRef = useRef(null)
   const unreadMessageIdsRef = useRef(new Set())
@@ -204,6 +206,21 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
     }
   }
 
+  const handleTyping = (e) => {
+    setText(e.target.value)
+
+    if (!connection) return
+
+    // Notify typing
+    connection.invoke('UserTyping', selectedFriendProfileId)
+
+    // Debounce stop typing
+    clearTimeout(typingTimeoutRef.current)
+    typingTimeoutRef.current = setTimeout(() => {
+      connection.invoke('UserStoppedTyping', selectedFriendProfileId)
+    }, 800)
+  }
+
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()
     window.addEventListener('focus', onFocus)
@@ -221,8 +238,20 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       .then(() => setConnected(true))
       .catch(() => setConnected(false))
 
+    conn.on('UserTyping', (senderId) => {
+      if (senderId === selectedFriendProfileId) {
+        setIsFriendTyping(true)
+      }
+    })
+
+    conn.on('UserStoppedTyping', (senderId) => {
+      if (senderId === selectedFriendProfileId) {
+        setIsFriendTyping(false)
+      }
+    })
+
     conn.on('ReceiveMessage', (msg) => {
-      getFriendList();
+      getFriendList()
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
@@ -401,12 +430,16 @@ const Landing = ({ selectedFriendProfileId, getFriendList }) => {
       </div>
 
       {/* ================= INPUT BAR ================= */}
+      {isFriendTyping && (
+        <div className="text-sm text-slate-400 ps-2 pb-1 animate-pulse">Typing…</div>
+      )}
+
       <div className="mt-3 flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow me-10">
         <AiOutlinePaperClip size={22} className="text-slate-500 cursor-pointer" />
 
         <input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={handleTyping}
           placeholder="Type a message"
           className="flex-1 outline-none text-slate-700 placeholder-slate-400"
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
