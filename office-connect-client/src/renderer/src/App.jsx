@@ -21,6 +21,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [friendList, setFriendList] = useState([])
   const [connection, setConnection] = useState(null)
+  const [pendingFriendReq, setPendingFriendReq] = useState(null)
 
   const isConnected = useSelector((state) => state.connection.isConnected)
 
@@ -35,6 +36,11 @@ function App() {
           const data = res?.data?.data
           const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
 
+          const countPendingFriendReq = data?.filter(
+            (item) => item.relation_status === 'PENDING_RECEIVED'
+          ).length
+          console.log({ pendingFriendReq })
+          setPendingFriendReq(countPendingFriendReq || null)
           setFriendList(filteredList || [])
         }
       } catch (error) {
@@ -158,6 +164,7 @@ function App() {
             setShowLogin={setShowLogin}
             friendList={friendList}
             getFriendList={getFriendList}
+            pendingFriendReq={pendingFriendReq}
           />
         )}
 

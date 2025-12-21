@@ -19,7 +19,5 @@ export const uploadFile = async (file) => {
 }
 
 export const viewUploadedFile = (url)=>{
-  console.log(`${API_BASE_URL}${url}`);
-  console.log(`${url}`);
   return `${API_BASE_URL}${url}`;
 }

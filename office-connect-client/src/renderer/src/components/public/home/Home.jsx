@@ -8,19 +8,11 @@ import { axiosInstance } from '../../../api/api'
 import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 import { useChat } from '../../../context/ChatContext'
 
-const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendList }) => {
+const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendList, pendingFriendReq }) => {
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
-  const [pendingFriendReq, setPendingFriendReq] = useState(null)
 
   const { selectedFriendProfileId } = useChat()
-
-  useState(() => {
-    const countPendingFriendReq = friendList?.filter(
-      (item) => item.relation_status === 'PENDING_RECEIVED'
-    ).length
-    setPendingFriendReq(countPendingFriendReq || null)
-  }, [friendList])
 
   useEffect(() => {
     if (selectedFriendProfileId) {
