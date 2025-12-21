@@ -6,19 +6,19 @@ import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
 import FriendsSection from './FriendsSection'
 import { viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 
-const UserProfile = ({trigger, getFriendList}) => {
+const UserProfile = ({ trigger, getFriendList }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(null)
 
-
+  console.table(user)
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const userId = await window.store.get('userId')
-        if (!userId) return;
+        if (!userId) return
 
-        setUserId(userId);
+        setUserId(userId)
 
         const res = await axiosInstance.post(GET_USER_DETAILS_URL, { UserId: userId })
         setUser(res?.data?.data)
@@ -32,8 +32,6 @@ const UserProfile = ({trigger, getFriendList}) => {
     fetchUserDetails()
   }, [])
 
- 
-
   if (loading) return <div className="p-6">Loading profile...</div>
   if (!user) return <div className="p-6 text-red-500">Failed to load profile</div>
 
@@ -43,19 +41,14 @@ const UserProfile = ({trigger, getFriendList}) => {
         {/* LEFT PROFILE CARD */}
         <div className="bg-white shadow rounded-2xl p-6 flex flex-col items-center">
           <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-            {/* {user.profile_image ? (
-              <img
-                src={user.profile_image || defaultUser}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-5xl font-semibold text-gray-400">
-                {user.full_name?.charAt(0)}
-              </span>
-            )} */}
             <img
-              src={user.profile_image && viewUploadedFile(user.profile_image) || defaultUser}
+              src={
+                user?.profile_image
+                  ? viewUploadedFile(user.profile_image)
+                  : user?.avatar_url
+                    ? viewUploadedFile(user.avatar_url)
+                    : defaultUser
+              }
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -100,9 +93,8 @@ const UserProfile = ({trigger, getFriendList}) => {
         </div>
       </div>
 
-    {/* Search friend and request */}
-    <FriendsSection getFriendList={getFriendList} trigger={trigger} userId={userId} /> 
-      
+      {/* Search friend and request */}
+      <FriendsSection getFriendList={getFriendList} trigger={trigger} userId={userId} />
     </div>
   )
 }
