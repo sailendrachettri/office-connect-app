@@ -6,9 +6,12 @@ import { FaRegUser } from 'react-icons/fa6'
 import { axiosInstance } from '../../../api/api'
 import { LOGOUT_URL } from '../../../api/routes_urls'
 import toast from 'react-hot-toast'
+import { useChat } from '../../../context/ChatContext'
 
-const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq, setSelectedFriendProfileId }) => {
+const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq  }) => {
   const [open, setOpen] = useState(false)
+
+  const {setSelectedFriendProfileId}  = useChat();
 
  const handleLogout = async () => {
   try {

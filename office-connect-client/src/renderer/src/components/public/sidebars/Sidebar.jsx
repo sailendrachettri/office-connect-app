@@ -4,6 +4,7 @@ import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
 const Sidebar = ({ friendList  }) => {
   const {selectedFriendProfileId, setSelectedFriendProfileId, isFriendTyping} = useChat();
+  
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
       {/* Title */}

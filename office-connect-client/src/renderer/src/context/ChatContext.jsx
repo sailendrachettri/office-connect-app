@@ -71,7 +71,7 @@ export const ChatProvider = ({
       connection.off('ReceiveMessage', handleReceiveMessage)
       connection.off('MessagesRead', handleMessagesRead)
     }
-  }, [connection, selectedFriendProfileId])
+  }, [connection, selectedFriendProfileId, getFriendList])
 
   return (
     <ChatContext.Provider

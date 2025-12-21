@@ -119,22 +119,10 @@ const Landing = () => {
 
   /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
-    console.log("hlo....");
     if (!text.trim() || !connection) return
 
     connection.invoke('UserStoppedTyping', selectedFriendProfileId)
 
-    // const optimisticMessage = {
-    //   messageId: Date.now(), // Temporary ID
-    //   senderId: currentUserId,
-    //   receiverId: selectedFriendProfileId,
-    //   messageText: text,
-    //   createdAt: new Date().toISOString(),
-    //   isRead: false
-    // }
-
-    // Optimistic UI update
-    // setMessages((prev) => [...prev, optimisticMessage])
     setMessages((prev) => [...prev])
     setText('')
 
@@ -232,31 +220,6 @@ const Landing = () => {
   }, [])
 
  
-
-  // useEffect(() => {
-  //   if (!incomingMessage) return
-
-  //   setMessages((prev) => {
-  //     // If optimistic message exists, replace it
-  //     const index = prev.findIndex(
-  //       (m) =>
-  //         m.senderId === incomingMessage.senderId &&
-  //         m.receiverId === incomingMessage.receiverId &&
-  //         m.messageText === incomingMessage.messageText &&
-  //         typeof m.messageId === 'number' &&
-  //         m.messageId > 1e12 // Date.now temp id
-  //     )
-
-  //     if (index !== -1) {
-  //       const updated = [...prev]
-  //       updated[index] = incomingMessage
-  //       return updated
-  //     }
-
-  //     // Otherwise append (for receiver)
-  //     return [...prev, incomingMessage]
-  //   })
-  // }, [incomingMessage])
 
   /* ---------------- Auto scroll to bottom for new messages ---------------- */
   useEffect(() => {

@@ -9,6 +9,7 @@ import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 import { IoChatbubblesOutline } from 'react-icons/io5'
 import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
 import { useSelector } from 'react-redux'
+import { useChat } from '../../../context/ChatContext'
 
 const Home = ({
   isLoggedIn,
@@ -17,11 +18,11 @@ const Home = ({
   friendList,
   getFriendList
 }) => {
-  const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
-  const [isFriendTyping, setIsFriendTyping] = useState(false)
+
+  const {selectedFriendProfileId} = useChat();
 
   useState(() => {
     const countPendingFriendReq = friendList?.filter(
@@ -101,7 +102,6 @@ const Home = ({
                     selectedTab={selectedTab}
                     setSelectedTab={setSelectedTab}
                     pendingFriendReq={pendingFriendReq}
-                    setSelectedFriendProfileId={setSelectedFriendProfileId}
                   />
                 </div>
 
@@ -113,12 +113,7 @@ const Home = ({
                       {/* CHAT LIST */}
                       <div className="w-105 bg-white border-r border-slate-200 p-1">
                         <Sidebar
-                          setShowLogin={setShowLogin}
-                          setIsLoggedIn={setIsLoggedIn}
-                          setSelectedFriendProfileId={setSelectedFriendProfileId}
-                          selectedFriendProfileId={selectedFriendProfileId}
                           friendList={friendList}
-                          isFriendTyping={isFriendTyping}
                         />
                       </div>
 
@@ -127,9 +122,7 @@ const Home = ({
                         {/* HEADER */}
                         <div className="h-17.5 bg-linear-to-t from-slate-50 to-slate-100">
                           <Headers
-                            selectedFriendProfileId={selectedFriendProfileId}
                             userFullDetails={userFullDetails}
-                            isFriendTyping={isFriendTyping}
                           />
                         </div>
 

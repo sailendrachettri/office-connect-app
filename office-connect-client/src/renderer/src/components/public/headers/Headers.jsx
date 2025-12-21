@@ -5,9 +5,11 @@ import { HiOutlineDotsVertical } from 'react-icons/hi'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import QuickProfile from '../../common/QuickProfile'
 import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
+import { useChat } from '../../../context/ChatContext'
 
-const Headers = ({ userFullDetails, selectedFriendProfileId, isFriendTyping }) => {
+const Headers = ({ userFullDetails}) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
+  const {selectedFriendProfileId, isFriendTyping} = useChat();
   // console.table(userFullDetails)
 
   return (
