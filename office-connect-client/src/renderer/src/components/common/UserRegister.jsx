@@ -1,22 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa'
 import { MdOutlinePhotoCamera } from 'react-icons/md'
 import banner from '../../assets/svgs/banner.svg'
 import { axiosInstance } from '../../api/api'
-import { REGISTER_USER_URL } from '../../api/routes_urls'
+import { GET_AVATAR_URL, REGISTER_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
 import InputField from '../../reusables/input-fields/InputField'
 import { REGEX } from '../../utils/regex'
-import { uploadFile } from '../../utils/file-upload-to-server/uploadFile'
+import { uploadFile, viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 import { useChat } from '../../context/ChatContext'
 
-const UserRegister = ({ setShowLogin, setIsLoggedIn  }) => {
+const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(null)
   const [preview, setPreview] = useState(null)
+  const [avatars, setAvatars] = useState([])
+  const [selectedAvatarId, setSelectedAvatarId] = useState(null)
 
-  const {setRefresh} = useChat();
+  const { setRefresh } = useChat()
 
   const {
     register,
@@ -29,10 +31,17 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn  }) => {
 
     try {
       let profileImageUrl = null
+      let avatarId = null
 
+      // If user uploaded custom image
       if (profile) {
         const uploadRes = await uploadFile(profile)
         profileImageUrl = uploadRes.url
+      }
+
+      // If avatar selected
+      if (selectedAvatarId && !profile) {
+        avatarId = selectedAvatarId
       }
 
       const payload = {
@@ -40,45 +49,47 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn  }) => {
         Email: data.email,
         Mobile: data.phone,
         Password: data.password,
-        ProfileImage: profileImageUrl
+        ProfileImage: profileImageUrl,
+        AvatarId: avatarId
       }
 
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
 
-      const accessToken = res?.data?.data?.accessToken
-      const refreshToken = res?.data?.data?.refreshToken
-      const userId = res?.data?.data?.userId
+      const { accessToken, refreshToken, userId } = res?.data?.data || {}
 
       if (res?.data?.success) {
         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
-        // await window.store.set('user', {
-        //   userId,
-        //   fullName,
-        //   email,
-        //   profileImage
 
-        // })
-
-        setRefresh(prev => !prev);
+        setRefresh((prev) => !prev)
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }
     } catch (err) {
-      if (err?.code == 'ERR_BAD_REQUEST') {
-        toast.error(err?.response?.data?.data?.message || 'Server errror.')
+      if (err?.code === 'ERR_BAD_REQUEST') {
+        toast.error(err?.response?.data?.data?.message || 'Server error.')
       }
-      if (err?.code == 'ERR_NETWORK') {
-        toast.error(
-          'Unable to register. Please ensure you are on the same local network as the server.'
-        )
+      if (err?.code === 'ERR_NETWORK') {
+        toast.error('Unable to register. Please ensure server is reachable.')
       }
       console.error(err)
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const res = await axiosInstance.get(GET_AVATAR_URL)
+        console.log(res?.data?.data)
+        setAvatars(res?.data?.data || [])
+      } catch (error) {
+        console.error('not able to get avatars', error)
+      }
+    })()
+  }, [])
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
@@ -141,28 +152,67 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn  }) => {
               regexMessage="Min 6 chars, include number"
             />
 
-            {/* Profile Upload */}
+            {/* Avatar Selection */}
+            <div>
+              {avatars?.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-slate-700">Choose an Avatar</p>
 
-            {preview && <img src={preview} className="w-16 h-16 rounded-full object-cover mb-2" />}
-            <div className="flex justify-between items-center border border-slate-300 p-3 rounded-lg bg-slate-50">
-              <div>
-                <p className="text-sm text-slate-600">Profile Picture</p>
-                <p className="text-xs text-slate-400">JPG / PNG</p>
-              </div>
+                  <div className="grid grid-cols-6 gap-4">
+                    {avatars.map((avatar) => (
+                      <button
+                        type="button"
+                        key={avatar.avatarId}
+                        onClick={() => {
+                          setSelectedAvatarId(avatar.avatarId)
+                          setProfile(null)
+                          setPreview(null)
+                        }}
+                        className={`relative w-14 h-14 rounded-full overflow-hidden border-2 transition
+            ${
+              selectedAvatarId === avatar.avatarId
+                ? 'border-primary ring-2 ring-primary/40'
+                : 'border-slate-200 hover:border-primary/60'
+            }`}
+                      >
+                        <img
+                          src={viewUploadedFile(avatar.avatarUrl)}
+                          alt="avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
 
-              <label className="cursor-pointer">
-                <MdOutlinePhotoCamera size={24} />
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0]
-                    setProfile(file)
-                    setPreview(URL.createObjectURL(file))
-                  }}
-                />
-              </label>
+                  <div className="flex items-center gap-3 pt-2">
+                    <span className="text-xs text-slate-400">Or upload custom photo</span>
+
+                    <label className="flex items-center gap-2 cursor-pointer text-primary text-sm">
+                      <MdOutlinePhotoCamera size={20} />
+                      Upload
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0]
+                          setProfile(file)
+                          setPreview(URL.createObjectURL(file))
+                          setSelectedAvatarId(null)
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Preview uploaded image */}
+                  {preview && (
+                    <div className="mt-3">
+                      <p className="text-xs text-slate-500 mb-1">Preview</p>
+                      <img src={preview} className="w-16 h-16 rounded-full object-cover border" />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <button

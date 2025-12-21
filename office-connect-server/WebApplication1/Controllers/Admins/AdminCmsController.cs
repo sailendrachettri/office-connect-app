@@ -3,12 +3,6 @@
 using OfficeConnectServer.Models.Admins;
 using OfficeConnectServer.Responses;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Npgsql;
-using OfficeConnectServer.Models;
-using OfficeConnectServer.Responses;
-using System.Text.Json;
-using OfficeConnectServer.Helpers;
 
 [ApiController]
 [Route("api/v1/admin/cms")]
@@ -22,6 +16,41 @@ public class AdminCmsController : ControllerBase
         _configuration = configuration;
         _db = db;
     }
+
+    [HttpGet("get-avatars")]
+    public async Task<IActionResult> GetAvatars()
+    {
+        try
+        {
+            const string sql = @"
+            SELECT
+            avatar_id  AS ""AvatarId"",
+            avatar_url AS ""AvatarUrl"",
+            created_at AS ""CreatedAt""
+        FROM public.utbl_avatars
+        ORDER BY created_at DESC;
+
+        ";
+
+            var avatars = await _db.ExecuteQueryListAsync<AvatarDto>(sql);
+
+            return Ok(new ApiResponse<List<AvatarDto>>(
+                true,
+                "Avatars fetched successfully",
+                avatars
+            ));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ApiResponse<string>(
+                false,
+                ex.Message,
+                null
+            ));
+        }
+    }
+
+
 
     [HttpPost("add-avatar")]
     public async Task<IActionResult> AddAvatar([FromBody] AddAvatarRequest req)

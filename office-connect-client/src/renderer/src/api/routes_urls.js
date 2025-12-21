@@ -18,3 +18,4 @@ export const ME_URL = "/api/v1/auth/me";
 
 //#region ADMINS
 export const ADD_AVATAR_URL = 'api/v1/admin/cms/add-avatar';
+export const GET_AVATAR_URL = 'api/v1/admin/cms/get-avatars';

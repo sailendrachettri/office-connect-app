@@ -31,6 +31,47 @@ public class DbHelper
         return (T)result;
     }
 
+    public async Task<List<T>> ExecuteQueryListAsync<T>(
+    string query,
+    Action<NpgsqlCommand>? parameters = null
+) where T : new()
+    {
+        using var conn = _factory.CreateConnection();
+        using var cmd = new NpgsqlCommand(query, conn);
+
+        parameters?.Invoke(cmd);
+
+        await conn.OpenAsync();
+
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        var list = new List<T>();
+        var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        while (await reader.ReadAsync())
+        {
+            var obj = new T();
+
+            foreach (var prop in props)
+            {
+                var colName = prop.Name;
+
+                if (!reader.HasColumn(colName))
+                    continue;
+
+                var val = reader[colName];
+                if (val == DBNull.Value) continue;
+
+                prop.SetValue(obj, val);
+            }
+
+            list.Add(obj);
+        }
+
+        return list;
+    }
+
+
     public async Task<int> ExecuteNonQueryAsync(
         string query,
         Action<NpgsqlCommand>? parameters = null

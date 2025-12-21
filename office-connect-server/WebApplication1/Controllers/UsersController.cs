@@ -175,7 +175,8 @@ namespace OfficeConnectServer.Controllers
                 @mobile_i,
                 @email_i,
                 @password_hash_i,
-                @profile_image_i
+                @profile_image_i,
+                @avatar_id_i
             );
         ";
 
@@ -188,6 +189,7 @@ namespace OfficeConnectServer.Controllers
                         cmd.Parameters.AddWithValue("email_i", req.Email);
                         cmd.Parameters.AddWithValue("password_hash_i", hashedPassword);
                         cmd.Parameters.AddWithValue("profile_image_i", (object?)req.ProfileImage ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("avatar_id_i", (object?)req.AvatarId ?? DBNull.Value);
                     }
                 );
 
