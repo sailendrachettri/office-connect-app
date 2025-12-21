@@ -72,7 +72,7 @@ const MessageBubble = ({
           }
         `}
       >
-        <div className="whitespace-pre-wrap break-words">{text}</div>
+        <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
 
         <span
           className={`text-xs flex justify-end items-center gap-1 mt-1

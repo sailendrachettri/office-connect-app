@@ -39,7 +39,6 @@ function App() {
           const countPendingFriendReq = data?.filter(
             (item) => item.relation_status === 'PENDING_RECEIVED'
           ).length
-          console.log({ pendingFriendReq })
           setPendingFriendReq(countPendingFriendReq || null)
           setFriendList(filteredList || [])
         }

@@ -1,13 +1,16 @@
 import { useEffect, useRef } from 'react'
 import { AiOutlinePaperClip } from 'react-icons/ai'
 import { IoMdSend } from 'react-icons/io'
+import { useChat } from '../../../context/ChatContext'
 
 const MAX_HEIGHT = 120
 
-const UserInputMessage = ({ text, setText, sendMessage, connection, selectedFriendProfileId }) => {
+const UserInputMessage = ({ text, setText, sendMessage  }) => {
   const typingTimeoutRef = useRef(null)
   const isTypingRef = useRef(false)
   const textareaRef = useRef(null)
+
+  const {selectedFriendProfileId, connection} = useChat();
 
   const handleTyping = (e) => {
     const value = e.target.value

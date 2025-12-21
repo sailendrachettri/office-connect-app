@@ -25,7 +25,7 @@ export const ChatProvider = ({
 
     const handleUserTyping = (senderId) => {
       if (String(senderId) === String(selectedFriendProfileId)) {
-        setIsFriendTyping(true)
+        setIsFriendTyping(true) 
       }
     }
 

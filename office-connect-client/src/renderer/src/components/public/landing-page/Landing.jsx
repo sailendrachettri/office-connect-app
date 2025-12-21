@@ -289,8 +289,6 @@ const Landing = () => {
       {/* ================= INPUT BAR ================= */}
 
       <UserInputMessage
-        connection={connection}
-        selectedFriendProfileId={selectedFriendProfileId}
         sendMessage={sendMessage}
         setText={setText}
         text={text}
