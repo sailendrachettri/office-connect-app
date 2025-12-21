@@ -148,7 +148,7 @@ function App() {
         {loading ? (
           <section>
             <div className="min-h-screen w-full flex items-center justify-center">
-              <div class="loader"></div>
+              <div className="loader"></div>
             </div>
           </section>
         ) : (
