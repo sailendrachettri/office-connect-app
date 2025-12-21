@@ -7,6 +7,7 @@ import UserProfile from '../../common/UserProfile'
 import { axiosInstance } from '../../../api/api'
 import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 import { useChat } from '../../../context/ChatContext'
+import AdminCms from '../../admins/admin-cms/AdminCms'
 
 const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendList, pendingFriendReq }) => {
   const [userFullDetails, setUserFullDetails] = useState({})
@@ -84,6 +85,21 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
                     {/* BODY */}
                     <div className="flex-1 overflow-y-auto bg-white custom-scroll">
                       <UserProfile getFriendList={getFriendList} />
+                    </div>
+                  </div>
+                )}
+
+                {/*  ADMIN CMS  */}
+                {selectedTab === 'admin-cms' && (
+                  <div className="flex-1 flex flex-col ">
+                    {/* HEADER */}
+                    <div className="h-17.5 bg-white border-b border-slate-200 shadow-sm px-4 flex items-center">
+                      Admin - Content Management System
+                    </div>
+
+                    {/* BODY */}
+                    <div className="flex-1 overflow-y-auto bg-white custom-scroll">
+                     <AdminCms />
                     </div>
                   </div>
                 )}

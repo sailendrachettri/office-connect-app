@@ -1,8 +1,5 @@
 import axios from 'axios'
 import { REFRESH_URL } from './routes_urls'
-import { createChatConnection } from '../signalr/chatConnection'
-import { setConnected, setDisconnected } from '../store/connectionSlice'
-import { store } from '../store'
 
 
 export const API_BASE_URL = 'http://192.168.1.50:5171'

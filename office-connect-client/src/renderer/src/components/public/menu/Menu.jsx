@@ -7,6 +7,7 @@ import { axiosInstance } from '../../../api/api'
 import { LOGOUT_URL } from '../../../api/routes_urls'
 import toast from 'react-hot-toast'
 import { useChat } from '../../../context/ChatContext'
+import { BiBookContent } from 'react-icons/bi'
 
 const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq  }) => {
   const [open, setOpen] = useState(false)
@@ -70,6 +71,22 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
             <FaRegUser size={17} />
           </div>
         </div>
+        
+        {/* Admin */}
+        <div onClick={() => setSelectedTab('admin-cms')} className="relative mt-6 cursor-pointer">
+         
+          
+
+          {/* Circle with icon */}
+          <div
+            className={`rounded-full p-2 text-slate-600 transition ${
+              selectedTab === 'admin-cms' ? 'bg-ternary' : 'bg-slate-100'
+            } hover:bg-ternary`}
+          >
+            <BiBookContent  size={17} />
+          </div>
+        </div>
+
       </div>
 
       {/* Bottom-left section (settings + popup modal) */}
