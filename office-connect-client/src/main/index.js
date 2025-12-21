@@ -20,33 +20,32 @@ ipcMain.handle('store-delete', (_, key) => store.delete(key))
 ipcMain.handle('store-clear', () => store.clear())
 
 ipcMain.on('window-minimize', () => {
-  BrowserWindow.getFocusedWindow().minimize()
+  BrowserWindow.getFocusedWindow()?.minimize()
 })
 
 ipcMain.on('window-maximize', () => {
   const win = BrowserWindow.getFocusedWindow()
-  win.isMaximized() ? win.unmaximize() : win.maximize()
+  if (!win) return
+
+  win.setFullScreen(!win.isFullScreen())
 })
 
 ipcMain.on('window-close', () => {
-  BrowserWindow.getFocusedWindow().close()
+  BrowserWindow.getFocusedWindow()?.close()
 })
 
 function createWindow() {
-  // Create the browser window.
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
   const mainWindow = new BrowserWindow({
     icon: path.join(process.cwd(), 'resources', 'icon.ico'),
-    autoHideMenuBar: true,
-    menuBarVisible: false,
-    frame: false,
-    titleBarOverlay: false,
-    // fullscreen: true,
-    width,
-    height,
+    width: 1200,
+    height: 800,
     show: false,
+
+    frame: false, // custom titlebar
     autoHideMenuBar: true,
-    // ...(process.platform === 'linux' ? { icon } : {}),
+    fullscreenable: true, // REQUIRED
+    maximizable: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -88,8 +87,6 @@ function createWindow() {
   `)
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -101,24 +98,17 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
