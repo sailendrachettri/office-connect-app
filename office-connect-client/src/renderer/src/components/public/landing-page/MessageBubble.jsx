@@ -36,7 +36,7 @@ const MessageBubble = ({
       data-sender-id={senderId}
       ref={(el) => {
         if (el && !isRead && senderId !== currentUserId && typeof messageId === 'number') {
-          observerRef.current.observe(el)
+          observerRef?.current?.observe(el)
         }
       }}
       className={`flex mb-2 ${fromMe ? 'justify-end' : 'justify-start'} group`}

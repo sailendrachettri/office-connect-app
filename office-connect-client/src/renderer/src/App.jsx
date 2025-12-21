@@ -9,6 +9,11 @@ import toast from 'react-hot-toast'
 import LoginUser from './components/common/LoginUser'
 import UserRegister from './components/common/UserRegister'
 import { ChatProvider } from './context/ChatContext'
+import { IoChatbubblesOutline } from 'react-icons/io5'
+import { useSelector } from 'react-redux'
+import TopHelpMenu from './components/public/menu/helper-menu/TopHelpMenu'
+
+let shown = false
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -16,6 +21,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [friendList, setFriendList] = useState([])
   const [connection, setConnection] = useState(null)
+
+  const isConnected = useSelector((state) => state.connection.isConnected)
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
@@ -72,13 +79,17 @@ function App() {
         toast.error(res?.data?.message || 'Something went wrong!')
       }
     } catch (err) {
-      if (err?.code == 'ERR_BAD_REQUEST') {
-        toast.error('Session expired, please login again')
-      } else {
-        toast.error('Not able to login')
+      if (!shown) {
+        if (err?.code == 'ERR_BAD_REQUEST') {
+          toast.error('Session expired, please login again')
+        } else {
+          toast.error('Not able to login')
+        }
+        console.error('not able to login', err)
+        setIsLoggedIn(false)
+
+        shown = true
       }
-      console.error('not able to login', err)
-      setIsLoggedIn(false)
     } finally {
       setLoading(false)
     }
@@ -94,6 +105,41 @@ function App() {
 
   return (
     <>
+      <div className="w-full h-7 bg-slate-200 text-slate-700 flex items-center px-6 select-none drag-region">
+        <div className="flex items-center justify-start gap-x-3 no-drag">
+          {isLoggedIn && (
+            <div
+              className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}
+            >
+              <IoChatbubblesOutline />
+              <small>{isConnected ? 'Connected' : 'Disconnected'}</small>
+            </div>
+          )}
+          <TopHelpMenu />
+        </div>
+
+        <div className="ml-auto flex gap-3 no-drag">
+          <button
+            onClick={() => window.api.minimize()}
+            className="px-3 cursor-pointer hover:bg-slate-50 rounded-sm"
+          >
+            —
+          </button>
+          <button
+            onClick={() => window.api.maximize()}
+            className="px-3 cursor-pointer hover:bg-slate-50 rounded-sm"
+          >
+            ▢
+          </button>
+          <button
+            onClick={() => window.api.close()}
+            className="px-3 hover:bg-red-600 hover:text-slate-300 cursor-pointer rounded-sm"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
       <ChatProvider
         connection={connection}
         getFriendList={getFriendList}
