@@ -52,13 +52,12 @@ function App() {
   const restoreSession = async () => {
     try {
       const res = await axiosPrivate.get(ME_URL)
-      // console.log('Logged In user details')
-      // console.table(res?.data?.data)
+
       if (res?.data?.success == true) {
         const email = res?.data?.data?.email
         const full_name = res?.data?.data?.full_Name
         const pic = res?.data?.data?.profile_Image
-        // const username = res?.data?.data?.username
+
         const user_Id = res?.data?.data?.user_Id
 
         await window.store.set('userId', user_Id)
