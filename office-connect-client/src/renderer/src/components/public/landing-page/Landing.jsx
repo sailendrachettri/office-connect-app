@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { BsCheck2All } from 'react-icons/bs'
-import { PiCheck } from 'react-icons/pi'
 import DefaultChatPage from '../../common/DefaultChatPage'
 import { createChatConnection } from '../../../signalr/chatConnection'
 import { MESSAGES_URL } from '../../../api/routes_urls'
 import { axiosPrivate } from '../../../api/api'
-import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
 import UserInputMessage from './UserInputMessage'
-import { IoCopyOutline } from 'react-icons/io5'
 import MessageBubble from './MessageBubble'
 
 const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) => {

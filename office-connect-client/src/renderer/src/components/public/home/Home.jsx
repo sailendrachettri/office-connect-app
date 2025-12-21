@@ -3,106 +3,38 @@ import Menu from '../menu/Menu'
 import Sidebar from '../sidebars/Sidebar'
 import Headers from '../headers/Headers'
 import Landing from '../landing-page/Landing'
-import UserRegister from '../../common/UserRegister'
-import LoginUser from '../../common/LoginUser'
 import UserProfile from '../../common/UserProfile'
-import { axiosInstance, axiosPrivate } from '../../../api/api'
-import { GET_FRIEND_LIST_URL, GET_USER_DETAILS_URL, ME_URL } from '../../../api/routes_urls'
+import { axiosInstance } from '../../../api/api'
+import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 import { IoChatbubblesOutline } from 'react-icons/io5'
 import TopHelpMenu from '../menu/helper-menu/TopHelpMenu'
 import { useSelector } from 'react-redux'
-import { setConnected, setDisconnected } from '../../../store/connectionSlice'
-import { createChatConnection } from '../../../signalr/chatConnection'
-import { store } from '../../../store'
-import toast from 'react-hot-toast'
 
-const Home = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [showLogin, setShowLogin] = useState(true)
+const Home = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  setShowLogin,
+  friendList,
+  getFriendList
+}) => {
   const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
-  const [loading, setLoading] = useState(true)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
-  const [friendList, setFriendList] = useState([])
   const [isFriendTyping, setIsFriendTyping] = useState(false)
 
-  const getFriendList = async () => {
-    const userId = await window.store.get('userId')
+  useState(() => {
+    const countPendingFriendReq = friendList?.filter(
+      (item) => item.relation_status === 'PENDING_RECEIVED'
+    ).length
+    setPendingFriendReq(countPendingFriendReq || null)
+  }, [friendList])
 
-    if (userId) {
-      try {
-        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-
-        if (res?.data?.success == true) {
-          const data = res?.data?.data
-          const filteredList = data.filter((item) => item.relation_status === 'FRIEND')
-          const countPendingFriendReq = data.filter(
-            (item) => item.relation_status === 'PENDING_RECEIVED'
-          ).length
-          setPendingFriendReq(countPendingFriendReq || null)
-          setFriendList(filteredList || [])
-        }
-      } catch (error) {
-        console.error('not able to get the friend list', error)
-      }
-    }
-  }
+  
 
   const isConnected = useSelector((state) => state.connection.isConnected)
 
-  useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const res = await axiosPrivate.get(ME_URL)
-        // console.log('Logged In user details')
-        // console.table(res?.data?.data)
-        if (res?.data?.success == true) {
-          const email = res?.data?.data?.email
-          const full_name = res?.data?.data?.full_Name
-          const pic = res?.data?.data?.profile_Image
-          // const username = res?.data?.data?.username
-          const user_Id = res?.data?.data?.user_Id
-
-          await window.store.set('userId', user_Id)
-          await window.store.set('user', {
-            user_Id,
-            full_name,
-            email,
-            pic
-          })
-          await getFriendList()
-
-          setIsLoggedIn(true)
-
-          const connection = createChatConnection(res?.data?.data?.user_Id)
-
-          connection
-            .start()
-            .then(() => {
-              store.dispatch(setConnected('signalr'))
-            })
-            .catch(() => {
-              store.dispatch(setDisconnected())
-            })
-        } else {
-          toast.error(res?.data?.message || 'Something went wrong!')
-        }
-      } catch (err) {
-        if (err?.code == 'ERR_BAD_REQUEST') {
-          toast.error('Session expired, please login again')
-        } else {
-          toast.error('Not able to login')
-        }
-        console.error('not able to login', err)
-        setIsLoggedIn(false)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    restoreSession()
-  }, [showLogin, loading])
+ 
 
   useEffect(() => {
     if (selectedFriendProfileId) {
@@ -117,21 +49,11 @@ const Home = () => {
         } catch (error) {}
       })()
     }
-
-    ;(async () => {
-      await getFriendList()
-    })()
   }, [selectedFriendProfileId, isLoggedIn])
 
   return (
     <>
-      {loading ? (
-        <section>
-          <div className="min-h-screen w-full flex items-center justify-center">
-            <div class="loader"></div>
-          </div>
-        </section>
-      ) : (
+     
         <section>
           {/* Icons to minimize, fullscreen and close */}
 
@@ -243,19 +165,9 @@ const Home = () => {
             </section>
           )}
 
-          <>
-            {!isLoggedIn && (
-              <>
-                {showLogin ? (
-                  <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
-                ) : (
-                  <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
-                )}
-              </>
-            )}
-          </>
+          
         </section>
-      )}
+      
     </>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { FaEnvelope, FaLock } from 'react-icons/fa'
 import banner from '../../assets/svgs/banner_login.svg'
 import { REGEX } from '../../utils/regex'
@@ -7,12 +7,9 @@ import { useForm } from 'react-hook-form'
 import { axiosInstance } from '../../api/api'
 import { LOGIN_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
-import { setConnected, setDisconnected } from '../../store/connectionSlice'
-import { createChatConnection } from '../../signalr/chatConnection'
-import { store } from '../../store'
 import { IoExitOutline } from 'react-icons/io5'
 
-const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
+const LoginUser = ({ setShowLogin, setIsLoggedIn, getFriendList  }) => {
   const [loading, isLoading] = useState(false)
 
   const {
@@ -48,6 +45,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
 
         // })
 
+        getFriendList();
         setTimeout(() => {
           isLoading(false)
           setIsLoggedIn(true)

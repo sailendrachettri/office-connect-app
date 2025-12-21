@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa'
 import { MdOutlinePhotoCamera } from 'react-icons/md'
@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import InputField from '../../reusables/input-fields/InputField'
 import { REGEX } from '../../utils/regex'
 
-const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
+const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(null)
 
@@ -49,6 +49,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
 
         // })
 
+        getFriendList()
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }
