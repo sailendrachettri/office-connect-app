@@ -8,12 +8,14 @@ import { setConnected, setDisconnected } from './store/connectionSlice'
 import toast from 'react-hot-toast'
 import LoginUser from './components/common/LoginUser'
 import UserRegister from './components/common/UserRegister'
+import { ChatProvider } from './context/ChatContext'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [showLogin, setShowLogin] = useState(true)
   const [loading, setLoading] = useState(true)
   const [friendList, setFriendList] = useState([])
+  const [connection, setConnection] = useState(null)
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
@@ -57,8 +59,8 @@ function App() {
 
           setIsLoggedIn(true)
 
-          const connection = createChatConnection(res?.data?.data?.user_Id)
-
+          const connection = createChatConnection(user_Id)
+          setConnection(connection)
           connection
             .start()
             .then(() => {
@@ -99,13 +101,15 @@ function App() {
           </div>
         </section>
       ) : (
-        <Home
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
-          setShowLogin={setShowLogin}
-          friendList={friendList}
-          getFriendList={getFriendList}
-        />
+        <ChatProvider connection={connection} getFriendList={getFriendList}>
+          <Home
+            isLoggedIn={isLoggedIn}
+            setIsLoggedIn={setIsLoggedIn}
+            setShowLogin={setShowLogin}
+            friendList={friendList}
+            getFriendList={getFriendList}
+          />
+        </ChatProvider>
       )}
 
       <>
@@ -118,7 +122,11 @@ function App() {
                 getFriendList={getFriendList}
               />
             ) : (
-              <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} getFriendList={getFriendList} />
+              <UserRegister
+                setShowLogin={setShowLogin}
+                setIsLoggedIn={setIsLoggedIn}
+                getFriendList={getFriendList}
+              />
             )}
           </>
         )}

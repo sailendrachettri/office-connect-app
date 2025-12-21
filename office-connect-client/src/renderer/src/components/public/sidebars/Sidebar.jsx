@@ -1,8 +1,9 @@
 import profilePic from '../../../assets/peoples/default_user.jpg'
+import { useChat } from '../../../context/ChatContext'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 
-const Sidebar = ({ setSelectedFriendProfileId, friendList, selectedFriendProfileId, isFriendTyping }) => {
-  
+const Sidebar = ({ friendList  }) => {
+  const {selectedFriendProfileId, setSelectedFriendProfileId, isFriendTyping} = useChat();
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
       {/* Title */}

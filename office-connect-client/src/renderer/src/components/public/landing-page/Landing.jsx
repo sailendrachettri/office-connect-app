@@ -6,14 +6,11 @@ import { axiosPrivate } from '../../../api/api'
 import { showSystemNotification } from '../../../utils/notifications/showSystemNotification'
 import UserInputMessage from './UserInputMessage'
 import MessageBubble from './MessageBubble'
+import { useChat } from '../../../context/ChatContext'
 
-const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) => {
-  const [messages, setMessages] = useState([])
+const Landing = () => {
   const [text, setText] = useState('')
-  const [connection, setConnection] = useState(null)
-  const [connected, setConnected] = useState(false)
   const [currentUserId, setCurrentUserId] = useState(null)
-  const [incomingMessage, setIncomingMessage] = useState(null)
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
   const [oldestMessageId, setOldestMessageId] = useState(null)
@@ -25,6 +22,8 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
   const restoreMessageIdRef = useRef(null)
   const isLoadingRef = useRef(false)
   const initialLoadDoneRef = useRef(false)
+
+  const { connection, selectedFriendProfileId, incomingMessage, messages, setMessages } = useChat()
 
   const isSameDay = (d1, d2) => {
     return (
@@ -120,21 +119,23 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
 
   /* ---------------- Send message ---------------- */
   const sendMessage = async () => {
-    if (!text.trim() || !connected) return
+    console.log("hlo....");
+    if (!text.trim() || !connection) return
 
     connection.invoke('UserStoppedTyping', selectedFriendProfileId)
 
-    const optimisticMessage = {
-      messageId: Date.now(), // Temporary ID
-      senderId: currentUserId,
-      receiverId: selectedFriendProfileId,
-      messageText: text,
-      createdAt: new Date().toISOString(),
-      isRead: false
-    }
+    // const optimisticMessage = {
+    //   messageId: Date.now(), // Temporary ID
+    //   senderId: currentUserId,
+    //   receiverId: selectedFriendProfileId,
+    //   messageText: text,
+    //   createdAt: new Date().toISOString(),
+    //   isRead: false
+    // }
 
     // Optimistic UI update
-    setMessages((prev) => [...prev, optimisticMessage])
+    // setMessages((prev) => [...prev, optimisticMessage])
+    setMessages((prev) => [...prev])
     setText('')
 
     try {
@@ -230,87 +231,32 @@ const Landing = ({ selectedFriendProfileId, getFriendList, setIsFriendTyping }) 
     return () => window.removeEventListener('focus', onFocus)
   }, [])
 
-  /* ---------------- SignalR connection ---------------- */
-  useEffect(() => {
-    if (!currentUserId || !selectedFriendProfileId) return
+ 
 
-    const conn = createChatConnection(currentUserId)
+  // useEffect(() => {
+  //   if (!incomingMessage) return
 
-    conn
-      .start()
-      .then(() => setConnected(true))
-      .catch(() => setConnected(false))
+  //   setMessages((prev) => {
+  //     // If optimistic message exists, replace it
+  //     const index = prev.findIndex(
+  //       (m) =>
+  //         m.senderId === incomingMessage.senderId &&
+  //         m.receiverId === incomingMessage.receiverId &&
+  //         m.messageText === incomingMessage.messageText &&
+  //         typeof m.messageId === 'number' &&
+  //         m.messageId > 1e12 // Date.now temp id
+  //     )
 
-    conn.on('UserTyping', (senderId) => {
-      if (String(senderId) === String(selectedFriendProfileId)) {
-        setIsFriendTyping(true)
-      }
-    })
+  //     if (index !== -1) {
+  //       const updated = [...prev]
+  //       updated[index] = incomingMessage
+  //       return updated
+  //     }
 
-    conn.on('UserStoppedTyping', (senderId) => {
-      if (String(senderId) === String(selectedFriendProfileId)) {
-        setIsFriendTyping(false)
-      }
-    })
-
-    conn.on('ReceiveMessage', (msg) => {
-      getFriendList()
-      const normalized = {
-        messageId: msg?.messageId ?? msg?.message_id,
-        senderId: msg?.senderId ?? msg?.sender_id,
-        receiverId: msg?.receiverId ?? msg?.receiver_id,
-        messageText: msg?.messageText ?? msg?.message_text,
-        createdAt: msg?.createdAt ?? msg?.created_at,
-        isRead: msg?.isRead ?? false
-      }
-      showSystemNotification(normalized)
-
-      if (
-        normalized.senderId === selectedFriendProfileId ||
-        normalized.receiverId === selectedFriendProfileId
-      ) {
-        // send to Landing via state or context
-        setIncomingMessage(normalized)
-      }
-    })
-
-    conn.on('MessagesRead', (ids) => {
-      setMessages((prev) =>
-        prev.map((m) => (ids.includes(m.messageId) ? { ...m, isRead: true } : m))
-      )
-    })
-
-    setConnection(conn)
-
-    return () => {
-      conn.stop()
-    }
-  }, [currentUserId, selectedFriendProfileId])
-
-  useEffect(() => {
-    if (!incomingMessage) return
-
-    setMessages((prev) => {
-      // If optimistic message exists, replace it
-      const index = prev.findIndex(
-        (m) =>
-          m.senderId === incomingMessage.senderId &&
-          m.receiverId === incomingMessage.receiverId &&
-          m.messageText === incomingMessage.messageText &&
-          typeof m.messageId === 'number' &&
-          m.messageId > 1e12 // Date.now temp id
-      )
-
-      if (index !== -1) {
-        const updated = [...prev]
-        updated[index] = incomingMessage
-        return updated
-      }
-
-      // Otherwise append (for receiver)
-      return [...prev, incomingMessage]
-    })
-  }, [incomingMessage])
+  //     // Otherwise append (for receiver)
+  //     return [...prev, incomingMessage]
+  //   })
+  // }, [incomingMessage])
 
   /* ---------------- Auto scroll to bottom for new messages ---------------- */
   useEffect(() => {

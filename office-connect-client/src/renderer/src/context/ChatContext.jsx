@@ -1,8 +1,3 @@
-<ChatProvider connection={connection} getFriendList={getFriendList}>
-  <Home />
-</ChatProvider>
-
-
 import { createContext, useContext, useEffect, useState } from 'react'
 import { showSystemNotification } from '../utils/notifications/showSystemNotification'
 
@@ -76,7 +71,7 @@ export const ChatProvider = ({
       connection.off('ReceiveMessage', handleReceiveMessage)
       connection.off('MessagesRead', handleMessagesRead)
     }
-  }, [connection, selectedFriendProfileId, getFriendList])
+  }, [connection, selectedFriendProfileId])
 
   return (
     <ChatContext.Provider

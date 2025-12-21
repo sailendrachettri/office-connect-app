@@ -136,10 +136,6 @@ const Home = ({
                         {/* BODY */}
                         <div className="flex-1 flex">
                           <Landing
-                            selectedFriendProfileId={selectedFriendProfileId}
-                            userFullDetails={userFullDetails}
-                            getFriendList={getFriendList}
-                            setIsFriendTyping={setIsFriendTyping}
                           />
                         </div>
                       </div>
