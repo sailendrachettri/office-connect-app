@@ -23,7 +23,7 @@ const Landing = () => {
   const isLoadingRef = useRef(false)
   const initialLoadDoneRef = useRef(false)
 
-  const { connection, selectedFriendProfileId, incomingMessage, messages, setMessages } = useChat()
+  const { connection, selectedFriendProfileId, getFriendList, messages, setMessages } = useChat()
 
   const isSameDay = (d1, d2) => {
     return (
@@ -112,6 +112,7 @@ const Landing = () => {
 
     try {
       await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
+      getFriendList();
     } catch (err) {
       console.error('Failed to mark messages as read', err)
     }

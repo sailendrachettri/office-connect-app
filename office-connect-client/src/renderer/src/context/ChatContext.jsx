@@ -90,7 +90,8 @@ export const ChatProvider = ({
         incomingMessage,
         messages,
         setMessages,
-        setRefresh
+        setRefresh,
+        getFriendList
       }}
     >
       {children}
