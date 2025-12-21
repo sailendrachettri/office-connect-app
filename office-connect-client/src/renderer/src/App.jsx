@@ -81,6 +81,8 @@ function App() {
           })
       } else {
         toast.error(res?.data?.message || 'Something went wrong!')
+        setLoading(false);
+        setShowLogin(false);
       }
     } catch (err) {
       if (!shown) {
@@ -94,6 +96,8 @@ function App() {
 
         shown = true
       }
+       setLoading(false);
+        setShowLogin(false);
     } finally {
       setLoading(false)
     }

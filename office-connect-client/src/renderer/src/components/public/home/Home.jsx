@@ -82,7 +82,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
                     </div>
 
                     {/* BODY */}
-                    <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="flex-1 overflow-y-auto bg-white custom-scroll">
                       <UserProfile getFriendList={getFriendList} />
                     </div>
                   </div>
