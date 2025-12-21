@@ -106,7 +106,7 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/uploads"
 });
-
+    
 
 app.UseCors("AllowViteDevServer");
 

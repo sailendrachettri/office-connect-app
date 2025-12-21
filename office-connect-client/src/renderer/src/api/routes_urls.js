@@ -8,6 +8,8 @@ export const GET_FRIEND_LIST_URL = "/api/v1/friends/list";
 export const REJECT_FRIEND_REQUEST_URL = "/api/v1/friends/reject";
 export const ACCEPT_FRIEND_REQUEST_URL = "/api/v1/friends/accept";
 
+export const UPLOAD_FILES_URL = 'api/v1/upload';
+
 export const MESSAGES_URL = 'api/messages'
 
 export const REFRESH_URL = "/api/v1/auth/refresh";

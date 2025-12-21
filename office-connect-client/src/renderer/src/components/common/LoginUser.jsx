@@ -8,9 +8,11 @@ import { axiosInstance } from '../../api/api'
 import { LOGIN_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
 import { IoExitOutline } from 'react-icons/io5'
+import { useChat } from '../../context/ChatContext'
 
-const LoginUser = ({ setShowLogin, setIsLoggedIn, getFriendList  }) => {
+const LoginUser = ({ setShowLogin, setIsLoggedIn  }) => {
   const [loading, isLoading] = useState(false)
+  const {setRefresh} = useChat();
 
   const {
     register,
@@ -44,8 +46,7 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn, getFriendList  }) => {
         //   profileImage
 
         // })
-
-        getFriendList();
+        setRefresh(prev => !prev);
         setTimeout(() => {
           isLoading(false)
           setIsLoggedIn(true)

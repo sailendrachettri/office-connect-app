@@ -4,6 +4,7 @@ import { axiosInstance } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
 import FriendsSection from './FriendsSection'
+import { viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 
 const UserProfile = ({trigger, getFriendList}) => {
   const [user, setUser] = useState(null)
@@ -54,7 +55,7 @@ const UserProfile = ({trigger, getFriendList}) => {
               </span>
             )} */}
             <img
-              src={user.profile_image || defaultUser}
+              src={user.profile_image && viewUploadedFile(user.profile_image) || defaultUser}
               alt="Profile"
               className="w-full h-full object-cover"
             />

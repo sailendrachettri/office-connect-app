@@ -10,6 +10,7 @@ import {
 import { axiosInstance, axiosPrivate } from '../../api/api'
 import defaultUser from '../../assets/peoples/default_user.jpg'
 import toast from 'react-hot-toast'
+import { viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 
 const FriendsSection = ({ userId, getFriendList }) => {
   const [searchText, setSearchText] = useState('')
@@ -182,14 +183,14 @@ const FriendsSection = ({ userId, getFriendList }) => {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={u.profile_image || defaultUser}
+                      src={u?.profile_image && viewUploadedFile(u?.profile_image) || defaultUser}
                       className="w-10 h-10 rounded-full object-cover"
                       alt=""
                     />
 
                     <div>
-                      <p className="font-medium text-gray-800">{u.full_name}</p>
-                      <p className="text-sm text-gray-500">@{u.username}</p>
+                      <p className="font-medium text-gray-800">{u?.full_name}</p>
+                      <p className="text-sm text-gray-500">@{u?.username}</p>
                     </div>
                   </div>
 
@@ -271,7 +272,7 @@ const FriendsSection = ({ userId, getFriendList }) => {
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={user?.profile_image || defaultUser}
+                    src={user.profile_image && viewUploadedFile(user.profile_image) || defaultUser}
                     alt={user?.full_name}
                     className="w-12 h-12 rounded-full object-cover border"
                   />

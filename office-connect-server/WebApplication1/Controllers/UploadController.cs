@@ -52,7 +52,7 @@ public class UploadController : ControllerBase
         await image.WriteAsync(filePath, MagickFormat.WebP);
 
 
-        var url = $"{Request.Scheme}://{Request.Host}/uploads/images/{fileName}";
+        var url = $"/uploads/images/{fileName}";
 
         return Ok(new
         {
@@ -80,7 +80,7 @@ public class UploadController : ControllerBase
         await using var fs = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(fs);
 
-        var url = $"{Request.Scheme}://{Request.Host}/uploads/files/{fileName}";
+        var url = $"/uploads/files/{fileName}";
 
         return Ok(new
         {

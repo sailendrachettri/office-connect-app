@@ -8,10 +8,15 @@ import { REGISTER_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
 import InputField from '../../reusables/input-fields/InputField'
 import { REGEX } from '../../utils/regex'
+import { uploadFile } from '../../utils/file-upload-to-server/uploadFile'
+import { useChat } from '../../context/ChatContext'
 
-const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
+const UserRegister = ({ setShowLogin, setIsLoggedIn  }) => {
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(null)
+  const [preview, setPreview] = useState(null)
+
+  const {setRefresh} = useChat();
 
   const {
     register,
@@ -23,12 +28,19 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
     setLoading(true)
 
     try {
+      let profileImageUrl = null
+
+      if (profile) {
+        const uploadRes = await uploadFile(profile)
+        profileImageUrl = uploadRes.url
+      }
+
       const payload = {
         FullName: data.fullName,
         Email: data.email,
         Mobile: data.phone,
         Password: data.password,
-        ProfileImage: profile
+        ProfileImage: profileImageUrl
       }
 
       const res = await axiosInstance.post(REGISTER_USER_URL, payload)
@@ -49,11 +61,14 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
 
         // })
 
-        getFriendList()
+        setRefresh(prev => !prev);
         toast.success(res.data.message)
         setIsLoggedIn(true)
       }
     } catch (err) {
+      if (err?.code == 'ERR_BAD_REQUEST') {
+        toast.error(err?.response?.data?.data?.message || 'Server errror.')
+      }
       if (err?.code == 'ERR_NETWORK') {
         toast.error(
           'Unable to register. Please ensure you are on the same local network as the server.'
@@ -66,7 +81,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
   }
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-5">
+    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
         {/* LEFT */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
@@ -127,6 +142,8 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
             />
 
             {/* Profile Upload */}
+
+            {preview && <img src={preview} className="w-16 h-16 rounded-full object-cover mb-2" />}
             <div className="flex justify-between items-center border border-slate-300 p-3 rounded-lg bg-slate-50">
               <div>
                 <p className="text-sm text-slate-600">Profile Picture</p>
@@ -135,7 +152,16 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn, getFriendList }) => {
 
               <label className="cursor-pointer">
                 <MdOutlinePhotoCamera size={24} />
-                <input type="file" hidden onChange={(e) => setProfile(e.target.files[0])} />
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0]
+                    setProfile(file)
+                    setPreview(URL.createObjectURL(file))
+                  }}
+                />
               </label>
             </div>
 

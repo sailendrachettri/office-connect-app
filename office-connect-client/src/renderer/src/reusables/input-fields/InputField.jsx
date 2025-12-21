@@ -21,7 +21,7 @@ const InputField = ({
 
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium text-slate-600 mb-1">{label}</label>}
+      {label && <label className="block text-sm font-medium text-slate-600 mb-1">{label} <span className='text-red-500'>{required? '*' : ''}</span></label>}
 
       <div
         className={`flex items-center gap-3 border rounded-lg p-3 bg-slate-50

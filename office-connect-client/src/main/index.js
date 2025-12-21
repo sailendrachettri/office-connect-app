@@ -3,8 +3,7 @@ import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
-
-import Store from 'electron-store';
+import Store from 'electron-store'
 
 const store = new Store({
   name: 'office-connect',
@@ -13,12 +12,12 @@ const store = new Store({
     accessToken: null,
     refreshToken: null
   }
-});
+})
 
-ipcMain.handle('store-get', (_, key) => store.get(key));
-ipcMain.handle('store-set', (_, key, value) => store.set(key, value));
-ipcMain.handle('store-delete', (_, key) => store.delete(key));
-ipcMain.handle('store-clear', () => store.clear());
+ipcMain.handle('store-get', (_, key) => store.get(key))
+ipcMain.handle('store-set', (_, key, value) => store.set(key, value))
+ipcMain.handle('store-delete', (_, key) => store.delete(key))
+ipcMain.handle('store-clear', () => store.clear())
 
 ipcMain.on('window-minimize', () => {
   BrowserWindow.getFocusedWindow().minimize()
@@ -32,8 +31,6 @@ ipcMain.on('window-maximize', () => {
 ipcMain.on('window-close', () => {
   BrowserWindow.getFocusedWindow().close()
 })
-
-
 
 function createWindow() {
   // Create the browser window.
@@ -54,13 +51,15 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       webSecurity: false,
-      notifications: true
+      notifications: true,
+      nodeIntegration: false,
+      contextIsolation: true
     }
   })
 
   if (is.dev) {
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
-}
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
+  }
 
   mainWindow.setMenu(null)
 
@@ -79,7 +78,7 @@ function createWindow() {
   app.commandLine.appendSwitch('enable-gpu-rasterization')
   app.commandLine.appendSwitch('enable-zero-copy')
   app.commandLine.appendSwitch('enable-blink-features', 'ColorEmojiFont')
-  app.commandLine.appendSwitch("ignore-certificate-errors");
+  app.commandLine.appendSwitch('ignore-certificate-errors')
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.insertCSS(`
@@ -114,7 +113,6 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-  
 
   createWindow()
 

@@ -4,7 +4,7 @@ import { createChatConnection } from '../signalr/chatConnection'
 import { setConnected, setDisconnected } from '../store/connectionSlice'
 import { store } from '../store'
 
-const API_BASE_URL = 'http://192.168.1.50:5171'
+export const API_BASE_URL = 'http://192.168.1.50:5171'
 
 // Public Axios instance (no auth)
 export const axiosInstance = axios.create({

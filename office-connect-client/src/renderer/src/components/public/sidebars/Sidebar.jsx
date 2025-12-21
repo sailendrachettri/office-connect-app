@@ -1,6 +1,7 @@
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import { useChat } from '../../../context/ChatContext'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
+import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile';
 
 const Sidebar = ({ friendList  }) => {
   const {selectedFriendProfileId, setSelectedFriendProfileId, isFriendTyping} = useChat();
@@ -37,7 +38,7 @@ const Sidebar = ({ friendList  }) => {
               >
                 {/* Image */}
                 <img
-                  src={user?.profile_image || profilePic}
+                  src={user?.profile_image && viewUploadedFile(user?.profile_image) || profilePic}
                   alt=""
                   className="w-12 h-12 rounded-full object-cover"
                 />

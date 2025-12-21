@@ -6,12 +6,19 @@ const ChatContext = createContext(null)
 export const ChatProvider = ({
   connection,
   getFriendList,
+  restoreSession,
   children
 }) => {
   const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
   const [isFriendTyping, setIsFriendTyping] = useState(false)
   const [incomingMessage, setIncomingMessage] = useState(null)
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(()=>{
+    restoreSession();
+    getFriendList();
+  }, [refresh]);
 
   useEffect(() => {
     if (!connection) return
@@ -82,7 +89,8 @@ export const ChatProvider = ({
         isFriendTyping,
         incomingMessage,
         messages,
-        setMessages
+        setMessages,
+        setRefresh
       }}
     >
       {children}
