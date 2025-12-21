@@ -82,13 +82,19 @@ function App() {
       } else {
         toast.error(res?.data?.message || 'Something went wrong!')
         setLoading(false);
-        setShowLogin(false);
+        setShowLogin(true);
       }
     } catch (err) {
       if (!shown) {
         if (err?.code == 'ERR_BAD_REQUEST') {
           toast.error('Session expired, please login again')
-        } else {
+        } 
+        else if (err?.code == 'ERR_NETWORK') {
+        toast.error(
+          'Unable to connect. Please ensure you are on the same local network as the server.'
+        )
+      }
+        else {
           toast.error('Not able to login')
         }
         console.error('not able to login', err)
@@ -97,7 +103,7 @@ function App() {
         shown = true
       }
        setLoading(false);
-        setShowLogin(false);
+        setShowLogin(true);
     } finally {
       setLoading(false)
     }
