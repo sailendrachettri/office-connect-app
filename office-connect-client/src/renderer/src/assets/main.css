@@ -1,13 +1,14 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; 
+  overflow: hidden;
 }
-
 
 .drag-region {
   -webkit-app-region: drag;
@@ -24,33 +25,27 @@ html, body, #root {
   --color-ternary: #fffeff;
 }
 
-
 /* ---------------------------------Scroll Bar--------------------------------- */
 .custom-scroll {
   overflow-y: auto;
 }
 
-/* scrollbar */
 .custom-scroll::-webkit-scrollbar {
   width: 6px;
 }
 
-/* normal thumb */
 .custom-scroll::-webkit-scrollbar-thumb {
   background-color: #849dc82c;
   border-radius: 9999px;
 }
 
-/* hover thumb */
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background-color: #849dc82c;
 }
 
-/* active (when dragging) */
 .custom-scroll::-webkit-scrollbar-thumb:active {
   background-color: #849dc82c;
 }
-
 
 /* ---------------------------------top help menu animation--------------------------------- */
 @keyframes fadeIn {
@@ -72,7 +67,7 @@ html, body, #root {
 /* HTML: <div className="loader"></div> */
 .loader {
   width: 120px;
-  height: 22px; 
+  height: 22px;
   border-radius: 40px;
   color: #6f9eea;
   border: 2px solid;
@@ -80,7 +75,7 @@ html, body, #root {
   overflow: hidden;
 }
 .loader::before {
-  content: "";
+  content: '';
   position: absolute;
   margin: 2px;
   width: 14px;
@@ -90,9 +85,11 @@ html, body, #root {
   border-radius: inherit;
   background: currentColor;
   box-shadow: -10px 0 12px 3px currentColor;
-  clip-path: polygon(0 5%, 100% 0,100% 100%,0 95%,-30px 50%);
+  clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 95%, -30px 50%);
   animation: l14 1s infinite linear;
 }
 @keyframes l14 {
-  100% {left: calc(100% + 20px)}
+  100% {
+    left: calc(100% + 20px);
+  }
 }
