@@ -51,7 +51,6 @@ function App() {
   const restoreSession = async () => {
     try {
       const res = await axiosPrivate.get(ME_URL)
-      console.log(" res?.data ", res?.data)
 
       if (res?.data?.success == true) {
         const email = res?.data?.data?.email

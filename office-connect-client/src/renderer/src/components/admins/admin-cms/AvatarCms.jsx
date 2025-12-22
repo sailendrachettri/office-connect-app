@@ -32,7 +32,6 @@ const AvatarCms = () => {
       }else{
         toast.error("Not able to add avatar.");
       }
-      console.log(res)
     } catch (err) {
       console.error(err)
     } finally {

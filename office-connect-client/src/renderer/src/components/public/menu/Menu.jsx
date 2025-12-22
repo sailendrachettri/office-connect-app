@@ -16,7 +16,6 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
 
   const { setSelectedFriendProfileId } = useChat()
   const { user } = useAuth()
-  console.log({ user })
 
   const handleLogout = async () => {
     try {

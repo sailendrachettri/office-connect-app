@@ -1,24 +1,48 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import { FaEnvelope, FaLock } from 'react-icons/fa'
 import banner from '../../assets/svgs/banner_login.svg'
 import { REGEX } from '../../utils/regex'
 import InputField from '../../reusables/input-fields/InputField'
 import { useForm } from 'react-hook-form'
 import { axiosInstance } from '../../api/api'
-import { LOGIN_USER_URL } from '../../api/routes_urls'
+import { GET_USER_DETAILS_URL, LOGIN_USER_URL } from '../../api/routes_urls'
 import toast from 'react-hot-toast'
 import { IoExitOutline } from 'react-icons/io5'
 import { useChat } from '../../context/ChatContext'
 
-const LoginUser = ({ setShowLogin, setIsLoggedIn  }) => {
+const LoginUser = ({ setShowLogin, setIsLoggedIn }) => {
   const [loading, isLoading] = useState(false)
-  const {setRefresh} = useChat();
+  const { setRefresh } = useChat()
 
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm()
+
+  const handleGetUserFullDetails = async (userId) => {
+    try {
+      const payload = {
+        UserId: userId
+      }
+      const res = await axiosInstance.post(GET_USER_DETAILS_URL, payload)
+       const user_Id = res?.data?.data?.user_id
+       const  full_name  = res?.data?.data?.full_name
+       const  email = res?.data?.data?.email
+       const  pic = res?.data?.data?.profile_image
+       const  roleId = res?.data?.data?.role_id
+       const  roleName = res?.data?.data?.role_name
+
+      await window.store.set('user', {
+        user_Id,
+          full_name,
+          email,
+          pic,
+          roleId,
+          roleName
+      })
+    } catch (error) {}
+  }
 
   const handlLogin = async (data) => {
     try {
@@ -39,14 +63,9 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn  }) => {
         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
-        await window.store.set('user', {
-          userId,
-          fullName,
-          email,
-          profileImage
+        handleGetUserFullDetails(userId)
 
-        })
-        setRefresh(prev => !prev);
+        setRefresh((prev) => !prev)
         setTimeout(() => {
           isLoading(false)
           setIsLoggedIn(true)

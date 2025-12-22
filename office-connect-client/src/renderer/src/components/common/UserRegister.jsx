@@ -83,7 +83,6 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
     ;(async () => {
       try {
         const res = await axiosInstance.get(GET_AVATAR_URL)
-        console.log(res?.data?.data)
         setAvatars(res?.data?.data || [])
       } catch (error) {
         console.error('not able to get avatars', error)
