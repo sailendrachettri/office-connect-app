@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BsChatLeftDots } from 'react-icons/bs'
 import { IoSettingsOutline } from 'react-icons/io5'
 import { IoPowerOutline } from 'react-icons/io5'
@@ -12,10 +12,22 @@ import { useAuth } from '../../../context/AuthContext'
 import { Roles } from '../../../api/roles'
 
 const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [roleId, setRoleId] = useState(null);
 
   const { setSelectedFriendProfileId } = useChat()
-  const { user } = useAuth()
+  
+  
+  useEffect(()=>{
+    (async()=>{
+      try {
+        const user = await window.store.get('user');
+        setRoleId(user?.roleId);
+      } catch (error) {
+        
+      }
+    })();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -73,7 +85,7 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
         </div>
 
         {/* Admin */}
-        {user?.roleId === Roles?.SUPER_ADMIN && (
+        {roleId === Roles?.SUPER_ADMIN && (
           <div onClick={() => setSelectedTab('admin-cms')} className="relative mt-6 cursor-pointer">
             {/* Circle with icon */}
             <div
