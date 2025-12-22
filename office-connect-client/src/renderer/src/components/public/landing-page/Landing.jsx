@@ -232,7 +232,7 @@ const Landing = () => {
   if (!selectedFriendProfileId) return <DefaultChatPage />
 
   return (
-    <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-7">
+    <div className="max-h-[84vh] w-full flex flex-col overflow-hidden ps-10 pt-0.5">
       {/* ================= MESSAGES ================= */}
       <div
         ref={scrollContainerRef}
