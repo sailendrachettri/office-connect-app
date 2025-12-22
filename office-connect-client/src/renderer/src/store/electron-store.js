@@ -8,6 +8,8 @@ const schema = {
       fullName: { type: "string" },
       email: { type: "string" },
       profileImage: { type: ["string", "null"] },
+      roleId : {type : "number"},
+      roleName : {type : "string"}
     },
     default: {}
   },

@@ -51,12 +51,14 @@ function App() {
   const restoreSession = async () => {
     try {
       const res = await axiosPrivate.get(ME_URL)
+      console.log(" res?.data ", res?.data)
 
       if (res?.data?.success == true) {
         const email = res?.data?.data?.email
         const full_name = res?.data?.data?.full_Name
         const pic = res?.data?.data?.profile_Image
-
+        const roleName = res?.data?.data?.roleName
+        const roleId = res?.data?.data?.roleId
         const user_Id = res?.data?.data?.user_Id
 
         await window.store.set('userId', user_Id)
@@ -64,7 +66,9 @@ function App() {
           user_Id,
           full_name,
           email,
-          pic
+          pic,
+          roleId,
+          roleName
         })
 
         setIsLoggedIn(true)

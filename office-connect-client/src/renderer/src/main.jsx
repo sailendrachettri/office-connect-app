@@ -6,9 +6,11 @@ import App from './App'
 import { Toaster } from 'react-hot-toast'
 import { Provider } from 'react-redux'
 import { store } from './store'
+import { AuthProvider } from './context/AuthContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <AuthProvider>
     <Provider store={store}>
       <Toaster
         position="bottom-center"
@@ -23,5 +25,6 @@ createRoot(document.getElementById('root')).render(
       />
       <App />
     </Provider>
+    </AuthProvider>
   </StrictMode>
 )

@@ -39,13 +39,13 @@ const LoginUser = ({ setShowLogin, setIsLoggedIn  }) => {
         await window.store.set('accessToken', accessToken)
         await window.store.set('refreshToken', refreshToken)
         await window.store.set('userId', userId)
-        // await window.store.set('user', {
-        //   userId,
-        //   fullName,
-        //   email,
-        //   profileImage
+        await window.store.set('user', {
+          userId,
+          fullName,
+          email,
+          profileImage
 
-        // })
+        })
         setRefresh(prev => !prev);
         setTimeout(() => {
           isLoading(false)

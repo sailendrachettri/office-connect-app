@@ -37,10 +37,20 @@ namespace OfficeConnectServer.Controllers
             var userId = Guid.Parse(userIdStr);
 
             const string sql = @"
-        SELECT user_id, username, full_name, email, profile_image
-        FROM utbl_users
-        WHERE user_id = @uid
-    ";
+                SELECT
+                    u.user_id        AS User_Id,
+                    u.username       AS Username,
+                    u.full_name      AS Full_Name,
+                    u.email          AS Email,
+                    u.profile_image  AS Profile_Image,
+                    u.role_id        AS RoleId,
+                    r.role_name      AS RoleName
+                FROM utbl_users u
+                LEFT JOIN utbl_mst_roles r 
+                    ON r.role_id = u.role_id
+                WHERE u.user_id = @uid;
+                ";
+
 
             var user = await _db.ExecuteQuerySingleAsync<AuthUserModel>(
                 sql,

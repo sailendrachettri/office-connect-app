@@ -8,37 +8,38 @@ import { LOGOUT_URL } from '../../../api/routes_urls'
 import toast from 'react-hot-toast'
 import { useChat } from '../../../context/ChatContext'
 import { BiBookContent } from 'react-icons/bi'
+import { useAuth } from '../../../context/AuthContext'
+import { Roles } from '../../../api/roles'
 
-const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq  }) => {
+const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendingFriendReq }) => {
   const [open, setOpen] = useState(false)
 
-  const {setSelectedFriendProfileId}  = useChat();
+  const { setSelectedFriendProfileId } = useChat()
+  const { user } = useAuth()
+  console.log({ user })
 
- const handleLogout = async () => {
-  try {
-    const refreshToken = await window.store.get('refreshToken');
-    const payload = { RefreshToken: refreshToken };
+  const handleLogout = async () => {
+    try {
+      const refreshToken = await window.store.get('refreshToken')
+      const payload = { RefreshToken: refreshToken }
 
-    const res = await axiosInstance.post(LOGOUT_URL, payload);
+      const res = await axiosInstance.post(LOGOUT_URL, payload)
 
-    if (res?.data?.success) {
-      toast.success(res?.data?.message || 'Logged out!');
-      
+      if (res?.data?.success) {
+        toast.success(res?.data?.message || 'Logged out!')
+      }
+
+      setTimeout(() => {
+        setSelectedFriendProfileId(null)
+      }, 100)
+
+      await window.store.clear()
+      setShowLogin(true)
+      setIsLoggedIn(false)
+    } catch (error) {
+      console.error('Not able to logout', error)
     }
-
-    setTimeout(() => {
-      setSelectedFriendProfileId(null);
-    }, 100);
-
-    await window.store.clear();
-    setShowLogin(true);
-    setIsLoggedIn(false);
-  } catch (error) {
-    console.error('Not able to logout', error);
   }
-}
-
-
 
   return (
     <div className="fixed left-2 top-10 bottom-5 flex flex-col justify-between">
@@ -71,22 +72,20 @@ const Menu = ({ setShowLogin, setIsLoggedIn, selectedTab, setSelectedTab, pendin
             <FaRegUser size={17} />
           </div>
         </div>
-        
+
         {/* Admin */}
-        <div onClick={() => setSelectedTab('admin-cms')} className="relative mt-6 cursor-pointer">
-         
-          
-
-          {/* Circle with icon */}
-          <div
-            className={`rounded-full p-2 text-slate-600 transition ${
-              selectedTab === 'admin-cms' ? 'bg-ternary' : 'bg-slate-100'
-            } hover:bg-ternary`}
-          >
-            <BiBookContent  size={17} />
+        {user?.roleId === Roles?.SUPER_ADMIN && (
+          <div onClick={() => setSelectedTab('admin-cms')} className="relative mt-6 cursor-pointer">
+            {/* Circle with icon */}
+            <div
+              className={`rounded-full p-2 text-slate-600 transition ${
+                selectedTab === 'admin-cms' ? 'bg-ternary' : 'bg-slate-100'
+              } hover:bg-ternary`}
+            >
+              <BiBookContent size={17} />
+            </div>
           </div>
-        </div>
-
+        )}
       </div>
 
       {/* Bottom-left section (settings + popup modal) */}
