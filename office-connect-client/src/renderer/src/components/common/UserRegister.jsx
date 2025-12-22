@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import { FaUser, FaEnvelope, FaPhone, FaLock, FaArrowRight, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa'
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaLock,
+  FaArrowRight,
+  FaArrowLeft,
+  FaEye,
+  FaEyeSlash
+} from 'react-icons/fa'
 import { MdOutlinePhotoCamera } from 'react-icons/md'
 import banner from '../../assets/svgs/banner.svg'
 import { axiosInstance } from '../../api/api'
@@ -8,10 +17,20 @@ import toast from 'react-hot-toast'
 import { uploadFile, viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 import { useChat } from '../../context/ChatContext'
 
-// Custom Input Field Component (moved outside to prevent re-creation)
-const InputField = ({ label, name, type = 'text', icon: Icon, placeholder, value, error, onChange, isPassword = false }) => {
+
+const InputField = ({
+  label,
+  name,
+  type = 'text',
+  icon: Icon,
+  placeholder,
+  value,
+  error,
+  onChange,
+  isPassword = false
+}) => {
   const [showPassword, setShowPassword] = useState(false)
-  
+
   return (
     <div>
       <label className="block text-sm font-medium text-slate-700 mb-1">{label}</label>
@@ -52,8 +71,8 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   const [preview, setPreview] = useState(null)
   const [avatars, setAvatars] = useState([])
   const [selectedAvatarId, setSelectedAvatarId] = useState(null)
+
   
-  // Store form data across steps
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -66,14 +85,14 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
 
   const { setRefresh } = useChat()
 
-  // Validation regex patterns
+  
   const REGEX = {
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     PASSWORD: /^(?=.*\d).{6,}$/,
     PHONE: /^[0-9]{10}$/
   }
 
-  // Validate step 1
+  
   const validateStep1 = () => {
     const newErrors = {}
 
@@ -100,7 +119,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
     return Object.keys(newErrors).length === 0
   }
 
-  // Validate step 2
+  
   const validateStep2 = () => {
     const newErrors = {}
 
@@ -118,28 +137,28 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
     return Object.keys(newErrors).length === 0
   }
 
-  // Handle input change
+  
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    // Clear error for this field
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
+      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
-  // Handle Next button for Step 1
+  
   const handleNext = () => {
     if (validateStep1()) {
       setCurrentStep(2)
     }
   }
 
-  // Handle Back button
+  
   const handleBack = () => {
     setCurrentStep(1)
   }
 
-  // Final form submission
+  
   const handleSubmit = async () => {
     if (!validateStep2()) return
 
@@ -149,13 +168,13 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
       let profileImageUrl = null
       let avatarId = null
 
-      // If user uploaded custom image
+      
       if (profile) {
         const uploadRes = await uploadFile(profile)
         profileImageUrl = uploadRes.url
       }
 
-      // If avatar selected
+      
       if (selectedAvatarId && !profile) {
         avatarId = selectedAvatarId
       }
@@ -196,7 +215,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   }
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
         const res = await axiosInstance.get(GET_AVATAR_URL)
         setAvatars(res?.data?.data || [])
@@ -207,7 +226,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
   }, [])
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-5">
+    <div className="w-full h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-5">
       <div className="w-full max-w-5xl flex bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
         {/* LEFT */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-10">
@@ -218,50 +237,62 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
         <div className="w-full md:w-1/2 p-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-slate-800">Create Account</h2>
-            
+
             {/* Step Indicators */}
             <div className="flex items-center gap-4 mt-6">
               {/* Step 1 */}
               <div className="flex items-center gap-3 flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
-                  currentStep === 1 
-                    ? 'bg-primary text-white ring-4 ring-primary/20' 
-                    : currentStep > 1
-                    ? 'bg-primary text-white'
-                    : 'bg-slate-200 text-slate-500'
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+                    currentStep === 1
+                      ? 'bg-primary text-white ring-4 ring-primary/20'
+                      : currentStep > 1
+                        ? 'bg-primary text-white'
+                        : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
                   {currentStep > 1 ? '✓' : '1'}
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium transition-colors ${
-                    currentStep === 1 ? 'text-primary' : 'text-slate-600'
-                  }`}>
+                  <p
+                    className={`text-sm font-medium transition-colors ${
+                      currentStep === 1 ? 'text-primary' : 'text-slate-600'
+                    }`}
+                  >
                     Credentials
                   </p>
-                  <div className={`h-1 rounded-full mt-1 transition-all duration-500 ${
-                    currentStep >= 1 ? 'bg-primary' : 'bg-slate-200'
-                  }`} />
+                  <div
+                    className={`h-1 rounded-full mt-1 transition-all duration-500 ${
+                      currentStep >= 1 ? 'bg-primary' : 'bg-slate-200'
+                    }`}
+                  />
                 </div>
               </div>
 
               {/* Step 2 */}
               <div className="flex items-center gap-3 flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
-                  currentStep === 2 
-                    ? 'bg-primary text-white ring-4 ring-primary/20' 
-                    : 'bg-slate-200 text-slate-500'
-                }`}>
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+                    currentStep === 2
+                      ? 'bg-primary text-white ring-4 ring-primary/20'
+                      : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
                   2
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium transition-colors ${
-                    currentStep === 2 ? 'text-primary' : 'text-slate-600'
-                  }`}>
+                  <p
+                    className={`text-sm font-medium transition-colors ${
+                      currentStep === 2 ? 'text-primary' : 'text-slate-600'
+                    }`}
+                  >
                     Personal Info
                   </p>
-                  <div className={`h-1 rounded-full mt-1 transition-all duration-500 ${
-                    currentStep === 2 ? 'bg-primary' : 'bg-slate-200'
-                  }`} />
+                  <div
+                    className={`h-1 rounded-full mt-1 transition-all duration-500 ${
+                      currentStep === 2 ? 'bg-primary' : 'bg-slate-200'
+                    }`}
+                  />
                 </div>
               </div>
             </div>
@@ -271,8 +302,8 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
             {/* Step 1: Email & Password */}
             <div
               className={`transition-all duration-500 ease-in-out ${
-                currentStep === 1 
-                  ? 'opacity-100 translate-x-0' 
+                currentStep === 1
+                  ? 'opacity-100 translate-x-0'
                   : 'opacity-0 -translate-x-full absolute top-0 left-0 w-full pointer-events-none'
               }`}
             >
@@ -312,7 +343,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="w-full py-3 rounded-lg font-medium bg-primary text-white hover:bg-primary/90 transition flex items-center justify-center gap-2"
+                  className="w-full py-3 cursor-pointer rounded-lg font-medium bg-primary text-white hover:bg-primary/90 transition flex items-center justify-center gap-2"
                 >
                   Next
                   <FaArrowRight />
@@ -323,8 +354,8 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
             {/* Step 2: Personal Details & Avatar */}
             <div
               className={`transition-all duration-500 ease-in-out ${
-                currentStep === 2 
-                  ? 'opacity-100 translate-x-0' 
+                currentStep === 2
+                  ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-full absolute top-0 left-0 w-full pointer-events-none'
               }`}
             >
@@ -409,7 +440,11 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
                       {preview && (
                         <div className="mt-3">
                           <p className="text-xs text-slate-500 mb-1">Preview</p>
-                          <img src={preview} className="w-16 h-16 rounded-full object-cover border" alt="Preview" />
+                          <img
+                            src={preview}
+                            className="w-16 h-16 rounded-full object-cover border"
+                            alt="Preview"
+                          />
                         </div>
                       )}
                     </div>
@@ -420,7 +455,7 @@ const UserRegister = ({ setShowLogin, setIsLoggedIn }) => {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="w-1/3 py-3 rounded-lg font-medium bg-slate-200 text-slate-700 hover:bg-slate-300 transition flex items-center justify-center gap-2"
+                    className="w-1/3 py-3 cursor-pointer rounded-lg font-medium bg-slate-200 text-slate-700 hover:bg-slate-300 transition flex items-center justify-center gap-2"
                   >
                     <FaArrowLeft />
                     Back
