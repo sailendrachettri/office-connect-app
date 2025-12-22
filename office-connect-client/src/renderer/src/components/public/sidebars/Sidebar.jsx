@@ -27,7 +27,7 @@ const Sidebar = ({ friendList  }) => {
         {friendList?.length == 0 ? (
           <div>No friends found</div>
         ) : (
-          <div>
+          <div className='me-1'>
             {friendList?.map((user) => (
               <div
                 key={user?.user_id}
