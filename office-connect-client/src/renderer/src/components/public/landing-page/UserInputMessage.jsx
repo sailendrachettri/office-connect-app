@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { AiOutlinePaperClip } from 'react-icons/ai'
 import { IoMdSend } from 'react-icons/io'
 import { useChat } from '../../../context/ChatContext'
+import { IoChatbubblesOutline } from 'react-icons/io5'
 
 const MAX_HEIGHT = 120
 
@@ -67,7 +68,7 @@ const UserInputMessage = ({ text, setText, sendMessage  }) => {
 
   return (
     <div className="mt-3 flex items-end gap-3 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow me-10">
-      <AiOutlinePaperClip size={22} className="text-slate-500 cursor-pointer mb-1" />
+      <IoChatbubblesOutline  size={22} className="text-slate-500 mb-1" />
 
       <textarea
         ref={textareaRef}

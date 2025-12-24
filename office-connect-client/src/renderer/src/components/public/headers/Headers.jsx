@@ -41,9 +41,9 @@ const Headers = ({ userFullDetails }) => {
 
           {/* RIGHT: Icons */}
           <div className="flex items-center gap-5 text-slate-600 text-xl">
-            <button className="hover:text-slate-900 transition">
+            {/* <button className="hover:text-slate-900 transition">
               <IoSearch />
-            </button>
+            </button> */}
 
             <button className="hover:text-slate-900 transition cursor-pointer">
               <IoInformationCircleOutline
@@ -54,9 +54,9 @@ const Headers = ({ userFullDetails }) => {
               />
             </button>
 
-            <button className="hover:text-slate-900 transition">
+            {/* <button className="hover:text-slate-900 transition">
               <HiOutlineDotsVertical />
-            </button>
+            </button> */}
           </div>
         </div>
       )}

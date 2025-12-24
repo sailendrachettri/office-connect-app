@@ -3,6 +3,7 @@ import svgBanner from '../../assets/svgs/comm.svg'
 import { BsChatDots } from 'react-icons/bs'
 import { FiPaperclip } from 'react-icons/fi'
 import { RiShieldCheckLine } from 'react-icons/ri'
+import { IoShieldCheckmarkOutline } from 'react-icons/io5'
 
 const DefaultChatPage = () => {
   return (
@@ -39,16 +40,16 @@ const DefaultChatPage = () => {
             className="flex items-center gap-3 bg-white border border-slate-200 
                   rounded-lg px-3 py-2 text-xs"
           >
-            <FiPaperclip className="text-emerald-600 text-nowrap" size={16} />
-            <span className="text-slate-600">Share files & docs</span>
+            <IoShieldCheckmarkOutline  className="text-emerald-600 text-nowrap" size={20} />
+            <span className="text-slate-600">Secure & easy</span>
           </div>
 
           <div
             className="flex items-center gap-3 bg-white border border-slate-200 
                   rounded-lg px-3 py-2 text-xs"
           >
-            <RiShieldCheckLine className="text-indigo-600 text-nowrap" size={16} />
-            <span className="text-slate-600">Secure LAN only</span>
+            <RiShieldCheckLine className="text-indigo-600 text-nowrap" size={20} />
+            <span className="text-slate-600">Local Network</span>
           </div>
         </div>
 
