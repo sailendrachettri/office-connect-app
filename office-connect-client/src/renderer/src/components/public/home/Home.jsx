@@ -63,7 +63,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
                     <div className="flex-1 flex flex-col">
                       {/* HEADER */}
                       <div className="h-17.5 bg-linear-to-t from-slate-50 to-slate-100">
-                        <Headers userFullDetails={userFullDetails} />
+                        <Headers  userFullDetails={userFullDetails} />
                       </div>
 
                       {/* BODY */}

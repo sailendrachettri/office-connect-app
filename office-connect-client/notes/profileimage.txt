@@ -1,0 +1,11 @@
+ <img
+              src={
+                user?.profile_image
+                  ? viewUploadedFile(user.profile_image)
+                  : user?.avatar_url
+                    ? viewUploadedFile(user.avatar_url)
+                    : defaultUser
+              }
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />

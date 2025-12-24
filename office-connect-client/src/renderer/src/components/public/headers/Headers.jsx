@@ -7,10 +7,10 @@ import QuickProfile from '../../common/QuickProfile'
 import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
 import { useChat } from '../../../context/ChatContext'
 
-const Headers = ({ userFullDetails}) => {
+const Headers = ({ userFullDetails }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
-  const {selectedFriendProfileId, isFriendTyping} = useChat();
-  // console.table(userFullDetails)
+
+  const { selectedFriendProfileId, isFriendTyping } = useChat()
 
   return (
     <>
@@ -26,7 +26,10 @@ const Headers = ({ userFullDetails}) => {
               <h3 className="text-lg font-semibold text-slate-900">{userFullDetails?.full_name}</h3>
               <p>
                 {userFullDetails?.status == 'Active' ? (
-                  <span className="text-green-600"> {isFriendTyping ? 'Typing...' : userFullDetails?.status}</span>
+                  <span className="text-green-600">
+                    {' '}
+                    {isFriendTyping ? 'Typing...' : userFullDetails?.status}
+                  </span>
                 ) : (
                   <small className="text-slate-500">
                     Last seen at: {formatLastSeen(userFullDetails?.last_seen)}
@@ -59,6 +62,7 @@ const Headers = ({ userFullDetails}) => {
       )}
 
       <QuickProfile
+      userFullDetails={userFullDetails}
         toggleQuickProfile={toggleQuickProfile}
         setToggleQuickProfile={setToggleQuickProfile}
       />
