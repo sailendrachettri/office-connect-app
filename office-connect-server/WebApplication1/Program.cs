@@ -7,9 +7,10 @@ using OfficeConnectServer.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.FileProviders;
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseWindowsService();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<MessageRepository>();
 builder.Services.AddScoped<DbConnectionFactory>();
