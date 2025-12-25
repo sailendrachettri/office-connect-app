@@ -67,7 +67,7 @@ axiosPrivate.interceptors.response.use(
 
         return axiosPrivate(originalRequest)
       } catch (err) {
-        console.error('Session expired, please login again')
+        console.error('Session expired, please login again -- api.js file', err)
         await window.store.delete('accessToken')
         await window.store.delete('refreshToken')
 

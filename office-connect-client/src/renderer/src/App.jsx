@@ -12,6 +12,7 @@ import { ChatProvider } from './context/ChatContext'
 import { IoChatbubblesOutline } from 'react-icons/io5'
 import { useSelector } from 'react-redux'
 import TopHelpMenu from './components/public/menu/helper-menu/TopHelpMenu'
+import ConnectionLostImg from './assets/svgs/conn_lost.svg'
 
 let shown = false
 
@@ -23,7 +24,7 @@ function App() {
   const [connection, setConnection] = useState(null)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
   const [friendSearchText, setFriendSearchText] = useState('')
-
+  const [serverAlive, setServerAlive] = useState(true)
   const isConnected = useSelector((state) => state.connection.isConnected)
 
   const getFriendList = async () => {
@@ -32,7 +33,7 @@ function App() {
     if (userId) {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL, {
-           params: {
+          params: {
             searchText: friendSearchText
           }
         })
@@ -45,10 +46,10 @@ function App() {
             (item) => item.relation_status === 'PENDING_RECEIVED'
           ).length
           setPendingFriendReq(countPendingFriendReq || null)
-            console.log(friendSearchText)
+          console.log(friendSearchText)
           setFriendList(filteredList || [])
 
-          console.log({filteredList})
+          console.log({ filteredList })
         }
       } catch (error) {
         console.error('not able to get the friend list', error)
@@ -95,30 +96,34 @@ function App() {
         setLoading(false)
         setShowLogin(true)
       }
+      console.log('after alive if')
+      setServerAlive(true)
     } catch (err) {
       if (!shown) {
         if (err?.code == 'ERR_BAD_REQUEST') {
-          toast.error('Session expired, please login again')
+          toast.error('Session expired, please login again - here')
         } else if (err?.code == 'ERR_NETWORK') {
-          toast.error(
-            'Unable to connect. Please ensure you are on the same local network as the server.'
-          )
+          setServerAlive(false)
+          console.log('hehe')
+          // toast.error(
+          //   'Unable to connect. Please ensure you are on the same local network as the server.  '
+          // )
+          return // If the server is not found return from here and do not trigger server alive true
         } else {
           toast.error('Not able to login')
         }
         console.error('not able to login', err)
         setIsLoggedIn(false)
-
         shown = true
       }
+
+      console.log('after alive else')
+      setServerAlive(true)
       setLoading(false)
-      setShowLogin(true)
     } finally {
       setLoading(false)
     }
   }
-
-
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -130,7 +135,7 @@ function App() {
 
   useEffect(() => {
     restoreSession()
-  }, [])
+  }, [loading])
 
   useEffect(() => {
     getFriendList()
@@ -180,34 +185,76 @@ function App() {
       >
         {loading ? (
           <section>
-            <div className="min-h-screen w-full flex items-center justify-center">
+            <div className="min-h-screen w-full flex items-center justify-center flex-col">
               <div className="loader"></div>
+              <div className='text-slate-600 italic text-sm pt-3'>Setting things up… connecting to the server.</div>
             </div>
           </section>
         ) : (
-          <Home
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
-            setShowLogin={setShowLogin}
-            friendList={friendList}
-            getFriendList={getFriendList}
-            pendingFriendReq={pendingFriendReq}
-            setFriendSearchText={setFriendSearchText}
-            friendSearchText={friendSearchText}
-          />
-        )}
+          <section>
+            {serverAlive ? (
+              <section>
+                <Home
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setShowLogin={setShowLogin}
+                  friendList={friendList}
+                  getFriendList={getFriendList}
+                  pendingFriendReq={pendingFriendReq}
+                  setFriendSearchText={setFriendSearchText}
+                  friendSearchText={friendSearchText}
+                />
 
-        <>
-          {!isLoggedIn && (
-            <>
-              {showLogin ? (
-                <LoginUser setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
-              ) : (
-                <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
-              )}
-            </>
-          )}
-        </>
+                <>
+                  {!isLoggedIn && (
+                    <>
+                      {showLogin ? (
+                        <LoginUser
+                          setServerAlive={setServerAlive}
+                          setShowLogin={setShowLogin}
+                          setIsLoggedIn={setIsLoggedIn}
+                        />
+                      ) : (
+                        <UserRegister setShowLogin={setShowLogin} setIsLoggedIn={setIsLoggedIn} />
+                      )}
+                    </>
+                  )}
+                </>
+              </section>
+            ) : (
+              <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50 px-4">
+                {/* Illustration */}
+                <img
+                  src={ConnectionLostImg}
+                  alt="Server not found"
+                  className="mb-6 h-56 w-auto select-none"
+                />
+
+                {/* Heading */}
+                <h1 className="text-xl font-semibold text-gray-800">Can’t reach the server</h1>
+
+                {/* Description */}
+                <p className="mt-2 max-w-md text-center text-sm text-gray-500">
+                  Looks like the server is unavailable or your network connection was interrupted.
+                  Please check your connection and try again.
+                </p>
+
+                {/* Action */}
+                <button
+                  onClick={() => setLoading(true)}
+                  className="mt-6 rounded-lg bg-primary/90 px-8 py-2.5 text-sm font-medium text-white
+               hover:bg-primary active:scale-95 transition cursor-pointer"
+                >
+                  Reconnect
+                </button>
+                {/* Footer hint */}
+                <span className="mt-4 text-xs text-gray-400">
+                  Office Connect works on LAN / Wi-Fi networks
+                </span>
+              </div>
+            )}
+          </section>
+        )}
       </ChatProvider>
     </>
   )
