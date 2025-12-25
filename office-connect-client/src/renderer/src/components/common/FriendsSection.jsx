@@ -228,7 +228,7 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
                 {tab === 'FRIEND' && (
                   <span className="flex items-center gap-2 cursor-pointer">
                     <span
-                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                      className="min-w-5 h-5 px-1 flex items-center justify-center 
                      rounded-full bg-secondary text-xs font-semibold text-white"
                     >
                       {friendsCount}
@@ -261,7 +261,7 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
                 {tab === 'PENDING_SENT' && (
                   <span className="flex items-center gap-2 cursor-pointer">
                     <span
-                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                      className="min-w-5 h-5 px-1 flex items-center justify-center 
                      rounded-full bg-secondary text-xs font-semibold text-white"
                     >
                       {pendingSentCount}

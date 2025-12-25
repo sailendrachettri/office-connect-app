@@ -187,7 +187,10 @@ function App() {
           <section>
             <div className="min-h-screen w-full flex items-center justify-center flex-col">
               <div className="loader"></div>
+              {serverAlive  ? 
               <div className='text-slate-600 italic text-sm pt-3'>Setting things up… connecting to the server.</div>
+            : <div className='text-slate-600 italic text-sm pt-3'>Reconnecting to the server... Hold tight!</div>
+            }
             </div>
           </section>
         ) : (
