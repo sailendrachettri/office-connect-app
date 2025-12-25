@@ -139,12 +139,12 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
     ;(async () => {
       try {
         const res = await axiosPrivate.get(GET_FRIEND_LIST_URL, {
-           params: {
-          searchText: friendSearchText
-        }
+          params: {
+            searchText: friendSearchText
+          }
         })
 
-        console.log("hehe", friendSearchText)
+        console.log('hehe', friendSearchText)
 
         if (res?.data?.success == true) {
           setFriendList(res?.data?.data || [])
@@ -226,7 +226,7 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
         }`}
               >
                 {tab === 'FRIEND' && (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 cursor-pointer">
                     <span
                       className="min-w-[20px] h-5 px-1 flex items-center justify-center 
                      rounded-full bg-secondary text-xs font-semibold text-white"
@@ -238,19 +238,28 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
                 )}
 
                 {tab === 'PENDING_RECEIVED' && (
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="min-w-[20px] h-5 px-1 flex items-center justify-center 
+                  <span className="flex items-center gap-2 cursor-pointer">
+                    {pendingReceivedCount < 1 ? (
+                      <span
+                        className="min-w-5 h-5 px-1 flex items-center justify-center 
                      rounded-full bg-secondary text-xs font-semibold text-white"
-                    >
-                      {pendingReceivedCount}
-                    </span>
+                      >
+                        0
+                      </span>
+                    ) : (
+                      <span className="relative flex ml-2">
+                        <span className="animate-ping absolute inline-flex h-5 w-5 rounded-full bg-secondary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-5 w-5 text-white bg-secondary items-center justify-center text-xs font-medium">
+                          {pendingReceivedCount}
+                        </span>
+                      </span>
+                    )}
                     <span>Pending</span>
                   </span>
                 )}
 
                 {tab === 'PENDING_SENT' && (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 cursor-pointer">
                     <span
                       className="min-w-[20px] h-5 px-1 flex items-center justify-center 
                      rounded-full bg-secondary text-xs font-semibold text-white"

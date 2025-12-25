@@ -231,7 +231,7 @@ function App() {
                 />
 
                 {/* Heading */}
-                <h1 className="text-xl font-semibold text-gray-800">Can’t reach the server</h1>
+                <h1 className="text-xl font-semibold text-gray-800">We’re having trouble connecting</h1>
 
                 {/* Description */}
                 <p className="mt-2 max-w-md text-center text-sm text-gray-500">
