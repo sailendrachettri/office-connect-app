@@ -56,7 +56,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
                   <>
                     {/* CHAT LIST */}
                     <div className="w-105 bg-white border-r border-slate-200 p-1">
-                      <Sidebar friendList={friendList} />
+                      <Sidebar setSelectedTab={setSelectedTab} friendList={friendList} />
                     </div>
 
                     {/* CHAT AREA */}
