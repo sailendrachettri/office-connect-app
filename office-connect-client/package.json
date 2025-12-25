@@ -1,6 +1,6 @@
 {
   "name": "office-connect-client",
-  "version": "1.0.0",
+  "version": "1.2.3",
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -8,15 +8,16 @@
   "build": {
     "appId": "com.office.connect",
     "productName": "Office Connect",
-    "icon": "assets/icon",
+    "icon": "build/icons/icon",
     "win": {
+      "icon": "build/icons/icon.ico",
       "target": "nsis"
     },
-    "linux": {
-      "target": "AppImage"
-    },
     "mac": {
-      "target": "dmg"
+      "icon": "build/icons/icon.icns"
+    },
+    "linux": {
+      "icon": "build/icons/icon.png"
     }
   },
   "scripts": {

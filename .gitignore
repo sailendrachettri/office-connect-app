@@ -9,7 +9,6 @@ out/
 **/obj/
 .github
 .github/
-build
 
 # .NET Core
 *.user

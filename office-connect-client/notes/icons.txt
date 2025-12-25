@@ -1,0 +1,2 @@
+build file is required to add icons
+in package.json file there will be the path
