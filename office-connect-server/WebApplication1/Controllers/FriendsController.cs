@@ -207,67 +207,58 @@ namespace OfficeConnectServer.Controllers
 
         [Authorize]
         [HttpGet("list")]
-        public async Task<IActionResult> GetFriendsAndRequests()
-        {
-            var senderObj = HttpContext.Items["UserId"];
-            if (senderObj == null)
-            {
-                return Unauthorized(new ApiResponse<string>(
-                    false,
-                    "Unauthorized",
-                    null!
-                ));
-            }
+        public async Task<IActionResult> GetFriendsAndRequests(
+            [FromQuery] string? searchText
+        )
+                {
+            Console.WriteLine(searchText);
+                    var senderObj = HttpContext.Items["UserId"];
+                    if (senderObj == null)
+                    {
+                        return Unauthorized(new ApiResponse<string>(false, "Unauthorized", null!));
+                    }
 
-            var userId = (Guid)senderObj;
+                    var userId = (Guid)senderObj;
 
-            try
-            {
-                const string sql = @"
+                    try
+                    {
+                        const string sql = @"
                     SELECT get_user_friends_and_requests_list(
-                        @user_id_i
+                        @user_id_i,
+                        @search_text_i
                     );
                 ";
 
-                var json = await _db.ExecuteScalarAsync<string>(
-                    sql,
-                    cmd =>
-                    {
-                        cmd.Parameters.AddWithValue("user_id_i", userId);
+                        var json = await _db.ExecuteScalarAsync<string>(
+                            sql,
+                            cmd =>
+                            {
+                                cmd.Parameters.AddWithValue("user_id_i", userId);
+                                cmd.Parameters.AddWithValue(
+                                    "search_text_i",
+                                    (object?)searchText ?? DBNull.Value
+                                );
+                            }
+                        );
+
+                        var result = JsonSerializer.Deserialize<JsonElement>(json);
+
+                        return Ok(new ApiResponse<JsonElement>(
+                            result.GetProperty("success").GetBoolean(),
+                            result.GetProperty("message").GetString()!,
+                            result.GetProperty("data")
+                        ));
                     }
-                );
-
-                var result = JsonSerializer.Deserialize<JsonElement>(json);
-
-                bool success = result.GetProperty("success").GetBoolean();
-                string message = result.GetProperty("message").GetString()!;
-
-                if (!success)
-                {
-                    return BadRequest(new ApiResponse<string>(
-                        false,
-                        message,
-                        null!
-                    ));
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, new ApiResponse<string>(
+                            false,
+                            ex.Message,
+                            null!
+                        ));
+                    }
                 }
 
-                var data = result.GetProperty("data");
-
-                return Ok(new ApiResponse<JsonElement>(
-                    true,
-                    message,
-                    data
-                ));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ApiResponse<string>(
-                    false,
-                    ex.Message,
-                    null!
-                ));
-            }
-        }
 
 
         [Authorize]

@@ -6,12 +6,11 @@ import { formatDateWithSuffix } from '../../utils/dates/formateDateWithSuffic'
 import FriendsSection from './FriendsSection'
 import { viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 
-const UserProfile = ({ trigger, getFriendList }) => {
+const UserProfile = ({ trigger, getFriendList, friendSearchText }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState(null)
 
-  console.table(user)
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -94,7 +93,7 @@ const UserProfile = ({ trigger, getFriendList }) => {
       </div>
 
       {/* Search friend and request */}
-      <FriendsSection getFriendList={getFriendList} trigger={trigger} userId={userId} />
+      <FriendsSection friendSearchText={friendSearchText} getFriendList={getFriendList} trigger={trigger} userId={userId} />
     </div>
   )
 }

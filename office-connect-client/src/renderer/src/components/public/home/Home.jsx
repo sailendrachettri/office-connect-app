@@ -9,7 +9,7 @@ import { GET_USER_DETAILS_URL } from '../../../api/routes_urls'
 import { useChat } from '../../../context/ChatContext'
 import AdminCms from '../../admins/admin-cms/AdminCms'
 
-const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendList, pendingFriendReq }) => {
+const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, setFriendSearchText, friendSearchText, getFriendList, pendingFriendReq }) => {
   const [userFullDetails, setUserFullDetails] = useState({})
   const [selectedTab, setSelectedTab] = useState('chat')
 
@@ -29,6 +29,10 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
       })()
     }
   }, [selectedFriendProfileId, isLoggedIn])
+
+  useEffect(()=>{
+    setFriendSearchText('');
+  }, [selectedTab]);
 
   return (
     <>
@@ -56,7 +60,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
                   <>
                     {/* CHAT LIST */}
                     <div className="w-105 bg-white border-r border-slate-200 p-1">
-                      <Sidebar setSelectedTab={setSelectedTab} friendList={friendList} />
+                      <Sidebar setFriendSearchText={setFriendSearchText} setSelectedTab={setSelectedTab} friendList={friendList} />
                     </div>
 
                     {/* CHAT AREA */}
@@ -84,7 +88,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn, setShowLogin, friendList, getFriendLi
 
                     {/* BODY */}
                     <div className="flex-1 overflow-y-auto bg-white custom-scroll">
-                      <UserProfile getFriendList={getFriendList} />
+                      <UserProfile friendSearchText={friendSearchText} getFriendList={getFriendList} />
                     </div>
                   </div>
                 )}

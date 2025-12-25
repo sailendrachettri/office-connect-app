@@ -12,7 +12,7 @@ import defaultUser from '../../assets/peoples/default_user.jpg'
 import toast from 'react-hot-toast'
 import { viewUploadedFile } from '../../utils/file-upload-to-server/uploadFile'
 
-const FriendsSection = ({ userId, getFriendList }) => {
+const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
   const [searchText, setSearchText] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [searching, setSearching] = useState(false)
@@ -26,7 +26,7 @@ const FriendsSection = ({ userId, getFriendList }) => {
         ReceiverId: user?.user_id
       }
       const res = await axiosPrivate.post(SEND_FRIEND_REQUEST_URL, payload)
-      
+
       if (res?.data?.success == true) {
         toast.success(res?.data?.message || 'Friend request sent!')
       }
@@ -64,12 +64,11 @@ const FriendsSection = ({ userId, getFriendList }) => {
       console.error('not able to cancle friend request', error)
     } finally {
       setRefreshPage((prev) => !prev)
-      getFriendList();
+      getFriendList()
     }
   }
 
   const handleRejectFreindRequest = async (user) => {
-    
     try {
       const payload = {
         reqId: user?.req_id
@@ -83,8 +82,8 @@ const FriendsSection = ({ userId, getFriendList }) => {
     } catch (error) {
       console.error('not able to reject friend request', error)
     } finally {
-      setRefreshPage((prev) => !prev);
-      getFriendList();
+      setRefreshPage((prev) => !prev)
+      getFriendList()
     }
   }
 
@@ -105,8 +104,8 @@ const FriendsSection = ({ userId, getFriendList }) => {
       console.error('not able to accept friend request', error)
       toast.error('Something went wrong')
     } finally {
-      setRefreshPage((prev) => !prev);
-      getFriendList();
+      setRefreshPage((prev) => !prev)
+      getFriendList()
     }
   }
 
@@ -124,7 +123,7 @@ const FriendsSection = ({ userId, getFriendList }) => {
           SearchText: searchText
         }
         const res = await axiosInstance.post(SEARCH_FRIEND_URL, payload)
-        
+
         setSuggestions(res?.data?.data || [])
       } catch (err) {
         console.error(err)
@@ -139,11 +138,16 @@ const FriendsSection = ({ userId, getFriendList }) => {
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
-        
+        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL, {
+           params: {
+          searchText: friendSearchText
+        }
+        })
+
+        console.log("hehe", friendSearchText)
+
         if (res?.data?.success == true) {
           setFriendList(res?.data?.data || [])
-          
         }
       } catch (error) {
         console.error('not able to get the friend list', error)
@@ -183,7 +187,7 @@ const FriendsSection = ({ userId, getFriendList }) => {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={u?.profile_image && viewUploadedFile(u?.profile_image) || defaultUser}
+                      src={(u?.profile_image && viewUploadedFile(u?.profile_image)) || defaultUser}
                       className="w-10 h-10 rounded-full object-cover"
                       alt=""
                     />
@@ -272,7 +276,9 @@ const FriendsSection = ({ userId, getFriendList }) => {
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={user.profile_image && viewUploadedFile(user.profile_image) || defaultUser}
+                    src={
+                      (user.profile_image && viewUploadedFile(user.profile_image)) || defaultUser
+                    }
                     alt={user?.full_name}
                     className="w-12 h-12 rounded-full object-cover border"
                   />

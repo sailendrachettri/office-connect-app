@@ -22,6 +22,7 @@ function App() {
   const [friendList, setFriendList] = useState([])
   const [connection, setConnection] = useState(null)
   const [pendingFriendReq, setPendingFriendReq] = useState(null)
+  const [friendSearchText, setFriendSearchText] = useState('')
 
   const isConnected = useSelector((state) => state.connection.isConnected)
 
@@ -30,7 +31,11 @@ function App() {
 
     if (userId) {
       try {
-        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL)
+        const res = await axiosPrivate.get(GET_FRIEND_LIST_URL, {
+           params: {
+            searchText: friendSearchText
+          }
+        })
 
         if (res?.data?.success == true) {
           const data = res?.data?.data
@@ -40,7 +45,10 @@ function App() {
             (item) => item.relation_status === 'PENDING_RECEIVED'
           ).length
           setPendingFriendReq(countPendingFriendReq || null)
+            console.log(friendSearchText)
           setFriendList(filteredList || [])
+
+          console.log({filteredList})
         }
       } catch (error) {
         console.error('not able to get the friend list', error)
@@ -84,20 +92,18 @@ function App() {
           })
       } else {
         toast.error(res?.data?.message || 'Something went wrong!')
-        setLoading(false);
-        setShowLogin(true);
+        setLoading(false)
+        setShowLogin(true)
       }
     } catch (err) {
       if (!shown) {
         if (err?.code == 'ERR_BAD_REQUEST') {
           toast.error('Session expired, please login again')
-        } 
-        else if (err?.code == 'ERR_NETWORK') {
-        toast.error(
-          'Unable to connect. Please ensure you are on the same local network as the server.'
-        )
-      }
-        else {
+        } else if (err?.code == 'ERR_NETWORK') {
+          toast.error(
+            'Unable to connect. Please ensure you are on the same local network as the server.'
+          )
+        } else {
           toast.error('Not able to login')
         }
         console.error('not able to login', err)
@@ -105,18 +111,28 @@ function App() {
 
         shown = true
       }
-       setLoading(false);
-        setShowLogin(true);
+      setLoading(false)
+      setShowLogin(true)
     } finally {
       setLoading(false)
     }
   }
 
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getFriendList(friendSearchText)
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [friendSearchText])
+
   useEffect(() => {
     restoreSession()
   }, [])
 
-  useState(() => {
+  useEffect(() => {
     getFriendList()
   }, [loading])
 
@@ -176,6 +192,8 @@ function App() {
             friendList={friendList}
             getFriendList={getFriendList}
             pendingFriendReq={pendingFriendReq}
+            setFriendSearchText={setFriendSearchText}
+            friendSearchText={friendSearchText}
           />
         )}
 

@@ -3,7 +3,7 @@ import { useChat } from '../../../context/ChatContext'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
 
-const Sidebar = ({ setSelectedTab, friendList }) => {
+const Sidebar = ({ setSelectedTab, friendList, setFriendSearchText }) => {
   const { selectedFriendProfileId, setSelectedFriendProfileId, isFriendTyping } = useChat()
 
   return (
@@ -16,6 +16,7 @@ const Sidebar = ({ setSelectedTab, friendList }) => {
       {/* Search */}
       <div className="px-1 py-3 border-b border-slate-200">
         <input
+          onChange={(e) => setFriendSearchText(e.target.value)}
           type="text"
           placeholder="Search here"
           className="w-full px-3 py-2 border rounded-lg border-slate-200 text-slate-500 bg-slate-50 focus:outline-none focus:ring-primary outline-none"
@@ -27,7 +28,7 @@ const Sidebar = ({ setSelectedTab, friendList }) => {
         {friendList?.length == 0 ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center max-w-sm px-6">
-              <div className="mb-3 text-lg font-semibold text-gray-700">No friends yet</div>
+              <div className="mb-3 text-lg font-semibold text-gray-700">No friends found</div>
 
               <p className="mb-5 text-sm text-gray-500">
                 Add a friend to start chatting and sharing messages.
