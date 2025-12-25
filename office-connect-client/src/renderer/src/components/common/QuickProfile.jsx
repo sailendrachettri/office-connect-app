@@ -57,13 +57,13 @@ const QuickProfile = ({ toggleQuickProfile, setToggleQuickProfile, userFullDetai
             <p className="text-sm text-slate-500">@{userFullDetails?.username}</p>
 
             {/* STATUS */}
-            <span
+            {/* <span
               className={`mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium
               ${isOnline ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}
             >
               <span className={`h-2 w-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-slate-400'}`} />
               {isOnline ? 'Online' : `Last seen ${formatLastSeen(userFullDetails?.last_seen) || 'recently'}`}
-            </span>
+            </span> */}
           </div>
 
           {/* DIVIDER */}

@@ -24,7 +24,7 @@ const Headers = ({ userFullDetails }) => {
             {/* Chat Details */}
             <div>
               <h3 className="text-lg font-semibold text-slate-900">{userFullDetails?.full_name}</h3>
-              <p>
+              {/* <p>
                 {userFullDetails?.status == 'Active' ? (
                   <span className="text-green-600">
                     {' '}
@@ -35,7 +35,7 @@ const Headers = ({ userFullDetails }) => {
                     Last seen at: {formatLastSeen(userFullDetails?.last_seen)}
                   </small>
                 )}
-              </p>
+              </p> */}
             </div>
           </div>
 
