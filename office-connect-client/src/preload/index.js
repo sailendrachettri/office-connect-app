@@ -2,6 +2,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 
+contextBridge.exposeInMainWorld('electron', {
+  notifyNewMessage: () => ipcRenderer.send('new-message'),
+  clearUnread: () => ipcRenderer.send('clear-unread')
+})
+
 contextBridge.exposeInMainWorld("api", {
   minimize: () => ipcRenderer.send("window-minimize"),
   maximize: () => ipcRenderer.send("window-maximize"),

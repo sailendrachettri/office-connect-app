@@ -48,6 +48,7 @@ export const ChatProvider = ({
       }
 
       showSystemNotification(normalized)
+      window.electron.notifyNewMessage()
 
       // push into current chat only if relevant
       if (
@@ -65,6 +66,7 @@ export const ChatProvider = ({
           ids.includes(m.messageId) ? { ...m, isRead: true } : m
         )
       )
+      window.electron.clearUnread()
     }
 
     connection.on('UserTyping', handleUserTyping)

@@ -1,9 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen , nativeImage } from 'electron'
 import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-
 import Store from 'electron-store'
+
+let mainWindow
+let isBackground = false
+let hasUnread = false
 
 const store = new Store({
   name: 'office-connect',
@@ -13,6 +16,37 @@ const store = new Store({
     refreshToken: null
   }
 })
+
+ipcMain.on('new-message', () => {
+  hasUnread = true
+  updateUnreadDot()
+})
+
+ipcMain.on('clear-unread', () => {
+  hasUnread = false
+  updateUnreadDot()
+})
+
+
+function updateUnreadDot() {
+  if (!mainWindow) return
+
+  if (hasUnread && isBackground) {
+    const iconPath = is.dev
+      ? path.join(process.cwd(), 'resources', 'red_dot.png')
+      : path.join(process.resourcesPath, 'red_dot.png')
+
+    const dotIcon = nativeImage.createFromPath(iconPath)
+
+    if (!dotIcon.isEmpty()) {
+      mainWindow.setOverlayIcon(dotIcon, 'Unread messages')
+    }
+  } else {
+    mainWindow.setOverlayIcon(null, '')
+  }
+}
+
+
 
 ipcMain.handle('store-get', (_, key) => store.get(key))
 ipcMain.handle('store-set', (_, key, value) => store.set(key, value))
@@ -36,7 +70,7 @@ ipcMain.on('window-close', () => {
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     icon: path.join(process.cwd(), 'resources', 'icon.ico'),
     width: 1200,
     height: 800,
@@ -70,6 +104,32 @@ function createWindow() {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+   mainWindow.on('minimize', () => {
+    isBackground = true
+  })
+
+  mainWindow.on('blur', () => {
+    isBackground = true
+  })
+
+  mainWindow.on('restore', () => {
+    isBackground = false
+    hasUnread = false
+    updateUnreadDot()
+  })
+
+  mainWindow.on('focus', () => {
+    isBackground = false
+    hasUnread = false
+    updateUnreadDot()
+  })
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  } else {
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
 
   app.commandLine.appendSwitch('enable-font-antialiasing')
   app.commandLine.appendSwitch('enable-color-correct-rendering')
