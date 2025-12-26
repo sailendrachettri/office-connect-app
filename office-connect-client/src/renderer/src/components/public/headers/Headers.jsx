@@ -1,12 +1,9 @@
-import { useEffect, useState } from 'react'
-import { IoSearch } from 'react-icons/io5'
 import { IoInformationCircleOutline } from 'react-icons/io5'
-import { HiOutlineDotsVertical } from 'react-icons/hi'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import QuickProfile from '../../common/QuickProfile'
-import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
 import { useChat } from '../../../context/ChatContext'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
+import { useState } from 'react'
 
 const Headers = ({ userFullDetails }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
@@ -35,6 +32,8 @@ const Headers = ({ userFullDetails }) => {
             {/* Chat Details */}
             <div>
               <h3 className="text-lg font-semibold text-slate-900">{userFullDetails?.full_name}</h3>
+              <span className="text-green-600">{isFriendTyping && 'Typing...'}</span>
+
               {/* <p>
                 {userFullDetails?.status == 'Active' ? (
                   <span className="text-green-600">

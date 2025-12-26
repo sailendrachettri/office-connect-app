@@ -69,7 +69,7 @@ const Sidebar = ({ setSelectedTab, friendList, setFriendSearchText }) => {
                 {/* Name + Last Message */}
                 <div className="flex-1">
                   <div className="font-medium text-slate-900">{user?.full_name}</div>
-                  <div className="text-sm text-slate-500 truncate w-45">
+                  <div className={`text-sm ${isFriendTyping ? 'text-green-500' : 'text-slate-500'} truncate w-45`}>
                     {selectedFriendProfileId == user?.user_id && isFriendTyping
                       ? 'Typing...'
                       : user?.last_message?.message_text}
