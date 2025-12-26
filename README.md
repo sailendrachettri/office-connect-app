@@ -54,7 +54,6 @@ Start the Server
 - Edit profile details
 
 # Screenshots
-## Homepage
 <p><img src="https://drive.google.com/uc?export=view&id=1z3ILSm1zug2hxGTB-UaDln4d53EfzA24" alt="Register page"></p>
 <p><img src="https://drive.google.com/uc?export=view&id=1Oubz79n0gMe_jVcdVx_lTQUU8yfeLOQT" alt="Login page"></p>
 
