@@ -57,6 +57,7 @@ Start the Server
 
 # Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=1z3ILSm1zug2hxGTB-UaDln4d53EfzA24" alt="Register page"></p>
+<p><img src="https://drive.google.com/uc?export=view&id=1CdKsjBLg4JqieiDHprA9K73ABJHYSWKM" alt="Home page"></p>
 <p><img src="https://drive.google.com/uc?export=view&id=1Oubz79n0gMe_jVcdVx_lTQUU8yfeLOQT" alt="Login page"></p>
 
 # Contact

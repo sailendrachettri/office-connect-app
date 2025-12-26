@@ -55,7 +55,13 @@ const Sidebar = ({ setSelectedTab, friendList, setFriendSearchText }) => {
               >
                 {/* Image */}
                 <img
-                  src={(user?.profile_image && viewUploadedFile(user?.profile_image)) || profilePic}
+                  src={
+                    user?.profile_image
+                      ? viewUploadedFile(user.profile_image)
+                      : user?.avatar_url
+                        ? viewUploadedFile(user.avatar_url)
+                        : profilePic
+                  }
                   alt=""
                   className="w-12 h-12 rounded-full object-cover"
                 />

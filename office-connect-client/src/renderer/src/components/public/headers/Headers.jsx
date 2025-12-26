@@ -6,6 +6,7 @@ import profilePic from '../../../assets/peoples/default_user.jpg'
 import QuickProfile from '../../common/QuickProfile'
 import { formatLastSeen } from '../../../utils/dates/formatLastSeen'
 import { useChat } from '../../../context/ChatContext'
+import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
 
 const Headers = ({ userFullDetails }) => {
   const [toggleQuickProfile, setToggleQuickProfile] = useState(false)
@@ -19,7 +20,17 @@ const Headers = ({ userFullDetails }) => {
           {/* LEFT: Profile & User Info */}
           <div className="flex items-center gap-3">
             {/* Profile Image */}
-            <img src={profilePic} alt="Profile" className="w-12 h-12 rounded-full object-cover" />
+            <img
+              src={
+                userFullDetails?.profile_image
+                  ? viewUploadedFile(userFullDetails.profile_image)
+                  : userFullDetails?.avatar_url
+                    ? viewUploadedFile(userFullDetails.avatar_url)
+                    : profilePic
+              }
+              alt="Profile"
+              className="w-12 h-12 rounded-full object-cover"
+            />
 
             {/* Chat Details */}
             <div>
@@ -62,7 +73,7 @@ const Headers = ({ userFullDetails }) => {
       )}
 
       <QuickProfile
-      userFullDetails={userFullDetails}
+        userFullDetails={userFullDetails}
         toggleQuickProfile={toggleQuickProfile}
         setToggleQuickProfile={setToggleQuickProfile}
       />
