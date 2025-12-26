@@ -37,7 +37,7 @@ Go to the project directory
 Install dependencies
 
 ```bash
-    pnpn install
+    pnpm install
 ```
 
 Start the Server
