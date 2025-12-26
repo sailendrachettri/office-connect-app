@@ -52,6 +52,7 @@ Start the Server
 - File sharing, docs, mp4, mp3 etc
 - Real time status update
 - Edit profile details
+- Search messages
 
 # Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=1z3ILSm1zug2hxGTB-UaDln4d53EfzA24" alt="Register page"></p>
