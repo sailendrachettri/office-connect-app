@@ -1,6 +1,8 @@
 
 # OFFICE CONNECT 
 
+Office Connect is a lightweight, on-premise chat and messaging application designed for secure communication within an office network. It allows team members to connect, chat, and share messages over LAN or Wi-Fi without relying on the internet or third-party servers. Built with a focus on speed, privacy, and simplicity, Office Connect ensures that conversations stay inside the organization while providing a smooth, modern user experience for everyday workplace communication.
+
 ## Tech Stack
 
 **Client:** ELECTRONJS, REACTJS, JAVASCRIPT
