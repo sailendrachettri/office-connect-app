@@ -13,6 +13,7 @@ import { IoChatbubblesOutline } from 'react-icons/io5'
 import { useSelector } from 'react-redux'
 import TopHelpMenu from './components/public/menu/helper-menu/TopHelpMenu'
 import ConnectionLostImg from './assets/svgs/conn_lost.svg'
+import { CgSoftwareDownload } from 'react-icons/cg'
 
 let shown = false
 
@@ -26,6 +27,7 @@ function App() {
   const [friendSearchText, setFriendSearchText] = useState('')
   const [serverAlive, setServerAlive] = useState(true)
   const isConnected = useSelector((state) => state.connection.isConnected)
+  const [updateReady, setUpdateReady] = useState(false)
 
   const getFriendList = async () => {
     const userId = await window.store.get('userId')
@@ -96,7 +98,6 @@ function App() {
         setLoading(false)
         setShowLogin(true)
       }
-      console.log('after alive if')
       setServerAlive(true)
     } catch (err) {
       if (!shown) {
@@ -104,7 +105,6 @@ function App() {
           toast.error('Session expired, please login again - here')
         } else if (err?.code == 'ERR_NETWORK') {
           setServerAlive(false)
-          console.log('hehe')
           // toast.error(
           //   'Unable to connect. Please ensure you are on the same local network as the server.  '
           // )
@@ -116,8 +116,6 @@ function App() {
         setIsLoggedIn(false)
         shown = true
       }
-
-      console.log('after alive else')
       setServerAlive(true)
       setLoading(false)
     } finally {
@@ -135,11 +133,27 @@ function App() {
 
   useEffect(() => {
     restoreSession()
+    getFriendList()
   }, [loading])
 
   useEffect(() => {
-    getFriendList()
-  }, [loading])
+    window.electron.onUpdateAvailable(() => {
+      toast('Update available. Downloading…')
+    })
+
+    window.electron.onUpdateDownloaded(() => {
+      toast('Update ready. Restart to apply.')
+      setUpdateReady(true)
+    })
+
+    window.electron.onUpdateProgress((progress) => {
+      console.log(`Update ${Math.round(progress.percent)}%`)
+    })
+  }, [])
+
+  const restartAndUpdate = () => {
+    window.electron.installUpdate()
+  }
 
   return (
     <>
@@ -150,9 +164,21 @@ function App() {
               className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}
             >
               <IoChatbubblesOutline />
-              <small>{isConnected ? 'Connected' : 'Disconnected'}</small>
+              <small>{isConnected ? 'Connected v1.3.4' : 'Disconnected'}</small>
             </div>
           )}
+          {updateReady &&
+            <button
+              onClick={restartAndUpdate}
+              className="ml-3 rounded bg-amber-500 px-2 py-0.5 text-xs text-white hover:bg-amber-600 cursor-pointer"
+            >
+              <div className='flex items-center justify-start gap-x-1 flex-nowrap'>
+                <CgSoftwareDownload size={20} />
+                <span> New update available – install now</span>
+              </div>
+            </button>
+          }
+
           <TopHelpMenu />
         </div>
 
@@ -187,10 +213,15 @@ function App() {
           <section>
             <div className="min-h-screen w-full flex items-center justify-center flex-col">
               <div className="loader"></div>
-              {serverAlive  ? 
-              <div className='text-slate-600 italic text-sm pt-3'>Setting things up… connecting to the server.</div>
-            : <div className='text-slate-600 italic text-sm pt-3'>Reconnecting to the server... Hold tight!</div>
-            }
+              {serverAlive ? (
+                <div className="text-slate-600 italic text-sm pt-3">
+                  Setting things up… connecting to the server.
+                </div>
+              ) : (
+                <div className="text-slate-600 italic text-sm pt-3">
+                  Reconnecting to the server... Hold tight!
+                </div>
+              )}
             </div>
           </section>
         ) : (
@@ -234,7 +265,9 @@ function App() {
                 />
 
                 {/* Heading */}
-                <h1 className="text-xl font-semibold text-gray-800">We’re having trouble connecting</h1>
+                <h1 className="text-xl font-semibold text-gray-800">
+                  We’re having trouble connecting
+                </h1>
 
                 {/* Description */}
                 <p className="mt-2 max-w-md text-center text-sm text-gray-500">

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using OfficeConnectServer.Data;
@@ -7,6 +8,7 @@ using OfficeConnectServer.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.StaticFiles;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -93,13 +95,35 @@ builder.WebHost.ConfigureKestrel(options =>
     //});
 });
 
+
 // Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+
 var app = builder.Build();
 
+app.UseStaticFiles();
+
+
+// Electron auto-updates
+var updatesPath = @"C:\OfficeConnectRelease";
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".yml"] = "application/octet-stream"; // ensure .yml is served
+
+if (!Directory.Exists(updatesPath))
+    Directory.CreateDirectory(updatesPath);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(updatesPath),
+    RequestPath = "/updates",
+    ContentTypeProvider = provider
+});
 
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -107,7 +131,27 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(builder.Environment.ContentRootPath, "Uploads")),
     RequestPath = "/uploads"
 });
-    
+
+
+
+app.MapGet("/updates-check", () =>
+{
+    return Directory.GetFiles(@"C:\OfficeConnectRelease");
+});
+
+
+app.MapGet("/debug-updates", () =>
+{
+    var path = @"C:\OfficeConnectRelease\latest.yml";
+    return new
+    {
+        Exists = System.IO.File.Exists(path),
+        Files = Directory.Exists(@"C:\OfficeConnectRelease")
+            ? Directory.GetFiles(@"C:\OfficeConnectRelease")
+            : Array.Empty<string>()
+    };
+});
+
 
 app.UseCors("AllowViteDevServer");
 

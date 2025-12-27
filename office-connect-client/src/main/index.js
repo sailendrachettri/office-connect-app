@@ -1,12 +1,25 @@
-import { app, shell, BrowserWindow, ipcMain, screen , nativeImage } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen, nativeImage } from 'electron'
 import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import Store from 'electron-store'
+import { autoUpdater } from 'electron-updater'
+import log from 'electron-log'
 
 let mainWindow
 let isBackground = false
 let hasUnread = false
+
+autoUpdater.logger = log
+autoUpdater.logger.transports.file.level = 'info'
+
+// optional but recommended
+autoUpdater.autoDownload = true
+autoUpdater.autoInstallOnAppQuit = true
+
+if (is.dev) {
+  autoUpdater.forceDevUpdateConfig = true
+}
 
 const store = new Store({
   name: 'office-connect',
@@ -27,7 +40,6 @@ ipcMain.on('clear-unread', () => {
   updateUnreadDot()
 })
 
-
 function updateUnreadDot() {
   if (!mainWindow) return
 
@@ -45,8 +57,6 @@ function updateUnreadDot() {
     mainWindow.setOverlayIcon(null, '')
   }
 }
-
-
 
 ipcMain.handle('store-get', (_, key) => store.get(key))
 ipcMain.handle('store-set', (_, key, value) => store.set(key, value))
@@ -105,7 +115,7 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-   mainWindow.on('minimize', () => {
+  mainWindow.on('minimize', () => {
     isBackground = true
   })
 
@@ -154,6 +164,11 @@ function createWindow() {
   }
 }
 
+ipcMain.on('install-update', () => {
+  if (autoUpdater.isDownloading) return
+  autoUpdater.quitAndInstall()
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -166,9 +181,40 @@ app.whenReady().then(() => {
 
   createWindow()
 
+  setTimeout(() => {
+    autoUpdater.checkForUpdatesAndNotify()
+  }, 3000)
+
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+ipcMain.handle('check-for-update', async () => {
+  return autoUpdater.checkForUpdatesAndNotify()
+})
+ipcMain.on('check-update', () => {
+  autoUpdater.checkForUpdatesAndNotify()
+})
+
+autoUpdater.on('update-available', () => {
+  mainWindow?.webContents.send('update-available')
+})
+
+autoUpdater.on('update-not-available', () => {
+  mainWindow?.webContents.send('update-not-available')
+})
+
+autoUpdater.on('error', (err) => {
+  mainWindow?.webContents.send('update-error', err.message)
+})
+
+autoUpdater.on('download-progress', (progress) => {
+  mainWindow?.webContents.send('update-progress', progress)
+})
+
+autoUpdater.on('update-downloaded', () => {
+  mainWindow?.webContents.send('update-downloaded')
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

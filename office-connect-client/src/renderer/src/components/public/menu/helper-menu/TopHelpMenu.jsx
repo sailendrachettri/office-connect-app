@@ -4,6 +4,10 @@ const TopHelpMenu = () => {
   const [open, setOpen] = useState(false)
   const menuRef = useRef(null)
 
+   const checkForUpdate = () => {
+    window.electron.checkForUpdate()
+  }
+
   // close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -40,6 +44,10 @@ const TopHelpMenu = () => {
             <li onClick={()=> {window.location.reload()}} className="px-4 py-2 hover:bg-slate-100 cursor-pointer mx-1 rounded-md">
              Refresh
             </li>
+
+            {/* <li onClick={()=> checkForUpdate()} className="px-4 py-2 hover:bg-slate-100 cursor-pointer mx-1 rounded-md">
+             Check for new updates
+            </li> */}
            
           </ul>
         </div>

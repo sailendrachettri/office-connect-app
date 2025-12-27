@@ -144,8 +144,6 @@ const FriendsSection = ({ userId, getFriendList, friendSearchText }) => {
           }
         })
 
-        console.log('hehe', friendSearchText)
-
         if (res?.data?.success == true) {
           setFriendList(res?.data?.data || [])
         }
