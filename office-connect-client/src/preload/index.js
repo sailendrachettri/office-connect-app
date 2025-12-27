@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('electron', {
   notifyNewMessage: () => ipcRenderer.send('new-message'),
   clearUnread: () => ipcRenderer.send('clear-unread'),
+  
   onUpdateAvailable: (callback) => ipcRenderer.on('update-available', callback),
 
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),

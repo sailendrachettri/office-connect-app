@@ -164,7 +164,7 @@ function App() {
               className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}
             >
               <IoChatbubblesOutline />
-              <small>{isConnected ? 'Connected v1.3.4' : 'Disconnected'}</small>
+              <small>{isConnected ? 'Connected v1.3.5' : 'Disconnected'}</small>
             </div>
           )}
           {updateReady &&
