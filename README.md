@@ -54,6 +54,10 @@ Start the Server
 - Edit profile details
 - Search messages
 - Group Chats
+- Message Encryption
+- Delete message
+- Temorary message
+- Emojies and Gif in Chats
 
 # Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=1z3ILSm1zug2hxGTB-UaDln4d53EfzA24" alt="Register page"></p>

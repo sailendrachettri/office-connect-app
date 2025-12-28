@@ -64,8 +64,6 @@ function updateUnreadDot() {
       ? path.join(process.cwd(), 'resources', 'red_dot.png')
       : path.join(process.resourcesPath, 'resources', 'red_dot.png')
 
-    console.log({ iconPath })
-
     const dotIcon = nativeImage.createFromPath(iconPath)
 
     if (!dotIcon.isEmpty()) {

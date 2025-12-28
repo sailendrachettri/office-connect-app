@@ -4,6 +4,8 @@ import { MdOutlineCheck } from 'react-icons/md'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
+import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
+import MediaMessage from './MediaMessage'
 
 const MessageBubble = ({
   text,
@@ -13,7 +15,9 @@ const MessageBubble = ({
   senderId,
   messageId,
   observerRef,
-  currentUserId
+  currentUserId,
+  messageType,
+  fullChat
 }) => {
   const [copied, setCopied] = useState(false)
 
@@ -57,7 +61,7 @@ const MessageBubble = ({
           {copied ? (
             <MdOutlineCheck size={16} className="text-secondary" />
           ) : (
-            <IoCopyOutline size={16} className='cursor-pointer' />
+            <IoCopyOutline size={16} className="cursor-pointer" />
           )}
         </button>
       )}
@@ -72,7 +76,12 @@ const MessageBubble = ({
           }
         `}
       >
-        <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
+        {/* <div className="whitespace-pre-wrap wrap-break-word">{text}</div> */}
+        {messageType === 'media' ? (
+          <MediaMessage msg={fullChat} />
+        ) : (
+          <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
+        )}
 
         <span
           className={`text-xs flex justify-end items-center gap-1 mt-1
@@ -100,7 +109,7 @@ const MessageBubble = ({
           {copied ? (
             <MdOutlineCheck size={16} className="text-secondary" />
           ) : (
-            <IoCopyOutline size={16} className='cursor-pointer' />
+            <IoCopyOutline size={16} className="cursor-pointer" />
           )}
         </button>
       )}

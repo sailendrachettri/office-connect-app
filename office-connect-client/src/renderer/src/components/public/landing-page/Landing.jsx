@@ -5,6 +5,7 @@ import { axiosPrivate } from '../../../api/api'
 import UserInputMessage from './UserInputMessage'
 import MessageBubble from './MessageBubble'
 import { useChat } from '../../../context/ChatContext'
+import toast from 'react-hot-toast'
 
 const Landing = () => {
   const [text, setText] = useState('')
@@ -12,6 +13,9 @@ const Landing = () => {
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
   const [oldestMessageId, setOldestMessageId] = useState(null)
+  const [fileId, setFileId] = useState(null)
+  const [selectedMedia, setSelectedMedia] = useState(null)
+  const [refreshChat, setRefreshChat] = useState(false);
 
   const observerRef = useRef(null)
   const unreadMessageIdsRef = useRef(new Set())
@@ -20,6 +24,8 @@ const Landing = () => {
   const restoreMessageIdRef = useRef(null)
   const isLoadingRef = useRef(false)
   const initialLoadDoneRef = useRef(false)
+
+  console.log({refreshChat});
 
   const { connection, selectedFriendProfileId, getFriendList, messages, setMessages } = useChat()
 
@@ -44,6 +50,30 @@ const Landing = () => {
       month: 'short',
       year: 'numeric'
     })
+  }
+
+  const fetchInitialMessages = async () => {
+    setLoading(true)
+    try {
+      const res = await axiosPrivate.get(
+        `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}?pageSize=50`
+      )
+
+      const data = res.data
+      setMessages(data || [])
+      setHasMore(data.hasMore)
+      setOldestMessageId(data.oldestMessageId)
+      initialLoadDoneRef.current = true
+
+      // Scroll to bottom after initial load
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView()
+      }, 100)
+    } catch (err) {
+      console.error('Failed to load messages:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   /* ---------------- Load older messages when scrolling up ---------------- */
@@ -110,7 +140,7 @@ const Landing = () => {
 
     try {
       await connection.invoke('MarkMessagesAsRead', ids, selectedFriendProfileId)
-      getFriendList();
+      getFriendList()
     } catch (err) {
       console.error('Failed to mark messages as read', err)
     }
@@ -126,8 +156,20 @@ const Landing = () => {
     setText('')
 
     try {
-      await connection.invoke('SendMessage', currentUserId, selectedFriendProfileId, text)
+      const safeFileId = fileId ?? null
+
+      console.log({ messages })
+
+      await connection.invoke(
+        'SendMessage',
+        currentUserId,
+        selectedFriendProfileId,
+        text,
+        safeFileId
+      )
+
     } catch (err) {
+      toast.error('Failed to send message')
       console.error('Failed to send message', err)
     }
   }
@@ -185,40 +227,14 @@ const Landing = () => {
     setOldestMessageId(null)
     initialLoadDoneRef.current = false
 
-    const fetchInitialMessages = async () => {
-      setLoading(true)
-      try {
-        const res = await axiosPrivate.get(
-          `${MESSAGES_URL}/${currentUserId}/${selectedFriendProfileId}?pageSize=50`
-        )
-
-        const data = res.data
-        setMessages(data || [])
-        setHasMore(data.hasMore)
-        setOldestMessageId(data.oldestMessageId)
-        initialLoadDoneRef.current = true
-
-        // Scroll to bottom after initial load
-        setTimeout(() => {
-          bottomRef.current?.scrollIntoView()
-        }, 100)
-      } catch (err) {
-        console.error('Failed to load messages:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchInitialMessages()
-  }, [currentUserId, selectedFriendProfileId])
+  }, [currentUserId, selectedFriendProfileId, refreshChat])
 
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [])
-
- 
 
   /* ---------------- Auto scroll to bottom for new messages ---------------- */
   useEffect(() => {
@@ -249,7 +265,7 @@ const Landing = () => {
           <div className="text-center py-2 text-slate-400 text-xs">No more messages</div>
         )}
 
-        {messages.map((msg, i) => {
+        {messages?.map((msg, i) => {
           const fromMe = msg?.senderId === currentUserId
           const msgDate = new Date(msg?.createdAt)
           const prevMsg = messages[i - 1]
@@ -277,6 +293,8 @@ const Landing = () => {
                 messageId={msg?.messageId}
                 observerRef={observerRef}
                 currentUserId={currentUserId}
+                messageType={msg?.messageType}
+                fullChat={msg}
               />
             </div>
           )
@@ -291,6 +309,10 @@ const Landing = () => {
         sendMessage={sendMessage}
         setText={setText}
         text={text}
+        setFileId={setFileId}
+        selectedMedia={selectedMedia}
+        setSelectedMedia={setSelectedMedia}
+        setRefreshChat={setRefreshChat}
       />
     </div>
   )

@@ -23,7 +23,7 @@ public class MessagesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SendMessage([FromBody] MessageSendRequest request)
     {
-        var id = await _repo.AddMessageAsync(request.SenderId, request.ReceiverId, request.MessageText);
+        var id = await _repo.AddMessageAsync(request.SenderId, request.ReceiverId, request.MessageText, request.FileId);
         return Ok(new { message_id = id });
     }
 }

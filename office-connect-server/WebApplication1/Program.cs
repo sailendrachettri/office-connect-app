@@ -17,6 +17,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<MessageRepository>();
 builder.Services.AddScoped<DbConnectionFactory>();
 builder.Services.AddScoped<DbHelper>();
+builder.Services.AddScoped<FileRepository>();
 
 
 
