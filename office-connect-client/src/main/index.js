@@ -30,9 +30,25 @@ const store = new Store({
   }
 })
 
+function clearAttention() {
+  hasUnread = false
+  updateUnreadDot()
+
+  if (process.platform === 'win32' && mainWindow) {
+    mainWindow.flashFrame(false)
+  }
+
+  setTimeout(() => {
+    if (mainWindow) mainWindow.flashFrame(false)
+  }, 3000)
+}
+
 ipcMain.on('new-message', () => {
   hasUnread = true
   updateUnreadDot()
+  if (process.platform === 'win32' && mainWindow && isBackground) {
+    mainWindow.flashFrame(true)
+  }
 })
 
 ipcMain.on('clear-unread', () => {
@@ -46,7 +62,9 @@ function updateUnreadDot() {
   if (hasUnread && isBackground) {
     const iconPath = is.dev
       ? path.join(process.cwd(), 'resources', 'red_dot.png')
-      : path.join(process.resourcesPath, 'red_dot.png')
+      : path.join(process.resourcesPath, 'resources', 'red_dot.png')
+
+    console.log({ iconPath })
 
     const dotIcon = nativeImage.createFromPath(iconPath)
 
@@ -127,13 +145,17 @@ function createWindow() {
     isBackground = false
     hasUnread = false
     updateUnreadDot()
+    clearAttention();
   })
 
   mainWindow.on('focus', () => {
     isBackground = false
     hasUnread = false
-    updateUnreadDot()
+    updateUnreadDot();
+    clearAttention()
   })
+
+  mainWindow.on('show', clearAttention)
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])

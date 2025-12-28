@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux'
 import TopHelpMenu from './components/public/menu/helper-menu/TopHelpMenu'
 import ConnectionLostImg from './assets/svgs/conn_lost.svg'
 import { CgSoftwareDownload } from 'react-icons/cg'
+import { APP_VERSION } from '../../../custom-config'
 
 let shown = false
 
@@ -48,10 +49,7 @@ function App() {
             (item) => item.relation_status === 'PENDING_RECEIVED'
           ).length
           setPendingFriendReq(countPendingFriendReq || null)
-          console.log(friendSearchText)
           setFriendList(filteredList || [])
-
-          console.log({ filteredList })
         }
       } catch (error) {
         console.error('not able to get the friend list', error)
@@ -142,12 +140,12 @@ function App() {
     })
 
     window.electron.onUpdateDownloaded(() => {
-      toast('Update ready. Restart to apply.')
+      // toast('Update ready. Restart to apply.')
       setUpdateReady(true)
     })
 
     window.electron.onUpdateProgress((progress) => {
-      console.log(`Update ${Math.round(progress.percent)}%`)
+      toast(`Update ${Math.round(progress.percent)}%`)
     })
   }, [])
 
@@ -164,7 +162,7 @@ function App() {
               className={`${isConnected ? 'text-green-500' : 'text-red-400'} flex items-center justify-center gap-x-1`}
             >
               <IoChatbubblesOutline />
-              <small>{isConnected ? 'Connected v1.3.5' : 'Disconnected'}</small>
+              <small>{isConnected ? `Connected v${APP_VERSION}` : 'Disconnected'}</small>
             </div>
           )}
           {updateReady &&
