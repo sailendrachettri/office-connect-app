@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { AiOutlinePaperClip } from 'react-icons/ai'
 import { IoMdSend } from 'react-icons/io'
 import { useChat } from '../../../context/ChatContext'
@@ -7,8 +7,15 @@ import { uploadMediaChat } from '../../../utils/file-upload-to-server/uploadMedi
 
 const MAX_HEIGHT = 120
 
-const UserInputMessage = ({ text, setText, sendMessage, setFileId, selectedMedia, setSelectedMedia, setRefreshChat }) => {
-
+const UserInputMessage = ({
+  text,
+  setText,
+  sendMessage,
+  setFileId,
+  selectedMedia,
+  setSelectedMedia,
+  setRefreshChat
+}) => {
   const typingTimeoutRef = useRef(null)
   const isTypingRef = useRef(false)
   const textareaRef = useRef(null)
@@ -55,11 +62,15 @@ const UserInputMessage = ({ text, setText, sendMessage, setFileId, selectedMedia
       // Send the medias with text in chat
       if (selectedMedia) {
         const res = await uploadMediaChat(selectedMedia, text, selectedFriendProfileId)
-        setFileId(res?.fileId || null)
-        setRefreshChat(prev => !prev);
-      } else {
-        // Text message send
-        sendMessage()
+        console.log(res)
+        if (res?.data) {
+          const msg = res.data
+
+          // 🔥 BROADCAST VIA SIGNALR
+          await connection.invoke('BroadcastUploadedMessage', msg)
+        }
+
+        setRefreshChat((prev) => !prev)
       }
 
       setText('')

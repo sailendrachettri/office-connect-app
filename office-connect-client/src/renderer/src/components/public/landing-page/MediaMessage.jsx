@@ -10,7 +10,6 @@ const formatSize = (bytes) => {
 
 const MediaMessage = ({ msg }) => {
   const fileUrl = viewUploadedFile(msg.filePath)
-
   const downloadFile = () => {
     const link = document.createElement('a')
     link.href = fileUrl
@@ -20,12 +19,14 @@ const MediaMessage = ({ msg }) => {
     document.body.removeChild(link)
   }
 
+  console.log({ msg })
+
   // IMAGE
   if (msg.fileType === 'image') {
     return (
       <div className="space-y-1">
         <img
-          src={fileUrl}
+          src={viewUploadedFile(msg?.thumbnailPath)}
           alt={msg.originalFileName}
           className="rounded-lg max-w-55 cursor-pointer"
           onClick={() => window.open(fileUrl)}

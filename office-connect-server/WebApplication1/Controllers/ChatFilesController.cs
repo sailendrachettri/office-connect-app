@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeConnectServer.Data;
 using OfficeConnectServer.Models;
-using System.IO;
 
 [Authorize]
 [ApiController]
@@ -26,9 +25,10 @@ public class ChatFilesController : ControllerBase
     [HttpPost("upload")]
     [RequestSizeLimit(50_000_000)] // 50MB
     public async Task<IActionResult> UploadFile(
-    IFormFile file,
-    [FromForm] Guid receiverId,
-    [FromForm] string? caption)
+        IFormFile file,
+        IFormFile? thumbnail,
+        [FromForm] Guid receiverId,
+        [FromForm] string? caption)
     {
         if (file == null || file.Length == 0)
             return BadRequest("File missing");
@@ -38,17 +38,44 @@ public class ChatFilesController : ControllerBase
         var ext = Path.GetExtension(file.FileName).ToLower();
         var fileType = GetFileType(ext);
 
+        // ===============================
+        // 1️⃣ Save ORIGINAL file
+        // ===============================
         var storedName = $"{Guid.NewGuid()}{ext}";
-        var folder = Path.Combine("Uploads", fileType, "original");
-        var fullPath = Path.Combine(_env.ContentRootPath, folder);
+        var originalFolder = Path.Combine("Uploads", fileType, "original");
+        var originalPathRoot = Path.Combine(_env.ContentRootPath, originalFolder);
 
-        Directory.CreateDirectory(fullPath);
+        Directory.CreateDirectory(originalPathRoot);
 
-        var filePath = Path.Combine(fullPath, storedName);
+        var originalPath = Path.Combine(originalPathRoot, storedName);
 
-        using (var stream = System.IO.File.Create(filePath))
+        using (var stream = System.IO.File.Create(originalPath))
             await file.CopyToAsync(stream);
 
+        // ===============================
+        // 2️⃣ Save THUMBNAIL (if exists)
+        // ===============================
+        string? thumbnailPath = null;
+
+        if (thumbnail != null)
+        {
+            var thumbFolder = Path.Combine("Uploads", fileType, "thumb");
+            var thumbRoot = Path.Combine(_env.ContentRootPath, thumbFolder);
+
+            Directory.CreateDirectory(thumbRoot);
+
+            var thumbName = $"{Guid.NewGuid()}.jpg";
+            var thumbFullPath = Path.Combine(thumbRoot, thumbName);
+
+            using (var stream = System.IO.File.Create(thumbFullPath))
+                await thumbnail.CopyToAsync(stream);
+
+            thumbnailPath = $"/{thumbFolder}/{thumbName}";
+        }
+
+        // ===============================
+        // 3️⃣ Save FILE record
+        // ===============================
         var fileModel = new FileModel
         {
             UploadedBy = senderId,
@@ -58,12 +85,15 @@ public class ChatFilesController : ControllerBase
             FileType = fileType,
             MimeType = file.ContentType,
             FileSize = file.Length,
-            FilePath = $"/{folder}/{storedName}"
+            FilePath = $"/{originalFolder}/{storedName}",
+            ThumbnailPath = thumbnailPath
         };
 
         var fileId = await _fileRepo.AddFileAsync(fileModel);
 
-        // ✅ message_text = caption OR fallback text
+        // ===============================
+        // 4️⃣ Save MESSAGE
+        // ===============================
         var messageText = string.IsNullOrWhiteSpace(caption)
             ? file.FileName
             : caption;
@@ -75,13 +105,30 @@ public class ChatFilesController : ControllerBase
             fileId
         );
 
-        return Ok(new
+        return Ok(new ChatMessageDto
         {
-            messageId,
-            fileId
-        });
-    }
+            MessageId = messageId,
+            SenderId = senderId,
+            ReceiverId = receiverId,
+            MessageText = messageText,
+            CreatedAt = DateTime.UtcNow,
 
+            MessageType = fileId != null ? "media" : "text",
+
+            FileId = fileId,
+            FileType = fileType,
+            FilePath = fileModel?.FilePath,
+            ThumbnailPath = fileModel?.ThumbnailPath,
+            MimeType = fileModel?.MimeType,
+            FileSize = fileModel?.FileSize,
+            OriginalFileName = fileModel?.OriginalFileName,
+            StoredFileName = fileModel?.StoredFileName,
+            FileExtension = fileModel?.FileExtension
+        });
+
+
+
+    }
 
     private static string GetFileType(string ext) =>
         ext switch

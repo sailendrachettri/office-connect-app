@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OfficeConnectServer.Data;
+using OfficeConnectServer.Models;
 using System.Text.RegularExpressions;
 
 public class ChatHub : Hub
@@ -59,6 +60,23 @@ public class ChatHub : Hub
 
         await base.OnConnectedAsync();
     }
+
+    public async Task BroadcastUploadedMessage(ChatMessageDto message)
+    {
+        var senderId = Guid.Parse(
+            Context.GetHttpContext()!.Request.Query["userId"]!
+        );
+
+        // Receiver
+        await Clients.Group(message.ReceiverId.ToString())
+            .SendAsync("ReceiveMessage", message);
+
+        // Sender (echo)
+        await Clients.Group(senderId.ToString())
+            .SendAsync("ReceiveMessage", message);
+    }
+
+
 
     public async Task SendMessage(Guid sender_id_i, Guid receiver_id_i, string message_text_i, Guid? file_id_i)
     {

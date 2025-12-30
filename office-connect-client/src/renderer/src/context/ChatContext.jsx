@@ -3,29 +3,24 @@ import { showSystemNotification } from '../utils/notifications/showSystemNotific
 
 const ChatContext = createContext(null)
 
-export const ChatProvider = ({
-  connection,
-  getFriendList,
-  restoreSession,
-  children
-}) => {
+export const ChatProvider = ({ connection, getFriendList, restoreSession, children }) => {
   const [selectedFriendProfileId, setSelectedFriendProfileId] = useState(null)
   const [isFriendTyping, setIsFriendTyping] = useState(false)
   const [incomingMessage, setIncomingMessage] = useState(null)
-  const [messages, setMessages] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+  const [messages, setMessages] = useState([])
+  const [refresh, setRefresh] = useState(false)
 
-  useEffect(()=>{
-    restoreSession();
-    getFriendList();
-  }, [refresh]);
+  useEffect(() => {
+    restoreSession()
+    getFriendList()
+  }, [refresh])
 
   useEffect(() => {
     if (!connection) return
 
     const handleUserTyping = (senderId) => {
       if (String(senderId) === String(selectedFriendProfileId)) {
-        setIsFriendTyping(true) 
+        setIsFriendTyping(true)
       }
     }
 
@@ -38,13 +33,28 @@ export const ChatProvider = ({
     const handleReceiveMessage = (msg) => {
       getFriendList?.()
 
+      console.log('msg ->', msg)
+
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
         receiverId: msg?.receiverId ?? msg?.receiver_id,
         messageText: msg?.messageText ?? msg?.message_text,
         createdAt: msg?.createdAt ?? msg?.created_at,
-        isRead: msg?.isRead ?? false
+        isRead: msg?.isRead ?? false,
+
+        fileId: msg?.fileId ?? null,
+        filePath: msg?.filePath ?? null,
+        thumbnailPath: msg?.thumbnailPath ?? null,
+        originalFileName: msg?.originalFileName ?? null,
+        storedFileName: msg?.storedFileName ?? null,
+        fileExtension: msg?.fileExtension ?? null,
+        fileType: msg?.fileType ?? null,
+        mimeType: msg?.mimeType ?? null,
+        fileSize: msg?.fileSize ?? null,
+
+        // ✅ detect message type safely
+        messageType: msg?.messageType ?? (msg?.filePath ? 'media' : 'text')
       }
 
       showSystemNotification(normalized)
@@ -62,9 +72,7 @@ export const ChatProvider = ({
 
     const handleMessagesRead = (ids) => {
       setMessages((prev) =>
-        prev.map((m) =>
-          ids.includes(m.messageId) ? { ...m, isRead: true } : m
-        )
+        prev.map((m) => (ids.includes(m.messageId) ? { ...m, isRead: true } : m))
       )
       window.electron.clearUnread()
     }

@@ -25,8 +25,6 @@ const Landing = () => {
   const isLoadingRef = useRef(false)
   const initialLoadDoneRef = useRef(false)
 
-  console.log({refreshChat});
-
   const { connection, selectedFriendProfileId, getFriendList, messages, setMessages } = useChat()
 
   const isSameDay = (d1, d2) => {
@@ -158,8 +156,6 @@ const Landing = () => {
     try {
       const safeFileId = fileId ?? null
 
-      console.log({ messages })
-
       await connection.invoke(
         'SendMessage',
         currentUserId,
@@ -228,7 +224,7 @@ const Landing = () => {
     initialLoadDoneRef.current = false
 
     fetchInitialMessages()
-  }, [currentUserId, selectedFriendProfileId, refreshChat])
+  }, [currentUserId, selectedFriendProfileId])
 
   useEffect(() => {
     const onFocus = () => markMessagesAsRead()

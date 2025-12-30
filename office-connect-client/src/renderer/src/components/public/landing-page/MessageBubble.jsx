@@ -34,6 +34,7 @@ const MessageBubble = ({
       <PiCheck size={16} className="text-slate-400" />
     )
 
+
   return (
     <div
       data-message-id={messageId}

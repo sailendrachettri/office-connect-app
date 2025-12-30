@@ -9,7 +9,7 @@ const MediaPreview = ({ file, onRemove }) => {
   return (
     <div className="flex items-center w-[93%] gap-4 p-4 bg-green-50 rounded-lg border-2 border-dashed border-green-300 shadow-sm mb-3 relative">
       {/* Media preview */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         {type === 'image' && (
           <img
             src={previewUrl}
