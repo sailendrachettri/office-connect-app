@@ -1,5 +1,46 @@
-import { FiDownload, FiFileText, FiVideo, FiMusic, FiImage } from 'react-icons/fi'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
+import {
+  FiFileText,
+  FiImage,
+  FiVideo,
+  FiMusic,
+  FiArchive,
+  FiTerminal,
+  FiCpu,
+  FiFile,
+  FiDownload
+} from 'react-icons/fi'
+
+const FILE_ICONS = {
+  image: FiImage,
+  video: FiVideo,
+  audio: FiMusic,
+  document: FiFileText,
+  sheet: FiFileText,
+  archive: FiArchive,
+  executable: FiCpu,
+  code: FiTerminal,
+  other: FiFile
+}
+
+
+const getFileCategory = (msg) => {
+  if (msg.fileType === 'image') return 'image'
+  if (msg.fileType === 'video') return 'video'
+  if (msg.fileType === 'audio') return 'audio'
+
+  const ext = msg.fileExtension?.toLowerCase()
+
+  if (['.pdf', '.doc', '.docx', '.txt'].includes(ext)) return 'document'
+  if (['.xls', '.xlsx', '.csv'].includes(ext)) return 'sheet'
+  if (['.zip', '.rar', '.7z'].includes(ext)) return 'archive'
+  if (['.exe', '.msi'].includes(ext)) return 'executable'
+  if (['.js', '.ts', '.html', '.css', '.json'].includes(ext)) return 'code'
+
+  return 'other'
+}
+
+
 
 const formatSize = (bytes) => {
   if (!bytes) return ''
@@ -10,83 +51,108 @@ const formatSize = (bytes) => {
 
 const MediaMessage = ({ msg }) => {
   const fileUrl = viewUploadedFile(msg.filePath)
+  const thumbUrl = msg.thumbnailPath
+    ? viewUploadedFile(msg.thumbnailPath)
+    : null
+
+  const category = getFileCategory(msg)
+  const Icon = FILE_ICONS[category]
+
   const downloadFile = () => {
     const link = document.createElement('a')
     link.href = fileUrl
     link.download = msg.originalFileName
+    link.rel = 'noopener'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
-  console.log({ msg })
-
-  // IMAGE
-  if (msg.fileType === 'image') {
+  /* ---------------- IMAGE ---------------- */
+  if (category === 'image') {
     return (
       <div className="space-y-1">
         <img
-          src={viewUploadedFile(msg?.thumbnailPath)}
+          src={thumbUrl}
           alt={msg.originalFileName}
+          loading="lazy"
           className="rounded-lg max-w-55 cursor-pointer"
-          onClick={() => window.open(fileUrl)}
+          onClick={() => window.open(fileUrl, '_blank')}
         />
         {msg.messageText && (
-          <div className="text-sm text-white whitespace-pre-wrap">{msg.messageText}</div>
+          <div className="text-sm text-white whitespace-pre-wrap">
+            {msg.messageText}
+          </div>
         )}
       </div>
     )
   }
 
-  // VIDEO
-  if (msg.fileType === 'video') {
+  /* ---------------- VIDEO ---------------- */
+  if (category === 'video') {
     return (
       <div className="space-y-1 max-w-65">
-        <video controls className="rounded-lg w-full">
+        <video
+          controls
+          preload="metadata"
+          poster={thumbUrl ?? undefined}
+          className="rounded-lg w-full"
+        >
           <source src={fileUrl} type={msg.mimeType} />
         </video>
         {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
+          <div className="text-sm text-slate-700 whitespace-pre-wrap">
+            {msg.messageText}
+          </div>
         )}
       </div>
     )
   }
 
-  // AUDIO
-  if (msg.fileType === 'audio') {
+  /* ---------------- AUDIO ---------------- */
+  if (category === 'audio') {
     return (
       <div className="space-y-1 max-w-[260px]">
-        <audio controls className="w-full">
+        <audio controls preload="none" className="w-full">
           <source src={fileUrl} type={msg.mimeType} />
         </audio>
         {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
+          <div className="text-sm text-slate-700 whitespace-pre-wrap">
+            {msg.messageText}
+          </div>
         )}
       </div>
     )
   }
 
-  // DOCUMENT (PDF, DOC, SQL, etc.)
+  /* ---------------- DOCUMENT / OTHER ---------------- */
   return (
     <>
-      <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 max-w-70">
-        <FiFileText className="text-slate-500" size={24} />
+      <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 max-w-72">
+        <Icon className="text-slate-500 shrink-0" size={22} />
 
-        <div className="flex-1 overflow-hidden text-slate-700">
-          <div className="text-sm font-medium truncate">{msg.originalFileName}</div>
-          <div className="text-xs text-slate-500">{formatSize(msg.fileSize)}</div>
+        <div className="flex-1 overflow-hidden">
+          <div className="text-sm font-medium truncate text-slate-700">
+            {msg.originalFileName}
+          </div>
+          <div className="text-xs text-slate-500">
+            {formatSize(msg.fileSize)}
+          </div>
         </div>
 
         <button
           onClick={downloadFile}
-          className="p-2 rounded-full bg-slate-500 hover:bg-slate-600 cursor-pointer"
+          className="p-2 rounded-full bg-slate-500 hover:bg-slate-600 text-white"
           title="Download"
         >
           <FiDownload />
         </button>
       </div>
+
       {msg.messageText && (
-        <div className="text-sm text-white mt-1 whitespace-pre-wrap">{msg.messageText}</div>
+        <div className="text-sm text-white mt-1 whitespace-pre-wrap">
+          {msg.messageText}
+        </div>
       )}
     </>
   )
