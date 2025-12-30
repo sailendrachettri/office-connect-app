@@ -1,1 +1,1 @@
-export const APP_VERSION = '1.3.6'; // also change in package.json
+export const APP_VERSION = '1.3.7'; // also change in package.json
