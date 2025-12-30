@@ -13,6 +13,34 @@ public class FileRepository
         _dbFactory = dbFactory;
     }
 
+    public async Task<FileModel?> GetByIdAsync(Guid fileId)
+    {
+        const string sql = @"
+        SELECT
+            file_id            AS FileId,
+            uploaded_by        AS UploadedBy,
+            original_file_name AS OriginalFileName,
+            stored_file_name   AS StoredFileName,
+            file_extension     AS FileExtension,
+            file_type          AS FileType,
+            mime_type          AS MimeType,
+            file_size          AS FileSize,
+            file_path          AS FilePath,
+            thumbnail_path     AS ThumbnailPath,
+            created_at         AS CreatedAt
+        FROM utbl_files
+        WHERE file_id = @FileId
+        LIMIT 1;
+    ";
+
+        using var conn = _dbFactory.CreateConnection();
+        return await conn.QueryFirstOrDefaultAsync<FileModel>(
+            sql,
+            new { FileId = fileId }
+        );
+    }
+
+
     public async Task<Guid> AddFileAsync(FileModel file)
     {
         const string sql = @"

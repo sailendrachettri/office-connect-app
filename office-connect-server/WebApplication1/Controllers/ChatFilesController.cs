@@ -22,6 +22,35 @@ public class ChatFilesController : ControllerBase
         _env = env;
     }
 
+    [HttpGet("download/{fileId}")]
+    public async Task<IActionResult> Download(Guid fileId)
+    {
+        var file = await _fileRepo.GetByIdAsync(fileId);
+        if (file == null)
+            return NotFound("File not found");
+
+        var absolutePath = Path.Combine(
+            _env.ContentRootPath,
+            file.FilePath.TrimStart('/')
+                .Replace("/", Path.DirectorySeparatorChar.ToString())
+        );
+
+        if (!System.IO.File.Exists(absolutePath))
+            return NotFound("File missing on server");
+
+        Response.Headers.Add(
+            "Content-Disposition",
+            $"attachment; filename=\"{file.OriginalFileName}\""
+        );
+
+        return PhysicalFile(
+            absolutePath,
+            file.MimeType ?? "application/octet-stream"
+        );
+    }
+
+
+
     [HttpPost("upload")]
     [RequestSizeLimit(50_000_000)] // 50MB
     public async Task<IActionResult> UploadFile(

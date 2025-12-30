@@ -1,4 +1,6 @@
+import React from 'react'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
+import { downloadChatFile } from '../../../utils/file-downloads-from-server/downloadChatFile'
 import {
   FiFileText,
   FiImage,
@@ -23,13 +25,13 @@ const FILE_ICONS = {
   other: FiFile
 }
 
-
 const getFileCategory = (msg) => {
-  if (msg?.fileType === 'image') return 'image'
-  if (msg?.fileType === 'video') return 'video'
-  if (msg?.fileType === 'audio') return 'audio'
+  if (!msg) return 'other'
+  if (msg.fileType === 'image') return 'image'
+  if (msg.fileType === 'video') return 'video'
+  if (msg.fileType === 'audio') return 'audio'
 
-  const ext = msg?.fileExtension?.toLowerCase()
+  const ext = msg.fileExtension?.toLowerCase()
 
   if (['.pdf', '.doc', '.docx', '.txt'].includes(ext)) return 'document'
   if (['.xls', '.xlsx', '.csv'].includes(ext)) return 'sheet'
@@ -40,8 +42,6 @@ const getFileCategory = (msg) => {
   return 'other'
 }
 
-
-
 const formatSize = (bytes) => {
   if (!bytes) return ''
   const sizes = ['B', 'KB', 'MB', 'GB']
@@ -50,47 +50,55 @@ const formatSize = (bytes) => {
 }
 
 const MediaMessage = ({ msg }) => {
-  const fileUrl = viewUploadedFile(msg?.filePath)
-  const thumbUrl = msg?.thumbnailPath
-    ? viewUploadedFile(msg?.thumbnailPath)
-    : null
+  if (!msg) return null
 
+  const previewUrl =
+    msg.fileType === 'image' || msg.fileType === 'video' || msg.fileType === 'audio'
+      ? viewUploadedFile(msg.filePath)
+      : null
+
+  const downloadUrl = downloadChatFile(msg.fileId)
+  const thumbUrl = msg.thumbnailPath ? viewUploadedFile(msg.thumbnailPath) : null
   const category = getFileCategory(msg)
-  const Icon = FILE_ICONS[category]
+  const Icon = FILE_ICONS[category] || FiFile
 
-  const downloadFile = () => {
+  const handleDownload = () => {
     const link = document.createElement('a')
-    link.href = fileUrl
-    link.download = msg?.originalFileName
+    link.href = downloadUrl
+    link.download = msg.originalFileName || 'file'
     link.rel = 'noopener'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
-  console.log({msg})
-
-  /* ---------------- IMAGE ---------------- */
+  // IMAGE
   if (category === 'image') {
     return (
       <div className="space-y-1">
         <img
-          src={thumbUrl}
-          alt={msg?.originalFileName}
+          src={thumbUrl || previewUrl}
+          alt={msg.originalFileName}
           loading="lazy"
           className="rounded-lg max-w-55 cursor-pointer"
-          onClick={() => window.open(fileUrl, '_blank')}
+          onClick={() => window.open(previewUrl)} // preview in new tab
         />
-        {msg?.messageText && (
-          <div className="text-sm text-white whitespace-pre-wrap">
-            {msg?.messageText}
+        {msg.messageText && (
+          <div className="text-sm text-slate-700 whitespace-pre-wrap">
+            {msg.messageText}
           </div>
         )}
+        <button
+          onClick={handleDownload}
+          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
+        >
+          Download
+        </button>
       </div>
     )
   }
 
-  /* ---------------- VIDEO ---------------- */
+  // VIDEO
   if (category === 'video') {
     return (
       <div className="space-y-1 max-w-65">
@@ -100,34 +108,46 @@ const MediaMessage = ({ msg }) => {
           poster={thumbUrl ?? undefined}
           className="rounded-lg w-full"
         >
-          <source src={fileUrl} type={msg?.mimeType} />
+          <source src={previewUrl} type={msg.mimeType} />
         </video>
-        {msg?.messageText && (
+        {msg.messageText && (
           <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg?.messageText}
+            {msg.messageText}
           </div>
         )}
+        <button
+          onClick={handleDownload}
+          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
+        >
+          Download
+        </button>
       </div>
     )
   }
 
-  /* ---------------- AUDIO ---------------- */
+  // AUDIO
   if (category === 'audio') {
     return (
       <div className="space-y-1 max-w-[260px]">
         <audio controls preload="none" className="w-full">
-          <source src={fileUrl} type={msg?.mimeType} />
+          <source src={previewUrl} type={msg.mimeType} />
         </audio>
-        {msg?.messageText && (
+        {msg.messageText && (
           <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg?.messageText}
+            {msg.messageText}
           </div>
         )}
+        <button
+          onClick={handleDownload}
+          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
+        >
+          Download
+        </button>
       </div>
     )
   }
 
-  /* ---------------- DOCUMENT / OTHER ---------------- */
+  // DOCUMENT / OTHER FILES
   return (
     <>
       <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 max-w-72">
@@ -135,15 +155,13 @@ const MediaMessage = ({ msg }) => {
 
         <div className="flex-1 overflow-hidden">
           <div className="text-sm font-medium truncate text-slate-700">
-            {msg?.originalFileName}
+            {msg.originalFileName}
           </div>
-          <div className="text-xs text-slate-500">
-            {formatSize(msg?.fileSize)}
-          </div>
+          <div className="text-xs text-slate-500">{formatSize(msg.fileSize)}</div>
         </div>
 
         <button
-          onClick={downloadFile}
+          onClick={handleDownload}
           className="p-2 rounded-full bg-slate-500 hover:bg-slate-600 text-white"
           title="Download"
         >
@@ -151,9 +169,9 @@ const MediaMessage = ({ msg }) => {
         </button>
       </div>
 
-      {msg?.messageText && (
-        <div className="text-sm text-white mt-1 whitespace-pre-wrap">
-          {msg?.messageText}
+      {msg.messageText && (
+        <div className="text-sm text-slate-700 mt-1 whitespace-pre-wrap">
+          {msg.messageText}
         </div>
       )}
     </>

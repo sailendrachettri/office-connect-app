@@ -12,6 +12,7 @@ export const UPLOAD_FILES_URL = 'api/v1/upload';
 
 export const MESSAGES_URL = 'api/messages'
 export const FILE_MESSAGES_URL = '/api/chat-files/upload'
+export const DOWNLOAD_FILES_URL = '/api/chat-files/download';
 
 export const REFRESH_URL = "/api/v1/auth/refresh";
 export const LOGOUT_URL = "/api/v1/auth/logout";
