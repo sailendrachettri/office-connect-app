@@ -25,11 +25,11 @@ const FILE_ICONS = {
 
 
 const getFileCategory = (msg) => {
-  if (msg.fileType === 'image') return 'image'
-  if (msg.fileType === 'video') return 'video'
-  if (msg.fileType === 'audio') return 'audio'
+  if (msg?.fileType === 'image') return 'image'
+  if (msg?.fileType === 'video') return 'video'
+  if (msg?.fileType === 'audio') return 'audio'
 
-  const ext = msg.fileExtension?.toLowerCase()
+  const ext = msg?.fileExtension?.toLowerCase()
 
   if (['.pdf', '.doc', '.docx', '.txt'].includes(ext)) return 'document'
   if (['.xls', '.xlsx', '.csv'].includes(ext)) return 'sheet'
@@ -50,9 +50,9 @@ const formatSize = (bytes) => {
 }
 
 const MediaMessage = ({ msg }) => {
-  const fileUrl = viewUploadedFile(msg.filePath)
-  const thumbUrl = msg.thumbnailPath
-    ? viewUploadedFile(msg.thumbnailPath)
+  const fileUrl = viewUploadedFile(msg?.filePath)
+  const thumbUrl = msg?.thumbnailPath
+    ? viewUploadedFile(msg?.thumbnailPath)
     : null
 
   const category = getFileCategory(msg)
@@ -61,12 +61,14 @@ const MediaMessage = ({ msg }) => {
   const downloadFile = () => {
     const link = document.createElement('a')
     link.href = fileUrl
-    link.download = msg.originalFileName
+    link.download = msg?.originalFileName
     link.rel = 'noopener'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
+
+  console.log({msg})
 
   /* ---------------- IMAGE ---------------- */
   if (category === 'image') {
@@ -74,14 +76,14 @@ const MediaMessage = ({ msg }) => {
       <div className="space-y-1">
         <img
           src={thumbUrl}
-          alt={msg.originalFileName}
+          alt={msg?.originalFileName}
           loading="lazy"
           className="rounded-lg max-w-55 cursor-pointer"
           onClick={() => window.open(fileUrl, '_blank')}
         />
-        {msg.messageText && (
+        {msg?.messageText && (
           <div className="text-sm text-white whitespace-pre-wrap">
-            {msg.messageText}
+            {msg?.messageText}
           </div>
         )}
       </div>
@@ -98,11 +100,11 @@ const MediaMessage = ({ msg }) => {
           poster={thumbUrl ?? undefined}
           className="rounded-lg w-full"
         >
-          <source src={fileUrl} type={msg.mimeType} />
+          <source src={fileUrl} type={msg?.mimeType} />
         </video>
-        {msg.messageText && (
+        {msg?.messageText && (
           <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg.messageText}
+            {msg?.messageText}
           </div>
         )}
       </div>
@@ -114,11 +116,11 @@ const MediaMessage = ({ msg }) => {
     return (
       <div className="space-y-1 max-w-[260px]">
         <audio controls preload="none" className="w-full">
-          <source src={fileUrl} type={msg.mimeType} />
+          <source src={fileUrl} type={msg?.mimeType} />
         </audio>
-        {msg.messageText && (
+        {msg?.messageText && (
           <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg.messageText}
+            {msg?.messageText}
           </div>
         )}
       </div>
@@ -133,10 +135,10 @@ const MediaMessage = ({ msg }) => {
 
         <div className="flex-1 overflow-hidden">
           <div className="text-sm font-medium truncate text-slate-700">
-            {msg.originalFileName}
+            {msg?.originalFileName}
           </div>
           <div className="text-xs text-slate-500">
-            {formatSize(msg.fileSize)}
+            {formatSize(msg?.fileSize)}
           </div>
         </div>
 
@@ -149,9 +151,9 @@ const MediaMessage = ({ msg }) => {
         </button>
       </div>
 
-      {msg.messageText && (
+      {msg?.messageText && (
         <div className="text-sm text-white mt-1 whitespace-pre-wrap">
-          {msg.messageText}
+          {msg?.messageText}
         </div>
       )}
     </>
