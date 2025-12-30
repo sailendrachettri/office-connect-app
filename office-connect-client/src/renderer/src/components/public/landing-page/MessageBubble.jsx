@@ -4,7 +4,6 @@ import { MdOutlineCheck } from 'react-icons/md'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
-import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
 import MediaMessage from './MediaMessage'
 
 const MessageBubble = ({
