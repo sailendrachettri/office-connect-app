@@ -75,25 +75,20 @@ const MediaMessage = ({ msg }) => {
   // IMAGE
   if (category === 'image') {
     return (
-      <div className="space-y-1">
+      <div className="space-y-1" onClick={handleDownload}>
         <img
           src={thumbUrl || previewUrl}
           alt={msg.originalFileName}
           loading="lazy"
           className="rounded-lg max-w-55 cursor-pointer"
-          onClick={() => window.open(previewUrl)} // preview in new tab
+          // onClick={() => window.open(previewUrl)} // preview in new tab
         />
         {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">
+          <div className="text-sm text-white whitespace-pre-wrap">
             {msg.messageText}
           </div>
         )}
-        <button
-          onClick={handleDownload}
-          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
-        >
-          Download
-        </button>
+       
       </div>
     )
   }
@@ -154,10 +149,10 @@ const MediaMessage = ({ msg }) => {
         <Icon className="text-slate-500 shrink-0" size={22} />
 
         <div className="flex-1 overflow-hidden">
-          <div className="text-sm font-medium truncate text-slate-700">
+          <div className="text-sm font-medium truncate text-wrap text-slate-700">
             {msg.originalFileName}
           </div>
-          <div className="text-xs text-slate-500">{formatSize(msg.fileSize)}</div>
+          <div className="text-xs text-white">{formatSize(msg.fileSize)}</div>
         </div>
 
         <button
@@ -170,7 +165,7 @@ const MediaMessage = ({ msg }) => {
       </div>
 
       {msg.messageText && (
-        <div className="text-sm text-slate-700 mt-1 whitespace-pre-wrap">
+        <div className="text-sm text-white mt-1 text-wrap whitespace-pre-wrap">
           {msg.messageText}
         </div>
       )}

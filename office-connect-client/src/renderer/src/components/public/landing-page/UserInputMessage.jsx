@@ -71,6 +71,8 @@ const UserInputMessage = ({
         }
 
         setRefreshChat((prev) => !prev)
+      }else{
+        sendMessage();
       }
 
       setText('')
