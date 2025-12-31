@@ -48,8 +48,6 @@ const MediaMessage = ({ msg }) => {
     downloadChatFile(msg.fileId, msg?.originalFileName)
   }
 
-  console.log(msg)
-
   // IMAGE
   if (category === 'image') {
     return (
@@ -136,14 +134,14 @@ const MediaMessage = ({ msg }) => {
           <div className="text-sm font-medium truncate text-wrap text-slate-700">
             {msg.originalFileName}
           </div>
-          <div className="text-xs text-white">{formatSize(msg.fileSize)}</div>
+          <div className="text-xs text-slate-700">{formatSize(msg.fileSize)}</div>
         </div>
 
         <button
           onClick={() => {
             handleDownload()
           }}
-          className="p-2 rounded-full bg-slate-500 hover:bg-slate-600 text-white"
+          className="p-2 rounded-full cursor-pointer bg-slate-500 hover:bg-slate-600 text-white"
           title="Download"
         >
           <FiDownload />

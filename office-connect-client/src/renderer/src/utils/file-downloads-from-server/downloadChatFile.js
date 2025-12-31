@@ -2,8 +2,7 @@ import { axiosPrivate } from '../../api/api'
 import { DOWNLOAD_FILES_URL } from '../../api/routes_urls'
 
 export const downloadChatFile = async (fileId, fileName = 'file') => {
-  console.log({fileId})
-  console.log({fileName})
+
   const res = await axiosPrivate.get(`${DOWNLOAD_FILES_URL}/${fileId}`, {
     responseType: 'blob',
     onDownloadProgress: (progressEvent) => {

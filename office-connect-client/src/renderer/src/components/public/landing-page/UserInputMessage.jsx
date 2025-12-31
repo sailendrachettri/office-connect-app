@@ -62,7 +62,6 @@ const UserInputMessage = ({
       // Send the medias with text in chat
       if (selectedMedia) {
         const res = await uploadMediaChat(selectedMedia, text, selectedFriendProfileId)
-        console.log(res)
         if (res?.data) {
           const msg = res.data
 

@@ -45,8 +45,6 @@ export const uploadMediaChat = async (file, text, selectedFriendProfileId) => {
       { headers: { 'Content-Type': 'multipart/form-data' } }
     )
 
-    console.log(res);
-
     return res
   } catch (error) {
     console.error("❌ not able to upload chat media", error)

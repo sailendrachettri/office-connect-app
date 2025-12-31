@@ -33,8 +33,6 @@ export const ChatProvider = ({ connection, getFriendList, restoreSession, childr
     const handleReceiveMessage = (msg) => {
       getFriendList?.()
 
-      console.log('msg ->', msg)
-
       const normalized = {
         messageId: msg?.messageId ?? msg?.message_id,
         senderId: msg?.senderId ?? msg?.sender_id,
