@@ -57,25 +57,23 @@ const MediaMessage = ({ msg }) => {
       ? viewUploadedFile(msg.filePath)
       : null
 
-  const downloadUrl = downloadChatFile(msg.fileId)
   const thumbUrl = msg.thumbnailPath ? viewUploadedFile(msg.thumbnailPath) : null
   const category = getFileCategory(msg)
   const Icon = FILE_ICONS[category] || FiFile
 
   const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = downloadUrl
-    link.download = msg.originalFileName || 'file'
-    link.rel = 'noopener'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    downloadChatFile(msg.fileId, msg?.originalFileName)
   }
 
   // IMAGE
   if (category === 'image') {
     return (
-      <div className="space-y-1" onClick={handleDownload}>
+      <div
+        className="space-y-1"
+        onClick={() => {
+          handleDownload()
+        }}
+      >
         <img
           src={thumbUrl || previewUrl}
           alt={msg.originalFileName}
@@ -84,11 +82,8 @@ const MediaMessage = ({ msg }) => {
           // onClick={() => window.open(previewUrl)} // preview in new tab
         />
         {msg.messageText && (
-          <div className="text-sm text-white whitespace-pre-wrap">
-            {msg.messageText}
-          </div>
+          <div className="text-sm text-white whitespace-pre-wrap">{msg.messageText}</div>
         )}
-       
       </div>
     )
   }
@@ -106,12 +101,12 @@ const MediaMessage = ({ msg }) => {
           <source src={previewUrl} type={msg.mimeType} />
         </video>
         {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg.messageText}
-          </div>
+          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
         )}
         <button
-          onClick={handleDownload}
+          onClick={() => {
+            handleDownload()
+          }}
           className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
         >
           Download
@@ -123,17 +118,17 @@ const MediaMessage = ({ msg }) => {
   // AUDIO
   if (category === 'audio') {
     return (
-      <div className="space-y-1 max-w-[260px]">
+      <div className="space-y-1 max-w-65">
         <audio controls preload="none" className="w-full">
           <source src={previewUrl} type={msg.mimeType} />
         </audio>
         {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">
-            {msg.messageText}
-          </div>
+          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
         )}
         <button
-          onClick={handleDownload}
+          onClick={() => {
+            handleDownload()
+          }}
           className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
         >
           Download
@@ -156,7 +151,9 @@ const MediaMessage = ({ msg }) => {
         </div>
 
         <button
-          onClick={handleDownload}
+          onClick={() => {
+            handleDownload()
+          }}
           className="p-2 rounded-full bg-slate-500 hover:bg-slate-600 text-white"
           title="Download"
         >
