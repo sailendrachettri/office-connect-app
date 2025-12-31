@@ -49,7 +49,7 @@ Start the Server
 ```
 
 # New feature to be added
-- File sharing, docs, mp4, mp3 etc
+- File sharing, docs, mp4, mp3 etc [developing...]
 - Real time status update
 - Edit profile details
 - Search messages
@@ -58,6 +58,7 @@ Start the Server
 - Delete message
 - Temorary message
 - Emojies and Gif in Chats
+- Dark mode
 
 # Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=1z3ILSm1zug2hxGTB-UaDln4d53EfzA24" alt="Register page"></p>
