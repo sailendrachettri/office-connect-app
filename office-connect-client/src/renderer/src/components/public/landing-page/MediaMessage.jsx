@@ -32,7 +32,6 @@ const FILE_ICONS = {
 
 const MediaMessage = ({ msg }) => {
   const [previewImage, setPreviewImage] = useState(null)
-  const [originalFileName, setOriginalFileName] = useState('image')
 
   if (!msg) return null
 

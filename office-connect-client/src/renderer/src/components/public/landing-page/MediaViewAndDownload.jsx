@@ -37,7 +37,7 @@ const MediaViewAndDownload = ({ previewImage, setPreviewImage, handleDownload })
             e.stopPropagation()
             handleDownload()
           }}
-          className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white"
+          className="p-2 rounded-full cursor-pointer bg-white/20 hover:bg-white/30 text-white"
         >
           <FiDownload size={18} />
         </button>
@@ -47,7 +47,7 @@ const MediaViewAndDownload = ({ previewImage, setPreviewImage, handleDownload })
             e.stopPropagation()
             closePreview()
           }}
-          className="py-2 px-3 rounded-full bg-white/20 hover:bg-white/30 text-white"
+          className="py-2 px-3 cursor-pointer rounded-full bg-white/20 hover:bg-white/30 text-white"
         >
           ✕
         </button>
@@ -66,6 +66,5 @@ const MediaViewAndDownload = ({ previewImage, setPreviewImage, handleDownload })
     </div>
   )
 }
-
 
 export default MediaViewAndDownload
