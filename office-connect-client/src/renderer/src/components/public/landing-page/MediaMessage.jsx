@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
 import { downloadChatFile } from '../../../utils/file-downloads-from-server/downloadChatFile'
 import {
@@ -12,6 +12,11 @@ import {
   FiFile,
   FiDownload
 } from 'react-icons/fi'
+import {
+  formatSize,
+  getFileCategory
+} from '../../../utils/file-downloads-from-server/getFileCategory'
+import MediaViewAndDownload from './MediaViewAndDownload'
 
 const FILE_ICONS = {
   image: FiImage,
@@ -25,31 +30,10 @@ const FILE_ICONS = {
   other: FiFile
 }
 
-const getFileCategory = (msg) => {
-  if (!msg) return 'other'
-  if (msg.fileType === 'image') return 'image'
-  if (msg.fileType === 'video') return 'video'
-  if (msg.fileType === 'audio') return 'audio'
-
-  const ext = msg.fileExtension?.toLowerCase()
-
-  if (['.pdf', '.doc', '.docx', '.txt'].includes(ext)) return 'document'
-  if (['.xls', '.xlsx', '.csv'].includes(ext)) return 'sheet'
-  if (['.zip', '.rar', '.7z'].includes(ext)) return 'archive'
-  if (['.exe', '.msi'].includes(ext)) return 'executable'
-  if (['.js', '.ts', '.html', '.css', '.json'].includes(ext)) return 'code'
-
-  return 'other'
-}
-
-const formatSize = (bytes) => {
-  if (!bytes) return ''
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
-}
-
 const MediaMessage = ({ msg }) => {
+  const [previewImage, setPreviewImage] = useState(null)
+  const [originalFileName, setOriginalFileName] = useState('image')
+
   if (!msg) return null
 
   const previewUrl =
@@ -65,26 +49,32 @@ const MediaMessage = ({ msg }) => {
     downloadChatFile(msg.fileId, msg?.originalFileName)
   }
 
+  console.log(msg)
+
   // IMAGE
   if (category === 'image') {
     return (
-      <div
-        className="space-y-1"
-        onClick={() => {
-          handleDownload()
-        }}
-      >
-        <img
-          src={thumbUrl || previewUrl}
-          alt={msg.originalFileName}
-          loading="lazy"
-          className="rounded-lg max-w-55 cursor-pointer"
-          // onClick={() => window.open(previewUrl)} // preview in new tab
+      <>
+        <MediaViewAndDownload
+          previewImage={previewImage}
+          setPreviewImage={setPreviewImage}
+          handleDownload={handleDownload}
         />
-        {msg.messageText && (
-          <div className="text-sm text-white whitespace-pre-wrap">{msg.messageText}</div>
-        )}
-      </div>
+        <div className="space-y-1">
+          <img
+            src={thumbUrl || previewUrl}
+            alt={msg.originalFileName}
+            loading="lazy"
+            className="rounded-lg max-w-55 cursor-pointer"
+            onClick={() => {
+              setPreviewImage(viewUploadedFile(msg.filePath))
+            }}
+          />
+          {msg.messageText && (
+            <div className="text-sm text-white whitespace-pre-wrap">{msg.messageText}</div>
+          )}
+        </div>
+      </>
     )
   }
 
