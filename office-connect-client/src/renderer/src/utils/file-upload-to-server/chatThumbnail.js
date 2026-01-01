@@ -32,9 +32,8 @@ export const generateImageThumbnail = (file) => {
     img.src = url
   })
 }
-
 // =======================
-// VIDEO THUMBNAIL
+// VIDEO THUMBNAIL (FIXED)
 // =======================
 export const generateVideoThumbnail = (file) => {
   return new Promise((resolve, reject) => {
@@ -44,28 +43,42 @@ export const generateVideoThumbnail = (file) => {
 
     video.preload = 'metadata'
     video.muted = true
-    video.src = URL.createObjectURL(file)
+    video.playsInline = true
 
-    video.onloadeddata = () => {
-      video.currentTime = 1
+    const blobUrl = URL.createObjectURL(file)
+    video.src = blobUrl
+
+    // 1️⃣ Wait for metadata (duration, size)
+    video.onloadedmetadata = () => {
+      // Seek safely (handle short videos)
+      const seekTime = Math.min(1, video.duration / 2)
+      video.currentTime = seekTime
     }
 
+    // 2️⃣ Draw frame after seek
     video.onseeked = () => {
-      canvas.width = 300
-      canvas.height = (video.videoHeight / video.videoWidth) * 300
+      const width = 300
+      const scale = video.videoHeight / video.videoWidth
+
+      canvas.width = width
+      canvas.height = width * scale
 
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
       canvas.toBlob(
         (blob) => {
-          URL.revokeObjectURL(video.src)
+          URL.revokeObjectURL(blobUrl)
           resolve(blob)
         },
         'image/jpeg',
-        0.7
+        0.75
       )
     }
 
-    video.onerror = reject
+    video.onerror = (e) => {
+      URL.revokeObjectURL(blobUrl)
+      reject(e)
+    }
   })
 }
+

@@ -17,6 +17,7 @@ import {
   getFileCategory
 } from '../../../utils/file-downloads-from-server/getFileCategory'
 import MediaViewAndDownload from './MediaViewAndDownload'
+import VideoMessage from './BubbleMessages/VideoMessage'
 
 const FILE_ICONS = {
   image: FiImage,
@@ -78,27 +79,7 @@ const MediaMessage = ({ msg }) => {
   // VIDEO
   if (category === 'video') {
     return (
-      <div className="space-y-1 max-w-65">
-        <video
-          controls
-          preload="metadata"
-          poster={thumbUrl ?? undefined}
-          className="rounded-lg w-full"
-        >
-          <source src={previewUrl} type={msg.mimeType} />
-        </video>
-        {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
-        )}
-        <button
-          onClick={() => {
-            handleDownload()
-          }}
-          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
-        >
-          Download
-        </button>
-      </div>
+      <VideoMessage formatSize={formatSize} handleDownload={handleDownload} msg={msg} thumbUrl={thumbUrl} />
     )
   }
 
@@ -107,7 +88,7 @@ const MediaMessage = ({ msg }) => {
     return (
       <div className="space-y-1 max-w-65">
         <audio controls preload="none" className="w-full">
-          <source src={previewUrl} type={msg.mimeType} />
+          <source src={thumbUrl} type={msg.mimeType} />
         </audio>
         {msg.messageText && (
           <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
