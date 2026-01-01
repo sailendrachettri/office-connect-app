@@ -13,9 +13,7 @@ const Landing = () => {
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
   const [oldestMessageId, setOldestMessageId] = useState(null)
-  const [fileId, setFileId] = useState(null)
   const [selectedMedia, setSelectedMedia] = useState(null)
-  const [refreshChat, setRefreshChat] = useState(false);
 
   const observerRef = useRef(null)
   const unreadMessageIdsRef = useRef(new Set())
@@ -154,7 +152,7 @@ const Landing = () => {
     setText('')
 
     try {
-      const safeFileId = fileId ?? null
+      const safeFileId = null;
 
       await connection.invoke(
         'SendMessage',
@@ -305,10 +303,8 @@ const Landing = () => {
         sendMessage={sendMessage}
         setText={setText}
         text={text}
-        setFileId={setFileId}
         selectedMedia={selectedMedia}
         setSelectedMedia={setSelectedMedia}
-        setRefreshChat={setRefreshChat}
       />
     </div>
   )

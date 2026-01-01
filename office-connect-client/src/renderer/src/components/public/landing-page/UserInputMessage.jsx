@@ -4,17 +4,18 @@ import { IoMdSend } from 'react-icons/io'
 import { useChat } from '../../../context/ChatContext'
 import MediaPreview from './MediaPreview'
 import { uploadMediaChat } from '../../../utils/file-upload-to-server/uploadMediaChat'
+import toast from 'react-hot-toast'
 
 const MAX_HEIGHT = 120
+const MAX_SIZE_MB = 45
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 const UserInputMessage = ({
   text,
   setText,
   sendMessage,
-  setFileId,
   selectedMedia,
-  setSelectedMedia,
-  setRefreshChat
+  setSelectedMedia
 }) => {
   const typingTimeoutRef = useRef(null)
   const isTypingRef = useRef(false)
@@ -25,7 +26,15 @@ const UserInputMessage = ({
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0]
+    console.log(file?.size)
+
     if (!file) return
+
+    if (file.size > MAX_SIZE_BYTES) {
+      toast.error(`File size must be under ${MAX_SIZE_MB} MB`)
+      e.target.value = '' // reset input
+      return
+    }
 
     setSelectedMedia(file)
   }
@@ -69,9 +78,8 @@ const UserInputMessage = ({
           await connection.invoke('BroadcastUploadedMessage', msg)
         }
 
-        setRefreshChat((prev) => !prev)
-      }else{
-        sendMessage();
+      } else {
+        sendMessage()
       }
 
       setText('')
