@@ -16,8 +16,9 @@ import {
   formatSize,
   getFileCategory
 } from '../../../utils/file-downloads-from-server/getFileCategory'
-import MediaViewAndDownload from './MediaViewAndDownload'
 import VideoMessage from './BubbleMessages/VideoMessage'
+import PhotosViewAndDownload from './BubbleMessages/MediaViewAndDownload'
+import MusicPlayAndDownload from './BubbleMessages/MusicPlayAndDownload'
 
 const FILE_ICONS = {
   image: FiImage,
@@ -53,7 +54,7 @@ const MediaMessage = ({ msg }) => {
   if (category === 'image') {
     return (
       <>
-        <MediaViewAndDownload
+        <PhotosViewAndDownload
           previewImage={previewImage}
           setPreviewImage={setPreviewImage}
           handleDownload={handleDownload}
@@ -86,22 +87,10 @@ const MediaMessage = ({ msg }) => {
   // AUDIO
   if (category === 'audio') {
     return (
-      <div className="space-y-1 max-w-65">
-        <audio controls preload="none" className="w-full">
-          <source src={thumbUrl} type={msg.mimeType} />
-        </audio>
-        {msg.messageText && (
-          <div className="text-sm text-slate-700 whitespace-pre-wrap">{msg.messageText}</div>
-        )}
-        <button
-          onClick={() => {
-            handleDownload()
-          }}
-          className="mt-1 px-3 py-1 rounded bg-slate-500 hover:bg-slate-600 text-white text-sm"
-        >
-          Download
-        </button>
-      </div>
+     
+      <>
+      <MusicPlayAndDownload handleDownload={handleDownload} msg={msg} formatSize={formatSize} />
+      </>
     )
   }
 
