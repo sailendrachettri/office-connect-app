@@ -12,6 +12,30 @@ public class ChatHub : Hub
         _repo = repo;
     }
 
+    public async Task DeleteMessage(long messageId, Guid receiverId)
+    {
+        var deletedBy = Guid.Parse(
+            Context.GetHttpContext()!.Request.Query["userId"]!
+        );
+
+        // Delete from DB
+        var result = await _repo.DeleteMessageAsync(messageId);
+
+        if (!result.Success)
+            return;
+
+        // Notify BOTH users
+        await Clients.Groups(
+            deletedBy.ToString(),
+            receiverId.ToString()
+        ).SendAsync("MessageDeleted", new
+        {
+            messageId = messageId,
+            deletedBy = deletedBy
+        });
+    }
+
+
     public async Task UserTyping(Guid receiverId)
     {
         var senderId = Guid.Parse(

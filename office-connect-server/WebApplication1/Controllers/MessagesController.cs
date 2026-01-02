@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Npgsql.Replication.PgOutput.Messages;
 using OfficeConnectServer.Data;
 using OfficeConnectServer.Models;
+using OfficeConnectServer.Responses;
 
 [ApiController]
 [Route("api/messages")]
@@ -19,6 +22,29 @@ public class MessagesController : ControllerBase
         var messages = await _repo.GetChatAsync(user1, user2);
         return Ok(messages);
     }
+
+    [Authorize]
+    [HttpPost("delete-message")]
+    public async Task<IActionResult> DeleteMessage([FromBody] DeleteMessageRequest req)
+    {
+        if (req == null || req.MessageId <= 0)
+        {
+            return BadRequest(new ApiResponse<bool>(
+                false,
+                "Invalid message id",
+                false
+            ));
+        }
+
+        var response = await _repo.DeleteMessageAsync(req.MessageId);
+
+        if (!response.Success)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
+
 
     [HttpPost]
     public async Task<IActionResult> SendMessage([FromBody] MessageSendRequest request)

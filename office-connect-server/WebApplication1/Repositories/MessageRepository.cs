@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using OfficeConnectServer.Models;
+using OfficeConnectServer.Responses;
 
 namespace OfficeConnectServer.Data
 {
@@ -12,6 +13,36 @@ namespace OfficeConnectServer.Data
         {
             _dbFactory = dbFactory;
         }
+
+        public async Task<ApiResponse<bool>> DeleteMessageAsync(long messageId)
+        {
+            const string sql = @"
+        SELECT public.delete_message(@message_id)::json;
+    ";
+
+            using var conn = _dbFactory.CreateConnection();
+            await conn.OpenAsync();
+
+            var result = await conn.ExecuteScalarAsync<string>(sql, new
+            {
+                message_id = messageId
+            });
+
+            // Simple parse (no extra models needed)
+            var json = System.Text.Json.JsonDocument.Parse(result);
+            var root = json.RootElement;
+
+            var success = root.GetProperty("status").GetBoolean();
+            var message = root.GetProperty("message").GetString() ?? "Unknown";
+
+            return new ApiResponse<bool>(
+                success,
+                message,
+                success
+            );
+        }
+
+
 
 
         public async Task MarkMessagesReadAsync(
@@ -70,6 +101,7 @@ namespace OfficeConnectServer.Data
                         OR (sender_id=@user2 AND receiver_id=@user1)
                     )
                     AND message_id < @beforeMessageId
+                    AND is_deleted = false
                     ORDER BY message_id DESC
                     LIMIT @pageSize
                 ";
@@ -94,8 +126,12 @@ namespace OfficeConnectServer.Data
                         is_read     AS ""IsRead"",
                         created_at  AS ""CreatedAt""
                     FROM utbl_messages
-                    WHERE (sender_id=@user1 AND receiver_id=@user2)
-                       OR (sender_id=@user2 AND receiver_id=@user1)
+                    WHERE (
+                        (sender_id=@user1 AND receiver_id=@user2)
+                        OR (sender_id=@user2 AND receiver_id=@user1)
+                    )
+                    AND is_deleted = false
+
                     ORDER BY message_id DESC
                     LIMIT @pageSize
                 ";
@@ -123,6 +159,7 @@ namespace OfficeConnectServer.Data
                         OR (sender_id=@user2 AND receiver_id=@user1)
                     )
                     AND message_id < @oldestMessageId
+                    AND is_deleted = false
                 ";
 
                 var olderCount = await conn.ExecuteScalarAsync<int>(countSql, new

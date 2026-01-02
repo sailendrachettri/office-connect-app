@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IoCopyOutline } from 'react-icons/io5'
 import { MdOutlineCheck } from 'react-icons/md'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { BsCheck2All } from 'react-icons/bs'
 import { PiCheck } from 'react-icons/pi'
 import MediaMessage from './MediaMessage'
+import MessageActions from './BubbleMessages/MessageActions'
+import toast from 'react-hot-toast'
+import { useChat } from '../../../context/ChatContext'
 
 const MessageBubble = ({
   text,
@@ -19,11 +22,27 @@ const MessageBubble = ({
   fullChat
 }) => {
   const [copied, setCopied] = useState(false)
+  const { connection } = useChat()
+
+  console.log({ fullChat })
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleMessageDelete = async () => {
+    try {
+      const receiverId = fullChat?.receiverId
+
+      await connection.invoke('DeleteMessage', messageId, receiverId)
+
+      toast.success('Message deleted')
+    } catch (error) {
+      console.error('not able to delete message', error)
+      toast.error('Delete failed')
+    }
   }
 
   const renderStatus = (status) =>
@@ -32,7 +51,6 @@ const MessageBubble = ({
     ) : (
       <PiCheck size={16} className="text-slate-400" />
     )
-
 
   return (
     <div
@@ -95,8 +113,7 @@ const MessageBubble = ({
 
       {/* RIGHT MESSAGE → copy on right */}
       {fromMe && (
-        <button
-          onClick={handleCopy}
+        <div
           className="
             ml-2 self-start mt-2
             opacity-0 group-hover:opacity-100
@@ -109,9 +126,9 @@ const MessageBubble = ({
           {copied ? (
             <MdOutlineCheck size={16} className="text-secondary" />
           ) : (
-            <IoCopyOutline size={16} className="cursor-pointer" />
+            <MessageActions handleCopy={handleCopy} handleMessageDelete={handleMessageDelete} />
           )}
-        </button>
+        </div>
       )}
     </div>
   )

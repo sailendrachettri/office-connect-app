@@ -1,6 +1,11 @@
 ﻿namespace OfficeConnectServer.Models
 {
 
+    public class DeleteMessageRequest
+    {
+        public long MessageId { get; set; }
+    }
+
     public class MessageModelDto
     {
         public long MessageId { get; set; }

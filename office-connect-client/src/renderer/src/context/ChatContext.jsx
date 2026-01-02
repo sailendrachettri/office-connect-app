@@ -16,6 +16,20 @@ export const ChatProvider = ({ connection, getFriendList, restoreSession, childr
   }, [refresh])
 
   useEffect(() => {
+      if (!connection) return
+
+      const onMessageDeleted = ({ messageId }) => {
+        setMessages((prev) => prev.filter((m) => m.messageId !== messageId))
+      }
+
+      connection.on('MessageDeleted', onMessageDeleted)
+
+      return () => {
+        connection.off('MessageDeleted', onMessageDeleted)
+      }
+    }, [connection])
+
+  useEffect(() => {
     if (!connection) return
 
     const handleUserTyping = (senderId) => {
