@@ -68,7 +68,7 @@ const MessageBubble = ({
 
       {/* MESSAGE BUBBLE */}
       <div
-        className={`max-w-xs px-6 py-3 rounded-xl text-sm shadow
+        className={`max-w-xs p-3 rounded-xl text-sm shadow
           ${
             fromMe
               ? 'bg-primary text-white rounded-br-none'

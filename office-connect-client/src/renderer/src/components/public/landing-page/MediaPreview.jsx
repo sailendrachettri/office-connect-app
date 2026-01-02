@@ -2,51 +2,66 @@ import { getMediaType } from '../../../utils/file-upload-to-server/getMediaType'
 import { AiOutlineFile } from 'react-icons/ai'
 import { MdClose } from 'react-icons/md'
 
+const formatSize = (bytes) => {
+  if (!bytes) return ''
+  const kb = bytes / 1024
+  if (kb < 1024) return `${kb.toFixed(1)} KB`
+  return `${(kb / 1024).toFixed(1)} MB`
+}
+
 const MediaPreview = ({ file, onRemove }) => {
   const type = getMediaType(file)
   const previewUrl = URL.createObjectURL(file)
 
   return (
     <div className="flex items-center w-[93%] gap-4 p-4 bg-green-50 rounded-lg border-2 border-dashed border-green-300 shadow-sm mb-3 relative">
-      {/* Media preview */}
+      {/* Thumbnail / Icon */}
       <div className="shrink-0">
         {type === 'image' && (
           <img
             src={previewUrl}
             alt="preview"
-            className="w-24 h-24 object-cover rounded-md border border-slate-200"
+            className="w-20 h-20 object-cover rounded-lg border"
           />
         )}
 
         {type === 'video' && (
-          <video
-            src={previewUrl}
-            controls
-            className="w-32 h-24 rounded-md border border-slate-200"
-          />
+          <video src={previewUrl} className="w-20 h-20 rounded-lg border object-cover" muted />
         )}
 
         {type === 'audio' && (
-          <div className="flex flex-col items-center justify-center w-32 h-20 bg-slate-100 rounded-md border border-slate-200 p-2">
-            <audio src={previewUrl} controls className="w-full" />
+          <div className="w-20 h-20 flex items-center justify-center rounded-lg border bg-slate-100">
+            🎵
           </div>
         )}
 
         {type === 'document' && (
-          <div className="flex items-center gap-2 w-32 h-20 bg-slate-100 rounded-md border border-slate-200 p-2">
-            <AiOutlineFile size={24} className="text-slate-500" />
-            <span className="text-sm font-medium text-slate-700 truncate">{file?.name}</span>
+          <div className="w-20 h-20 flex items-center justify-center rounded-lg border bg-slate-100">
+            <AiOutlineFile size={28} className="text-slate-500" />
           </div>
         )}
+      </div>
+
+      {/* File info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-800">
+          {file?.name?.length > 90 ? `${file.name.substring(0, 90)}...` : file?.name}
+        </p>
+
+        <p className="text-xs text-slate-500 mt-1">{formatSize(file?.size)}</p>
+
+        {type === 'audio' && <audio src={previewUrl} controls className="mt-2 w-full h-8" />}
+
+        {type === 'video' && <p className="text-xs text-slate-400 mt-2">Video attached</p>}
       </div>
 
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className="absolute top-2 right-2 text-red-500 hover:text-red-600"
+        className="absolute top-2 right-2 p-1 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-red-500 hover:border-red-300 transition"
         title="Remove"
       >
-        <MdClose size={20} />
+        <MdClose size={16} />
       </button>
     </div>
   )
