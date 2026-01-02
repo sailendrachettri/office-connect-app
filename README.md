@@ -49,13 +49,11 @@ Start the Server
 ```
 
 # New feature to be added
-- File sharing, docs, mp4, mp3 etc [developing...]
 - Real time status update
 - Edit profile details
 - Search messages
 - Group Chats
 - Message Encryption
-- Delete message
 - Temorary message
 - Emojies and Gif in Chats
 - Dark mode
