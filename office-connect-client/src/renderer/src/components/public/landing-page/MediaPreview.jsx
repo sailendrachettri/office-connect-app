@@ -21,22 +21,22 @@ const MediaPreview = ({ file, onRemove }) => {
           <img
             src={previewUrl}
             alt="preview"
-            className="w-20 h-20 object-cover rounded-lg border"
+            className="w-20 h-20 object-cover rounded-lg border border-slate-200"
           />
         )}
 
         {type === 'video' && (
-          <video src={previewUrl} className="w-20 h-20 rounded-lg border object-cover" muted />
+          <video src={previewUrl} className="w-20 h-20 rounded-lg border border-slate-200 object-cover" muted />
         )}
 
         {type === 'audio' && (
-          <div className="w-20 h-20 flex items-center justify-center rounded-lg border bg-slate-100">
+          <div className="w-20 h-20 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-100">
             🎵
           </div>
         )}
 
         {type === 'document' && (
-          <div className="w-20 h-20 flex items-center justify-center rounded-lg border bg-slate-100">
+          <div className="w-20 h-20 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-100">
             <AiOutlineFile size={28} className="text-slate-500" />
           </div>
         )}
