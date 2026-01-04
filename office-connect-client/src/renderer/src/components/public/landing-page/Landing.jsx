@@ -6,6 +6,7 @@ import UserInputMessage from './UserInputMessage'
 import MessageBubble from './MessageBubble'
 import { useChat } from '../../../context/ChatContext'
 import toast from 'react-hot-toast'
+import { encryptMessage } from '../../../utils/encryption-decryption/EncDecHelper'
 
 const Landing = () => {
   const [text, setText] = useState('')
@@ -146,6 +147,9 @@ const Landing = () => {
   const sendMessage = async () => {
     if (!text.trim() || !connection) return
 
+     const encryptedMsg = await encryptMessage(text, selectedFriendProfileId);
+     console.log({encryptedMsg})
+
     connection.invoke('UserStoppedTyping', selectedFriendProfileId)
 
     setMessages((prev) => [...prev])
@@ -158,7 +162,7 @@ const Landing = () => {
         'SendMessage',
         currentUserId,
         selectedFriendProfileId,
-        text,
+        encryptedMsg,
         safeFileId
       )
 

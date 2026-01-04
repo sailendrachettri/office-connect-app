@@ -24,7 +24,6 @@ export const uploadMediaChat = async (file, text, selectedFriendProfileId) => {
 
     if (file.type.startsWith('video/')) {
       thumbnailBlob = await generateVideoThumbnail(file)
-      console.log({thumbnailBlob})
     }
 
     if (thumbnailBlob) {
@@ -36,7 +35,6 @@ export const uploadMediaChat = async (file, text, selectedFriendProfileId) => {
 
       formData.append('thumbnail', thumbFile)
     }
-    console.log({thumbnailBlob})
     // =========================
     // 3️⃣ UPLOAD
     // =========================

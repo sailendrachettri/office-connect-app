@@ -32,7 +32,7 @@ const FILE_ICONS = {
   other: FiFile
 }
 
-const MediaMessage = ({ msg }) => {
+const MediaMessage = ({ msg, decryptedMsg }) => {
   const [previewImage, setPreviewImage] = useState(null)
 
   if (!msg) return null
@@ -69,8 +69,8 @@ const MediaMessage = ({ msg }) => {
               setPreviewImage(viewUploadedFile(msg.filePath))
             }}
           />
-          {msg.messageText && (
-            <div className="text-sm text-white whitespace-pre-wrap">{msg.messageText}</div>
+          {decryptedMsg && (
+            <div className="text-sm text-white whitespace-pre-wrap">{decryptedMsg}</div>
           )}
         </div>
       </>
@@ -80,7 +80,7 @@ const MediaMessage = ({ msg }) => {
   // VIDEO
   if (category === 'video') {
     return (
-      <VideoMessage formatSize={formatSize} handleDownload={handleDownload} msg={msg} thumbUrl={thumbUrl} />
+      <VideoMessage decryptedMsg={decryptedMsg} formatSize={formatSize} handleDownload={handleDownload} msg={msg} thumbUrl={thumbUrl} />
     )
   }
 
@@ -89,7 +89,7 @@ const MediaMessage = ({ msg }) => {
     return (
      
       <>
-      <MusicPlayAndDownload handleDownload={handleDownload} msg={msg} formatSize={formatSize} />
+      <MusicPlayAndDownload decryptedMsg={decryptedMsg} handleDownload={handleDownload} msg={msg} formatSize={formatSize} />
       </>
     )
   }
@@ -118,9 +118,9 @@ const MediaMessage = ({ msg }) => {
         </button>
       </div>
 
-      {msg.messageText && (
+      {decryptedMsg && (
         <div className="text-sm text-white mt-1 text-wrap whitespace-pre-wrap">
-          {msg.messageText}
+          {decryptedMsg}
         </div>
       )}
     </>

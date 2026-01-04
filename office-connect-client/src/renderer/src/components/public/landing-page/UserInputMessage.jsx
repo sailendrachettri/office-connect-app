@@ -5,6 +5,7 @@ import { useChat } from '../../../context/ChatContext'
 import MediaPreview from './MediaPreview'
 import { uploadMediaChat } from '../../../utils/file-upload-to-server/uploadMediaChat'
 import toast from 'react-hot-toast'
+import { encryptMessage } from '../../../utils/encryption-decryption/EncDecHelper'
 
 const MAX_HEIGHT = 120
 const MAX_SIZE_MB = 45
@@ -26,7 +27,6 @@ const UserInputMessage = ({
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0]
-    console.log(file?.size)
 
     if (!file) return
 
@@ -68,9 +68,11 @@ const UserInputMessage = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
 
+      const encryptedMsg = await encryptMessage(text, selectedFriendProfileId);
+
       // Send the medias with text in chat
       if (selectedMedia) {
-        const res = await uploadMediaChat(selectedMedia, text, selectedFriendProfileId)
+        const res = await uploadMediaChat(selectedMedia, encryptedMsg, selectedFriendProfileId)
         if (res?.data) {
           const msg = res.data
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FiDownload, FiPlay, FiMusic } from 'react-icons/fi'
 import { viewUploadedFile } from '../../../../utils/file-upload-to-server/uploadFile'
 
-const MusicPlayAndDownload = ({ msg, handleDownload, formatSize }) => {
+const MusicPlayAndDownload = ({ msg, handleDownload, formatSize, decryptedMsg }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const audioUrl = viewUploadedFile(msg?.filePath)
 
@@ -61,9 +61,9 @@ const MusicPlayAndDownload = ({ msg, handleDownload, formatSize }) => {
       </div>
 
       {/* MESSAGE TEXT */}
-      {msg.messageText && (
+      {decryptedMsg && (
         <div className="text-sm text-white mt-1 whitespace-pre-wrap max-w-72">
-          {msg.messageText}
+          {decryptedMsg}
         </div>
       )}
     </>

@@ -1,10 +1,45 @@
+import { useEffect, useState } from 'react'
 import profilePic from '../../../assets/peoples/default_user.jpg'
 import { useChat } from '../../../context/ChatContext'
 import { getTime24FromDate } from '../../../utils/dates/getTime24FromDate'
 import { viewUploadedFile } from '../../../utils/file-upload-to-server/uploadFile'
+import { decryptMessage } from '../../../utils/encryption-decryption/EncDecHelper'
 
 const Sidebar = ({ setSelectedTab, friendList, setFriendSearchText }) => {
   const { selectedFriendProfileId, setSelectedFriendProfileId, isFriendTyping } = useChat()
+  const [decryptedMessages, setDecryptedMessages] = useState({})
+
+  useEffect(() => {
+    if (!friendList?.length) return
+
+    const decryptAll = async () => {
+      const result = {}
+
+      for (const user of friendList) {
+        const encryptedText = user?.last_message?.message_text
+
+        if (!encryptedText) {
+          result[user.user_id] = ''
+          continue
+        }
+
+        try {
+          const decrypted = await decryptMessage(
+            encryptedText,
+            user.user_id // ✅ password per friend
+          )
+          result[user.user_id] = decrypted
+        } catch (err) {
+          console.error('Decrypt failed:', err)
+          result[user.user_id] = '[Encrypted message]'
+        }
+      }
+
+      setDecryptedMessages(result)
+    }
+
+    decryptAll()
+  }, [friendList])
 
   return (
     <div className="w-full h-full flex flex-col bg-white pb-10">
@@ -69,10 +104,18 @@ const Sidebar = ({ setSelectedTab, friendList, setFriendSearchText }) => {
                 {/* Name + Last Message */}
                 <div className="flex-1">
                   <div className="font-medium text-slate-900">{user?.full_name}</div>
-                  <div className={`text-sm ${isFriendTyping ? 'text-green-500' : 'text-slate-500'} truncate w-45`}>
-                    {selectedFriendProfileId == user?.user_id && isFriendTyping
-                      ? 'Typing...'
-                      : user?.last_message?.message_text}
+                  <div
+                    className={`text-sm ${isFriendTyping ? 'text-green-500' : 'text-slate-500'} truncate w-45`}
+                  >
+                    {selectedFriendProfileId == user?.user_id && isFriendTyping ? (
+                      'Typing...'
+                    ) : (
+                      <span>
+                        {selectedFriendProfileId == user?.user_id && isFriendTyping
+                          ? 'Typing...'
+                          : decryptedMessages[user?.user_id] || ''}
+                      </span>
+                    )}
                   </div>
                 </div>
 

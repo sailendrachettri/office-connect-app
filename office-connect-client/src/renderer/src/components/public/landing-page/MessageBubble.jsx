@@ -8,6 +8,7 @@ import MediaMessage from './MediaMessage'
 import MessageActions from './BubbleMessages/MessageActions'
 import toast from 'react-hot-toast'
 import { useChat } from '../../../context/ChatContext'
+import { decryptMessage } from '../../../utils/encryption-decryption/EncDecHelper'
 
 const MessageBubble = ({
   text,
@@ -22,12 +23,20 @@ const MessageBubble = ({
   fullChat
 }) => {
   const [copied, setCopied] = useState(false)
-  const { connection } = useChat()
+  const { connection, selectedFriendProfileId } = useChat();
+  const [decryptedMsg, setDecryptedMsg] = useState('');
 
-  console.log({ fullChat })
+  useEffect(()=>{
+    (async()=>{
+
+      const msg = await  decryptMessage(text, selectedFriendProfileId);
+      setDecryptedMsg(msg);
+    })();
+  }, []);
+
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(text)
+    await navigator.clipboard.writeText(decryptedMsg)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -96,9 +105,9 @@ const MessageBubble = ({
       >
         {/* <div className="whitespace-pre-wrap wrap-break-word">{text}</div> */}
         {messageType === 'media' ? (
-          <MediaMessage msg={fullChat} />
+          <MediaMessage msg={fullChat} decryptedMsg={decryptedMsg}/>
         ) : (
-          <div className="whitespace-pre-wrap wrap-break-word">{text}</div>
+          <div className="whitespace-pre-wrap wrap-break-word">{decryptedMsg}</div>
         )}
 
         <span

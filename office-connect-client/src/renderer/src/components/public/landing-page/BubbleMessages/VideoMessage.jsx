@@ -6,7 +6,8 @@ const VideoMessage = ({
   thumbUrl,
   msg,
   handleDownload,
-  formatSize
+  formatSize,
+  decryptedMsg
 }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const previewUrl = viewUploadedFile(msg?.filePath);
@@ -69,9 +70,9 @@ const VideoMessage = ({
       </div>
 
       {/* MESSAGE TEXT */}
-      {msg.messageText && (
+      {decryptedMsg && (
         <div className="text-sm text-white mt-1 whitespace-pre-wrap">
-          {msg.messageText}
+          {decryptedMsg}
         </div>
       )}
     </>
